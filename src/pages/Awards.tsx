@@ -112,12 +112,12 @@ const Awards = () => {
 
   return (
     <Layout>
-      <div className="bg-background min-h-screen pb-20">
-        <section className="relative min-h-[92vh] w-full flex items-center justify-center overflow-hidden py-12 bg-[#08111d]">
+      <div className="bg-background min-h-screen pb-12">
+        <section className="relative min-h-[70vh] sm:min-h-[75vh] w-full flex items-center justify-center overflow-hidden py-10 sm:py-12 bg-[#08111d]">
           <div className="absolute inset-0 z-0">
             <img
               src="/awards_gala_night_bg_1778965666277.png"
-              alt="NACOS Day Awards"
+              alt="NASS Day Awards"
               className="h-full w-full object-cover opacity-20 transition-transform duration-1000 scale-105"
             />
             <div className="absolute inset-0 bg-gradient-to-b from-blue-600/10 via-[#08111d]/90 to-[#08111d]" />
@@ -141,7 +141,7 @@ const Awards = () => {
                   transition={{ delay: 0.1 }}
                   className="max-w-4xl text-5xl font-black tracking-tight text-white sm:text-6xl lg:text-[6.5rem] lg:leading-[1] mb-6 uppercase font-display"
                 >
-                  NACOS AWARDS
+                  NASS AWARDS
                   <span className="block text-primary italic normal-case text-4xl sm:text-5xl lg:text-7xl font-black">Day 2026</span>
                 </motion.h1>
 
@@ -203,7 +203,7 @@ const Awards = () => {
                     </div>
                   )}
                   <p className="mt-4 text-white/70 text-[11px] font-bold">
-                    NACOS Awards Day - <span className="text-primary font-black">17th June 2026</span>
+                    NASS Awards Day - <span className="text-primary font-black">17th June 2026</span>
                   </p>
                 </motion.div>
               </div>
@@ -244,8 +244,8 @@ const Awards = () => {
           </div>
         </section>
 
-        <div className="container px-4 relative z-20 mt-[-4rem] mb-20">
-          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="container px-4 relative z-20 mt-[-2.5rem] sm:mt-[-3.5rem] mb-10">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {[
               { icon: Trophy, title: "Excellence", desc: "Recognizing academic and technical brilliance" },
               { icon: Users, title: "Community", desc: "Celebrating those who build and lead us" },
@@ -257,25 +257,25 @@ const Awards = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className="group rounded-[2rem] border border-border bg-white p-8 shadow-xl transition-all hover:shadow-2xl hover:border-primary/20 hover:-translate-y-2"
+                className="group rounded-[2rem] border border-border bg-white p-6 sm:p-7 shadow-xl transition-all hover:shadow-2xl hover:border-primary/20 hover:-translate-y-2"
               >
-                <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/5 text-primary border border-primary-100 transition-transform group-hover:scale-110 duration-300">
-                  <item.icon className="h-7 w-7" />
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/5 text-primary border border-primary-100 transition-transform group-hover:scale-110 duration-300">
+                  <item.icon className="h-6 w-6" />
                 </div>
                 <h3 className="text-xl font-bold text-foreground">{item.title}</h3>
-                <p className="mt-3 text-base leading-relaxed text-muted-foreground">{item.desc}</p>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{item.desc}</p>
               </motion.div>
             ))}
           </div>
         </div>
 
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 bg-white">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-black mb-4 text-slate-900 uppercase tracking-tight">How to Vote</h2>
-            <p className="text-slate-500 text-lg">Support your candidates in 4 easy steps</p>
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-12 bg-white">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl sm:text-4xl font-black mb-3 text-slate-900 uppercase tracking-tight">How to Vote</h2>
+            <p className="text-slate-500 text-base sm:text-lg">Support your candidates in 4 easy steps</p>
           </div>
 
-          <div className="flex justify-between items-start mb-16 max-w-3xl mx-auto relative px-2">
+          <div className="flex justify-between items-start mb-10 max-w-3xl mx-auto relative px-2">
             {/* Connecting Line behind */}
             <div className="absolute top-6 left-[10%] right-[10%] h-[2px] bg-slate-100 hidden sm:block -z-10"></div>
             
@@ -360,29 +360,29 @@ const Awards = () => {
           </div>
         </section>
 
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 bg-slate-50 rounded-[3rem] border border-slate-200 shadow-inner">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-black mb-4 text-slate-900 uppercase tracking-tight">Award Sections</h2>
-            <p className="text-slate-500 text-lg max-w-2xl mx-auto">Click a group to explore individual categories</p>
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-12 bg-slate-50 rounded-[2.5rem] border border-slate-200 shadow-inner">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl sm:text-4xl font-black mb-3 text-slate-900 uppercase tracking-tight">Award Sections</h2>
+            <p className="text-slate-500 text-base sm:text-lg max-w-2xl mx-auto">Click a group to explore individual categories</p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {categoryGroups.map((group, index) => (
               <motion.div
                 key={index}
                 whileHover={{ scale: 1.02 }}
                 onClick={() => setSelectedGroup(selectedGroup === group.title ? null : group.title)}
-                className={`cursor-pointer group relative bg-white rounded-[2.5rem] p-10 border transition-all duration-300 ${
+                className={`cursor-pointer group relative bg-white rounded-3xl p-6 sm:p-8 border transition-all duration-300 ${
                   selectedGroup === group.title ? "border-primary shadow-xl ring-2 ring-primary/10" : "border-slate-200 shadow-sm hover:shadow-lg"
                 }`}
               >
-                <div className={`mb-8 flex h-16 w-16 items-center justify-center rounded-2xl transition-all duration-300 ${
+                <div className={`mb-5 flex h-14 w-14 items-center justify-center rounded-2xl transition-all duration-300 ${
                   selectedGroup === group.title ? "bg-primary text-white" : "bg-primary/5 text-primary"
                 }`}>
-                  <group.icon className="h-8 w-8" />
+                  <group.icon className="h-7 w-7" />
                 </div>
-                <h3 className="text-2xl font-black text-slate-900 mb-2">{group.title}</h3>
-                <p className="text-slate-500 text-sm mb-6">{group.categories.length} Categories</p>
+                <h3 className="text-xl sm:text-2xl font-black text-slate-900 mb-1.5">{group.title}</h3>
+                <p className="text-slate-500 text-sm mb-4">{group.categories.length} Categories</p>
                 <div className="flex items-center text-primary font-bold text-sm">
                   {selectedGroup === group.title ? "Hide List" : "View All Categories"}
                   <ChevronRight className={`ml-1 h-4 w-4 transition-transform ${selectedGroup === group.title ? "rotate-90" : ""}`} />
@@ -396,7 +396,7 @@ const Awards = () => {
                       exit={{ opacity: 0, height: 0 }}
                       className="overflow-hidden"
                     >
-                      <ul className="mt-8 space-y-3 border-t border-slate-100 pt-6">
+                      <ul className="mt-5 space-y-2.5 border-t border-slate-100 pt-5">
                         {group.categories.map((cat, i) => (
                           <li key={i} className="flex items-start gap-2 text-slate-600 text-sm font-medium">
                             <div className="mt-1.5 h-1.5 w-1.5 rounded-full bg-primary/20" />
@@ -405,7 +405,7 @@ const Awards = () => {
                         ))}
                       </ul>
                       <Link to="/voting/categories">
-                        <Button className="w-full mt-6 rounded-full bg-primary text-white font-bold">
+                        <Button className="w-full mt-5 rounded-full bg-primary text-white font-bold">
                           Go to Section
                         </Button>
                       </Link>
@@ -416,22 +416,22 @@ const Awards = () => {
             ))}
           </div>
 
-          <div className="mt-16 text-center">
+          <div className="mt-8 text-center">
             <Link to="/voting/categories">
-              <Button variant="outline" className="rounded-full border-slate-200 bg-white px-10 py-7 text-lg font-bold text-slate-700 hover:bg-slate-50 transition-all shadow-sm">
+              <Button variant="outline" className="rounded-full border-slate-200 bg-white px-8 py-5 text-base font-bold text-slate-700 hover:bg-slate-50 transition-all shadow-sm">
                 Explore All Award Categories
               </Button>
             </Link>
           </div>
         </section>
 
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-black mb-4 text-slate-900 uppercase tracking-tight">Today's <span className="text-primary">Leaders</span></h2>
-            <p className="text-slate-500 text-lg">The current standings across the department</p>
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-12">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl sm:text-4xl font-black mb-3 text-slate-900 uppercase tracking-tight">Today's <span className="text-primary">Leaders</span></h2>
+            <p className="text-slate-500 text-base sm:text-lg">The current standings across the department</p>
           </div>
 
-          <div className="grid gap-6">
+          <div className="grid gap-4 sm:gap-5">
             {topCandidates.slice(0, 5).map((cand: any, index: number) => (
               <motion.div
                 key={index}
@@ -439,12 +439,12 @@ const Awards = () => {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
-                className="group relative bg-white rounded-3xl p-6 border border-slate-100 shadow-sm hover:shadow-xl transition-all flex flex-col sm:flex-row items-center gap-6"
+                className="group relative bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-lg transition-all flex flex-col sm:flex-row items-center gap-5"
               >
-                <div className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-2xl font-black shadow-lg overflow-hidden border-[3px] ${
-                  index === 0 ? "border-amber-400" :
+                <div className={`flex h-12 w-12 sm:h-14 sm:w-14 shrink-0 items-center justify-center rounded-full text-2xl font-black shadow-md overflow-hidden border-[3px] ${
+                  index === 0 ? "border-[#1a4480]" :
                   index === 1 ? "border-slate-300" :
-                  index === 2 ? "border-orange-500" :
+                  index === 2 ? "border-emerald-600" :
                   "border-slate-100"
                 }`}>
                   <img 
@@ -458,16 +458,16 @@ const Awards = () => {
                 </div>
 
                 <div className="flex-1 text-center sm:text-left">
-                  <h3 className="text-xl font-black text-slate-900">{cand.name || cand.full_name}</h3>
-                  <p className="text-sm font-bold text-primary uppercase tracking-widest">{cand.categoryName || cand.category}</p>
+                  <h3 className="text-lg sm:text-xl font-black text-slate-900">{cand.name || cand.full_name}</h3>
+                  <p className="text-xs sm:text-sm font-bold text-primary uppercase tracking-widest">{cand.categoryName || cand.category}</p>
                 </div>
 
                 <div className="flex flex-col items-center sm:items-end">
-                  <p className="text-sm font-black text-slate-400 uppercase tracking-widest">Position {index + 1}</p>
+                  <p className="text-xs sm:text-sm font-black text-slate-400 uppercase tracking-widest">Position {index + 1}</p>
                 </div>
 
                 <Link to={`/voting/${cand.categorySlug || 'category'}/${cand.slug || cand.id}`}>
-                  <Button className="rounded-full bg-primary/10 text-primary hover:bg-primary hover:text-white transition-all font-bold px-8">
+                  <Button className="rounded-full bg-primary/10 text-primary hover:bg-primary hover:text-white transition-all font-bold px-6 py-2">
                     Vote
                   </Button>
                 </Link>
@@ -475,11 +475,11 @@ const Awards = () => {
             ))}
           </div>
 
-          <div className="mt-16 text-center">
+          <div className="mt-8 text-center">
             <Link to="/voting/leaderboard">
-              <Button variant="outline" className="rounded-full border-slate-200 bg-white px-10 py-7 text-lg font-bold text-slate-700 hover:bg-slate-50 transition-all shadow-sm">
+              <Button variant="outline" className="rounded-full border-slate-200 bg-white px-8 py-5 text-base font-bold text-slate-700 hover:bg-slate-50 transition-all shadow-sm">
                 View Full Leaderboard
-                <ArrowRight className="ml-2 h-5 w-5" />
+                <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
           </div>

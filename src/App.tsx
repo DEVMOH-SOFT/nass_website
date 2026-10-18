@@ -4,6 +4,8 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Index from "./pages/Index.tsx";
+import About from "./pages/About.tsx";
+import Associations from "./pages/Associations.tsx";
 import Executives from "./pages/Executives.tsx";
 import Events from "./pages/Events.tsx";
 import Dashboard from "./pages/Dashboard.tsx";
@@ -19,6 +21,7 @@ import NotFound from "./pages/NotFound.tsx";
 import Donate from "./pages/Donate.tsx";
 import ScrollToTop from "./components/ScrollToTop";
 import ScrollToTopButton from "./components/ScrollToTopButton";
+import FloatingChatWidget from "./components/FloatingChatWidget";
 import { isAwardsHost } from "@/lib/api";
 
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -37,6 +40,8 @@ const App = () => {
           <ScrollToTop />
           <Routes>
             <Route path="/" element={awardsMode ? <Awards /> : <Index />} />
+            <Route path="/about" element={awardsMode ? <NotFound /> : <About />} />
+            <Route path="/associations" element={awardsMode ? <NotFound /> : <Associations />} />
             <Route path="/executives" element={awardsMode ? <NotFound /> : <Executives />} />
             <Route path="/events" element={awardsMode ? <NotFound /> : <Events />} />
             <Route path="/dashboard" element={
@@ -58,6 +63,7 @@ const App = () => {
             <Route path="*" element={<NotFound />} />
           </Routes>
           <ScrollToTopButton />
+          <FloatingChatWidget />
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>

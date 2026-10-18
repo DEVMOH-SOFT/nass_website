@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 import rateLimit from 'express-rate-limit';
 import axios from 'axios';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 
 import paymentRoutes from './routes/payment.routes.js';
@@ -16,13 +17,14 @@ import contentRoutes from './routes/content.routes.js';
 import servicesRoutes from './routes/services.routes.js';
 import contactRoutes from './routes/contact.routes.js';
 import adminRoutes from './routes/admin.routes.js';
+import mailerRoutes from './routes/mailer.routes.js';
 import BirthdayService from './services/birthday.service.js';
 
 // Load environment variables
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 
 // __dirname equivalent for ES Modules
 const __filename = fileURLToPath(import.meta.url);
@@ -37,6 +39,7 @@ app.set('trust proxy', 1);
  * Accepts requests from all our known frontend domains.
  */
 const allowedOrigins = [
+  'http://localhost:8080',
   'http://localhost:5173',
   'http://localhost:3000',
   'https://nacoslasustech.org.ng',
@@ -71,7 +74,8 @@ const authLimiter = rateLimit({
 });
 
 app.use(helmet({ crossOriginResourcePolicy: false }));
-app.use(express.json({ limit: '10kb' }));
+app.use(express.json({ limit: '25mb' }));
+app.use(express.urlencoded({ extended: true, limit: '25mb' }));
 app.use(morgan('dev'));
 app.use(limiter);
 
@@ -106,6 +110,28 @@ app.get('/api/health', (_req, res) => {
     message: 'NACOS LASUSTECH Backend is humming along nicely.',
     environment: process.env.NODE_ENV || 'development',
   });
+});
+
+// Official File Attachment Download Route (forces browser to save with exact filename & extension)
+app.get('/api/download', (req, res) => {
+  const filePath = req.query.url;
+  const fileName = req.query.name || 'download.png';
+  if (!filePath) return res.status(400).send('Missing url parameter');
+
+  let cleanName = fileName.replace(/[^a-zA-Z0-9_\-\.]/g, '_');
+  const projectRoot = path.resolve(__dirname, '..');
+  let cleanRelative = filePath.startsWith('/') ? filePath.slice(1) : filePath;
+  cleanRelative = cleanRelative.split('?')[0];
+
+  const fullPath = path.resolve(projectRoot, cleanRelative);
+  if (fs.existsSync(fullPath) && fs.statSync(fullPath).isFile()) {
+    const ext = path.extname(fullPath).toLowerCase();
+    if (!cleanName.includes('.')) cleanName += ext || '.png';
+    res.setHeader('Content-Disposition', `attachment; filename="${cleanName}"`);
+    return res.sendFile(fullPath);
+  } else {
+    return res.status(404).send('File not found');
+  }
 });
 
 // Vercel Cron Job endpoint — called daily at 07:00 UTC
@@ -162,6 +188,7 @@ app.use('/api/services', servicesRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/payments', paymentRoutes);
+app.use('/api/mailer', mailerRoutes);
 
 /**
  * GLOBAL ERROR HANDLER

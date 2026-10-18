@@ -16,8 +16,12 @@ export const config = {
     password: process.env.DB_PASSWORD || "",
   },
   korapay: {
-    publicKey: process.env.KORAPAY_PUBLIC_KEY || "",
-    secretKey: process.env.KORAPAY_SECRET_KEY || "",
+    publicKey: (process.env.KORAPAY_MODE === "test" || process.env.KORAPAY_SECRET_KEY?.startsWith("sk_test_"))
+      ? (process.env.KORAPAY_TEST_PUBLIC_KEY || process.env.KORAPAY_PUBLIC_KEY || "")
+      : (process.env.KORAPAY_PUBLIC_KEY || process.env.KORAPAY_TEST_PUBLIC_KEY || ""),
+    secretKey: (process.env.KORAPAY_MODE === "test" || process.env.KORAPAY_SECRET_KEY?.startsWith("sk_test_"))
+      ? (process.env.KORAPAY_TEST_SECRET_KEY || process.env.KORAPAY_SECRET_KEY || "")
+      : (process.env.KORAPAY_SECRET_KEY || process.env.KORAPAY_TEST_SECRET_KEY || ""),
     baseUrl: process.env.KORAPAY_BASE_URL || "https://api.korapay.com/merchant/api/v1",
   },
   admin: {

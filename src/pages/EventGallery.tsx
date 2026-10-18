@@ -3,6 +3,14 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { X, Eye, Download, ArrowLeft } from "lucide-react";
 import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { downloadFile, getDownloadUrl } from "@/lib/download";
 import { eventGalleries } from "@/data/galleries";
 
 const EventGallery = () => {
@@ -13,7 +21,6 @@ const EventGallery = () => {
 
   useEffect(() => {
     if (!gallery && id) {
-      // If gallery doesn't exist for this ID, maybe redirect back or show error
       console.error("Gallery not found for ID:", id);
     }
   }, [gallery, id]);
@@ -34,17 +41,13 @@ const EventGallery = () => {
 
   const handleDownload = (e: React.MouseEvent, src: string, alt: string) => {
     e.stopPropagation();
-    const link = document.createElement("a");
-    link.href = src;
-    link.download = `${alt.toLowerCase().replace(/\s+/g, "-")}.jpg`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    const filename = `${alt.toLowerCase().replace(/\s+/g, "_")}.jpg`;
+    downloadFile(src, filename);
   };
 
   return (
     <Layout>
-      <section className="bg-foreground py-14 md:py-20">
+      <section className="bg-foreground py-8 md:py-10">
         <div className="container">
           <button 
             onClick={() => navigate(-1)}
@@ -52,16 +55,16 @@ const EventGallery = () => {
           >
             <ArrowLeft className="h-4 w-4" /> Back to Events
           </button>
-          <div className="mt-6 max-w-2xl">
-            <h1 className="font-display text-3xl font-bold text-white md:text-4xl">{gallery.title}</h1>
-            <p className="mt-3 text-sm leading-relaxed text-white/60">
+          <div className="mt-4 max-w-2xl">
+            <h1 className="font-display text-2xl font-bold text-white sm:text-3xl md:text-4xl">{gallery.title}</h1>
+            <p className="mt-2 text-sm leading-relaxed text-white/60">
               {gallery.description}
             </p>
           </div>
         </div>
       </section>
 
-      <section className="py-14 md:py-20">
+      <section className="py-8 md:py-10">
         <div className="container">
           <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4 md:gap-6">
             {gallery.images.map((img, i) => (
@@ -85,13 +88,14 @@ const EventGallery = () => {
                   >
                     <Eye className="h-5 w-5" />
                   </button>
-                  <button
-                    onClick={(e) => handleDownload(e, img.src, img.alt)}
+                  <a
+                    href={getDownloadUrl(img.src, `${img.alt.toLowerCase().replace(/\s+/g, "_")}.jpg`)}
+                    download={`${img.alt.toLowerCase().replace(/\s+/g, "_")}.jpg`}
                     className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-white shadow-sm transition-transform hover:scale-110"
                     title="Download Image"
                   >
                     <Download className="h-5 w-5" />
-                  </button>
+                  </a>
                 </div>
               </div>
             ))}
@@ -99,35 +103,41 @@ const EventGallery = () => {
         </div>
       </section>
 
-      {selectedImage !== null && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/95 p-4 backdrop-blur-sm"
-          onClick={() => setSelectedImage(null)}
-        >
-          <div className="relative max-h-[90vh] max-w-[90vw]">
-            <button
-              onClick={() => setSelectedImage(null)}
-              className="absolute -right-4 -top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white text-foreground shadow-lg transition-transform hover:scale-110"
-            >
-              <X className="h-5 w-5" />
-            </button>
-            <img
-              src={selectedImage.src}
-              alt={selectedImage.alt}
-              className="h-auto max-h-[85vh] w-auto max-w-full rounded-lg object-contain shadow-2xl"
-              onClick={(e) => e.stopPropagation()}
-            />
-            <div className="mt-4 flex justify-center">
-              <button
-                onClick={(e) => handleDownload(e, selectedImage.src, selectedImage.alt)}
-                className="flex items-center gap-2 rounded-full bg-white px-6 py-2.5 text-sm font-bold text-foreground shadow-lg transition-transform hover:scale-105"
-              >
-                <Download className="h-4 w-4" /> Download Original
-              </button>
+      {/* High Resolution Lightbox Dialog (Portaled to body) */}
+      <Dialog open={selectedImage !== null} onOpenChange={(open) => !open && setSelectedImage(null)}>
+        <DialogContent className="max-w-4xl p-4 sm:p-6 bg-slate-950 text-white border-slate-800 rounded-2xl shadow-2xl">
+          <DialogHeader className="flex flex-row items-center justify-between pb-3 border-b border-white/10 gap-3 pr-8">
+            <div className="text-left">
+              <DialogTitle className="text-white font-display text-sm sm:text-base font-bold truncate max-w-[240px] sm:max-w-md">
+                {selectedImage?.alt}
+              </DialogTitle>
+              <DialogDescription className="text-emerald-400 text-xs">
+                {gallery.title} • High Resolution Photo
+              </DialogDescription>
             </div>
+            {selectedImage && (
+              <a
+                href={getDownloadUrl(selectedImage.src, `${selectedImage.alt.toLowerCase().replace(/\s+/g, "_")}.jpg`)}
+                download={`${selectedImage.alt.toLowerCase().replace(/\s+/g, "_")}.jpg`}
+                className="h-8 sm:h-9 px-3 gap-1.5 text-xs font-bold bg-emerald-500 hover:bg-emerald-400 text-slate-950 shadow-md shrink-0 cursor-pointer inline-flex items-center justify-center rounded-md"
+              >
+                <Download className="h-3.5 w-3.5" />
+                <span>Download Photo</span>
+              </a>
+            )}
+          </DialogHeader>
+
+          <div className="relative max-h-[72vh] overflow-y-auto flex items-center justify-center p-2 bg-slate-900/90 rounded-xl mt-2">
+            {selectedImage && (
+              <img
+                src={selectedImage.src}
+                alt={selectedImage.alt}
+                className="max-w-full max-h-[68vh] object-contain rounded-lg shadow-2xl"
+              />
+            )}
           </div>
-        </div>
-      )}
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 };

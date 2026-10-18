@@ -4,60 +4,76 @@ import {
   ArrowRight,
   LogIn,
   CreditCard,
-  IdCard,
+  ShieldCheck,
   BookOpen,
   ChevronRight,
+  Layers,
+  GraduationCap,
+  FlaskConical,
+  Atom,
+  Users,
+  Building2,
+  Quote,
+  Calendar,
+  ExternalLink,
+  MapPin,
+  CheckCircle2,
+  Mail,
 } from "lucide-react";
-import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import Layout from "@/components/Layout";
-import SectionHeading from "@/components/SectionHeading";
 import ExecutiveCard from "@/components/ExecutiveCard";
-import EventCard from "@/components/EventCard";
 import LoginModal from "@/components/LoginModal";
-import { fetchApi } from "@/lib/api";
-import BlogCard from "@/components/BlogCard";
-import heroBg from "@/assets/Events/bootcamp_onboarding/PHOTO-2026-04-29-19-36-06.jpg";
-import nacosLogo from "@/assets/nacos_logo.png";
+import AssociationCard from "@/components/AssociationCard";
+import nassLogo from "@/assets/nass_logo.png";
 import lasustechLogo from "@/assets/lasustech_logo.png";
+import cbsFacultyBuilding from "@/assets/cbs_faculty_building.jpg";
 import { executives as staticExecutives } from "@/data/executives";
 import { events as staticEvents } from "@/data/events";
+import { departments, collegeInfo, affiliatedInstitutions } from "@/data/college";
 
-// Latest Chapter Moments
-import moment1 from "@/assets/Events/bootcamp_onboarding/PHOTO-2026-04-29-19-36-10.jpg";
-import moment2 from "@/assets/Events/bootcamp_onboarding/PHOTO-2026-04-29-19-36-10(1).jpg";
-import moment3 from "@/assets/Events/bootcamp_onboarding/PHOTO-2026-04-29-19-36-11.jpg";
-import moment4 from "@/assets/Events/bootcamp_onboarding/PHOTO-2026-04-29-19-36-11(1).jpg";
+// Latest Chapter Moments & Action
+import symposiumStage from "@/assets/nass_symposium_stage.jpg";
+import academicExcellence from "@/assets/academic_excellence_awards.jpg";
+import pioneersAwards from "@/assets/pioneers_awards_president.png";
+import behindAcademicWall from "@/assets/behind_academic_wall_auditorium.jpg";
 
 const quickActions = [
-  { icon: LogIn, label: "Login", path: "#", action: "login", targetTab: "overview", desc: "Access your member portal" },
-  { icon: CreditCard, label: "Pay Dues", path: "#", action: "login", targetTab: "dues", desc: "Pay your NACOS dues" },
-  { icon: IdCard, label: "ID Card", path: "#", action: "login", targetTab: "idcard", desc: "Register for your NACOS ID" },
-  { icon: BookOpen, label: "Constitution", path: "/constitution", desc: "Read the chapter constitution" },
+  { icon: Layers, label: "Departments Directory", path: "/associations", desc: "5 Accredited Academic Departments" },
+  { icon: Users, label: "Student Executive Council", path: "/executives", desc: "Elected Collegiate Leadership" },
+  { icon: BookOpen, label: "Science Resources", path: "#", action: "login", targetTab: "resources", desc: "Past Questions & Lab Manuals" },
+  { icon: CreditCard, label: "Pay College Dues", path: "#", action: "login", targetTab: "dues", desc: "Annual Dues Administration" },
 ];
 
-const galleryImages = [moment1, moment2, moment3, moment4];
+const stats = [
+  { value: "5", label: "Academic Departments", icon: Building2 },
+  { value: "4,500+", label: "Science Scholars", icon: GraduationCap },
+  { value: "14", label: "Research Laboratories", icon: FlaskConical },
+  { value: "100%", label: "Unified Representation", icon: Atom },
+];
+
+const galleryImages = [
+  { src: symposiumStage, caption: "Collegiate Symposium & Faculty Leaders on Stage" },
+  { src: academicExcellence, caption: "Academic Excellence Honors & Recognition" },
+  { src: pioneersAwards, caption: "The Pioneers Awards Night & Presidential Accolades" },
+  { src: behindAcademicWall, caption: "Behind the Academic Wall Conference & Tech Hub" },
+];
 
 const Index = () => {
   const [loginOpen, setLoginOpen] = useState(false);
   const [redirectTab, setRedirectTab] = useState<string | undefined>(undefined);
   const [isLoggedIn, setIsLoggedIn] = useState(localStorage.getItem("isLoggedIn") === "true");
-  
-  // Update login state if storage changes
+  const [selectedDeptFilter, setSelectedDeptFilter] = useState("all");
+  const navigate = useNavigate();
+
   useEffect(() => {
     const checkLogin = () => {
       setIsLoggedIn(localStorage.getItem("isLoggedIn") === "true");
     };
-    window.addEventListener('storage', checkLogin);
-    return () => window.removeEventListener('storage', checkLogin);
+    window.addEventListener("storage", checkLogin);
+    return () => window.removeEventListener("storage", checkLogin);
   }, []);
-
-  // Using static data directly from your .ts files as requested
-  const [data] = useState({ 
-    executives: staticExecutives, 
-    events: staticEvents 
-  });
-  const navigate = useNavigate();
 
   const handleAction = (item: typeof quickActions[0]) => {
     if (item.action === "login") {
@@ -70,356 +86,637 @@ const Index = () => {
     }
   };
 
-  const [isHoveringLogos, setIsHoveringLogos] = useState(false);
-  
-  // Drag-to-rotate state for logos
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-
-  const rotateX = useSpring(useTransform(y, [-100, 100], [30, -30]), { stiffness: 100, damping: 30 });
-  const rotateY = useSpring(useTransform(x, [-100, 100], [-30, 30]), { stiffness: 100, damping: 30 });
-
-  const handleDrag = (_: any, info: any) => {
-    x.set(info.offset.x);
-    y.set(info.offset.y);
-  };
-
-  const handleDragEnd = () => {
-    x.set(0);
-    y.set(0);
-  };
+  const filteredDepts = selectedDeptFilter === "all"
+    ? departments
+    : departments.filter((d) => d.id === selectedDeptFilter || d.code.toLowerCase() === selectedDeptFilter);
 
   return (
     <>
-      <LoginModal 
-        open={loginOpen} 
-        onClose={() => { setLoginOpen(false); setRedirectTab(undefined); }} 
+      <LoginModal
+        open={loginOpen}
+        onClose={() => {
+          setLoginOpen(false);
+          setRedirectTab(undefined);
+        }}
         redirectTab={redirectTab}
       />
       <Layout>
-      {/* Hero */}
-      <section className="relative isolate overflow-hidden bg-[#08111d]">
-        <div className="absolute inset-0">
-          <img
-            src={heroBg}
-            alt=""
-            className="h-full w-full object-cover object-center"
-          />
-        </div>
+        {/* ======================================================== */}
+        {/* EDITORIAL HERO BANNER (COLLEGE BUILDING AS BACKGROUND) */}
+        {/* ======================================================== */}
+        <section className="relative isolate overflow-hidden bg-[#061d10] text-white border-b border-emerald-950/60 pt-5 pb-8 sm:pt-7 sm:pb-10 md:pt-8 md:pb-12 lg:pt-9 lg:pb-14 flex items-center">
+          {/* Authentic College Building Image as Full-Bleed Banner Background */}
+          <div className="absolute inset-0 z-0 overflow-hidden">
+            <img
+              src={cbsFacultyBuilding}
+              alt="College of Basic Sciences Complex, LASUSTECH Main Campus"
+              className="h-full w-full object-cover object-[center_35%] md:object-[75%_35%] filter brightness-[0.98] contrast-[1.05] saturate-[1.05]"
+            />
+          </div>
 
-        <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(8,17,29,0.85)_0%,rgba(8,17,29,0.4)_50%,rgba(8,17,29,0.85)_100%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(31,95,175,0.15),transparent_70%)]" />
+          {/* Directional Scrim Overlays for Professional Readability & Architectural Clarity */}
+          {/* 1. Horizontal gradient: Deep institutional scrim on left for crystal-clear text; fades smoothly to reveal architecture on right */}
+          <div className="absolute inset-0 z-0 bg-gradient-to-r from-[#061d10] via-[#072414]/90 sm:via-[#072414]/80 md:via-[#072414]/65 to-transparent" />
 
-        <div className="container relative z-10 py-20 md:py-32 lg:py-40">
-          <div className="flex flex-col items-center text-center">
-            <h1 className="max-w-4xl font-display text-5xl font-extrabold leading-[0.95] tracking-tight text-white md:text-6xl lg:text-7xl xl:text-8xl animate-reveal">
-              NACOS <span className="text-[#4C8DDA]">LASUSTECH</span> Chapter
-            </h1>
+          {/* 2. Vertical vignette: Soft anchoring at top and bottom edges */}
+          <div className="absolute inset-0 z-0 bg-gradient-to-t from-[#061d10] via-transparent to-[#061d10]/40" />
 
-            <p className="mt-8 max-w-2xl text-base leading-7 text-white md:text-lg md:leading-8 animate-reveal-delay-1 drop-shadow-md">
-              Building the next generation of computing leaders through learning, innovation, leadership, and community.
-            </p>
+          <div className="container relative z-10 w-full">
+            <div className="max-w-2xl lg:max-w-3xl">
+              {/* Institutional Eyebrow */}
+              <div className="inline-flex items-center gap-2 rounded-full border border-blue-400/35 bg-[#071d33]/85 px-3.5 py-1 text-xs font-semibold text-sky-300 shadow-sm backdrop-blur-md tracking-wider">
+                <span className="h-1.5 w-1.5 rounded-full bg-blue-400" />
+                <span>COLLEGE OF BASIC SCIENCES • LASUSTECH</span>
+              </div>
 
-            <div className="mt-10 flex flex-col sm:flex-row gap-4 animate-reveal-delay-2 w-full justify-center px-4">
-              <a href="https://portal.nacos.org.ng/register" target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">
+              {/* Main Headline */}
+              <h1 className="mt-3 font-display text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-[1.12]">
+                Nigerian Association of Science Students
+              </h1>
+
+              <p className="mt-1.5 text-sm sm:text-base font-semibold text-emerald-300">
+                NASS LASUSTECH Chapter
+              </p>
+
+              <p className="mt-3 max-w-xl text-xs sm:text-sm md:text-base leading-relaxed text-slate-200">
+                The central collegiate student body uniting undergraduates across 5 accredited scientific departments. Driving empirical research, academic excellence, and student advocacy across Lagos State University of Science and Technology.
+              </p>
+
+              {/* Primary & Secondary Actions */}
+              <div className="mt-5 sm:mt-6 flex flex-wrap items-center gap-2.5 sm:gap-3">
+                <Link to="/associations" className="w-full sm:w-auto">
+                  <Button
+                    size="lg"
+                    className="w-full sm:w-auto h-10 sm:h-11 gap-2 rounded-lg bg-[#1a4480] hover:bg-[#143766] px-4 sm:px-5 text-xs font-bold text-white border border-blue-400/30 shadow-md transition-colors justify-center"
+                  >
+                    <Layers className="h-4 w-4 text-sky-200" />
+                    <span>Explore Departments</span>
+                  </Button>
+                </Link>
+
+                <Link to="/events" className="w-full sm:w-auto">
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="w-full sm:w-auto h-10 sm:h-11 gap-2 rounded-lg border-white/30 bg-white/10 px-4 sm:px-5 text-xs font-semibold text-white hover:bg-white/20 backdrop-blur-xs transition-colors justify-center"
+                  >
+                    <Calendar className="h-4 w-4 text-emerald-300" />
+                    <span>College Events</span>
+                  </Button>
+                </Link>
+
                 <Button
                   size="lg"
-                  className="w-full sm:min-w-[200px] bg-primary text-xs sm:text-base font-bold text-white hover:bg-primary/90 shadow-2xl shadow-primary/40 p-6"
-                >
-                  Join NACOS National
-                </Button>
-              </a>
-
-              <Button
-                size="lg"
-                onClick={() => {
-                  if (isLoggedIn) {
-                    navigate("/dashboard", { state: { tab: "overview" } });
-                  } else {
-                    setRedirectTab("overview");
+                  onClick={() => {
                     setLoginOpen(true);
-                  }
-                }}
-                className="w-full sm:w-auto sm:min-w-[200px] bg-[#1F5FAF] text-xs sm:text-base font-bold text-white hover:bg-[#184d90] shadow-2xl shadow-blue-500/40 p-6"
-              >
-                {isLoggedIn ? "Visit Portal" : "Go to Portal"}
-              </Button>
+                  }}
+                  className="w-full sm:w-auto h-10 sm:h-11 gap-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs border border-emerald-400/40 shadow-md transition-colors justify-center"
+                >
+                  <CreditCard className="h-4 w-4 text-emerald-100" />
+                  <span>Pay Dues</span>
+                </Button>
+              </div>
+
+              {/* Institutional Metrics Strip */}
+              <div className="mt-6 sm:mt-7 pt-4 border-t border-white/15 grid grid-cols-3 gap-2 sm:gap-4 max-w-md">
+                <div>
+                  <p className="font-display text-lg sm:text-2xl font-bold text-white">5</p>
+                  <p className="text-[9.5px] sm:text-[11px] font-medium text-emerald-200/80 uppercase tracking-wider mt-0.5 truncate">Departments</p>
+                </div>
+                <div className="border-l border-white/15 pl-2.5 sm:pl-4">
+                  <p className="font-display text-lg sm:text-2xl font-bold text-sky-300">4,500+</p>
+                  <p className="text-[9.5px] sm:text-[11px] font-medium text-emerald-200/80 uppercase tracking-wider mt-0.5 truncate">Undergrads</p>
+                </div>
+                <div className="border-l border-white/15 pl-2.5 sm:pl-4">
+                  <p className="font-display text-lg sm:text-2xl font-bold text-white">14</p>
+                  <p className="text-[9.5px] sm:text-[11px] font-medium text-emerald-200/80 uppercase tracking-wider mt-0.5 truncate">Laboratories</p>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Quick Access */}
-      <section className="relative -mt-6 z-20">
-        <div className="container">
-          <div className="grid gap-2 grid-cols-2 lg:grid-cols-4 animate-reveal-delay-2">
-            {quickActions.map((item) => (
-              <div key={item.label}>
-                {item.path !== "#" ? (
+        {/* ======================================================== */}
+        {/* ESSENTIAL STUDENT SERVICES (QUICK ACCESS) */}
+        {/* ======================================================== */}
+        <section className="py-3.5 sm:py-4 bg-[#f8faf8] border-b border-slate-200/80">
+          <div className="container">
+            <div className="grid gap-2.5 sm:gap-3 grid-cols-2 lg:grid-cols-4">
+              {quickActions.map((item) => (
+                <div key={item.label}>
+                  {item.path !== "#" ? (
+                    <Link
+                      to={item.path}
+                      className="group flex flex-col sm:flex-row items-start sm:items-center gap-2.5 sm:gap-3 rounded-lg border border-slate-200/90 bg-white p-2.5 sm:p-3 transition-all hover:border-[#145a32]/50 hover:bg-emerald-50/20 hover:shadow-xs h-full"
+                    >
+                      <div className="flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-[#145a32] group-hover:bg-[#145a32] group-hover:text-white transition-colors">
+                        <item.icon className="h-4 w-4 sm:h-4.5 sm:w-4.5" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <h3 className="text-xs sm:text-[13px] font-bold text-slate-900 group-hover:text-[#145a32] transition-colors leading-snug">
+                          {item.label}
+                        </h3>
+                        <p className="mt-0.5 text-[10px] sm:text-[11px] text-slate-500 line-clamp-1">
+                          {item.desc}
+                        </p>
+                      </div>
+                    </Link>
+                  ) : (
+                    <button
+                      onClick={() => handleAction(item)}
+                      className="w-full text-left group flex flex-col sm:flex-row items-start sm:items-center gap-2.5 sm:gap-3 rounded-lg border border-slate-200/90 bg-white p-2.5 sm:p-3 transition-all hover:border-[#145a32]/50 hover:bg-emerald-50/20 hover:shadow-xs h-full"
+                    >
+                      <div className="flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-[#145a32] group-hover:bg-[#145a32] group-hover:text-white transition-colors">
+                        <item.icon className="h-4 w-4 sm:h-4.5 sm:w-4.5" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <h3 className="text-xs sm:text-[13px] font-bold text-slate-900 group-hover:text-[#145a32] transition-colors leading-snug">
+                          {item.label}
+                        </h3>
+                        <p className="mt-0.5 text-[10px] sm:text-[11px] text-slate-500 line-clamp-1">
+                          {item.desc}
+                        </p>
+                      </div>
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ======================================================== */}
+        {/* LEADERSHIP PERSPECTIVES & WELCOME ADDRESS */}
+        {/* ======================================================== */}
+        <section className="pt-6 pb-10 md:pt-8 md:pb-12 bg-white border-b border-slate-200/80">
+          <div className="container">
+            <div className="max-w-3xl mb-5 sm:mb-6">
+              <span className="text-[10.5px] font-bold uppercase tracking-wider text-[#145a32]">
+                College Leadership & Governance
+              </span>
+              <h2 className="mt-0.5 font-display text-xl sm:text-2xl md:text-3xl font-bold text-slate-900">
+                Perspectives on Scientific Leadership
+              </h2>
+              <p className="mt-1 text-xs sm:text-sm text-slate-600">
+                Official perspectives from the Dean of the College, the College Staff Adviser Dr. Joshua Ajilore, and the President of the NASS Chapter on our collective academic charter.
+              </p>
+            </div>
+
+            <div className="grid gap-6 lg:grid-cols-3">
+              {/* 1. Dean's Welcome - DEAN IMAGE FIRST */}
+              <div className="flex flex-col justify-between rounded-xl border border-slate-200 bg-slate-50/50 p-6 shadow-xs hover:border-blue-400/50 transition-all">
+                <div>
+                  <div className="flex items-center gap-3.5 mb-4">
+                    <div className="relative h-16 w-16 sm:h-18 sm:w-18 shrink-0 overflow-hidden rounded-xl border-2 border-[#1a4480]/40 shadow-sm">
+                      <img
+                        src={collegeInfo.deanImage}
+                        alt={collegeInfo.dean}
+                        className="h-full w-full object-cover object-top"
+                      />
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-[#1a4480]">
+                        Faculty Patronage
+                      </span>
+                      <h3 className="font-display text-base font-bold text-slate-900 leading-snug">
+                        {collegeInfo.dean}
+                      </h3>
+                      <p className="text-[11px] text-slate-500">
+                        {collegeInfo.deanTitle}
+                      </p>
+                      <a
+                        href={`mailto:${collegeInfo.deanEmail}`}
+                        className="text-[11px] text-blue-700 hover:underline flex items-center gap-1 mt-0.5"
+                      >
+                        <Mail className="h-3 w-3" />
+                        <span>{collegeInfo.deanEmail}</span>
+                      </a>
+                    </div>
+                  </div>
+
+                  <p className="text-xs sm:text-[13px] leading-relaxed text-slate-700 border-l-2 border-[#1a4480]/50 pl-3">
+                    "{collegeInfo.deanMessage}"
+                  </p>
+                </div>
+
+                <div className="mt-6 pt-4 border-t border-slate-200/70 flex items-center justify-between text-xs">
+                  <span className="font-semibold text-slate-600 text-[11px]">
+                    College of Basic Sciences
+                  </span>
+                  <a
+                    href="https://lasustech.edu.ng"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 font-semibold text-[#1a4480] hover:text-blue-900 text-[11px]"
+                  >
+                    <span>University Portal</span>
+                    <ExternalLink className="h-3 w-3" />
+                  </a>
+                </div>
+              </div>
+
+              {/* 2. College Staff Adviser - DR JOSHUA AJILORE */}
+              <div className="flex flex-col justify-between rounded-xl border border-slate-200 bg-slate-50/50 p-6 shadow-xs hover:border-emerald-600/50 transition-all">
+                <div>
+                  <div className="flex items-center gap-3.5 mb-4">
+                    <div className="relative h-16 w-16 sm:h-18 sm:w-18 shrink-0 overflow-hidden rounded-xl border-2 border-emerald-700/40 shadow-sm">
+                      <img
+                        src={collegeInfo.advisorImage}
+                        alt={collegeInfo.advisorName}
+                        className="h-full w-full object-cover object-top"
+                      />
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800">
+                        College Staff Adviser
+                      </span>
+                      <h3 className="font-display text-base font-bold text-slate-900 leading-snug">
+                        {collegeInfo.advisorName}
+                      </h3>
+                      <p className="text-[11px] text-slate-500">
+                        {collegeInfo.advisorTitle}
+                      </p>
+                    </div>
+                  </div>
+
+                  <p className="text-xs sm:text-[13px] leading-relaxed text-slate-700 border-l-2 border-emerald-600/50 pl-3">
+                    "{collegeInfo.advisorMessage}"
+                  </p>
+                </div>
+
+                <div className="mt-6 pt-4 border-t border-slate-200/70 flex items-center justify-between text-xs">
+                  <span className="font-semibold text-slate-600 text-[11px]">
+                    Academic Mentorship
+                  </span>
+                  <span className="text-emerald-800 font-semibold text-[11px]">
+                    Staff Advisory
+                  </span>
+                </div>
+              </div>
+
+              {/* 3. President's Welcome */}
+              <div className="flex flex-col justify-between rounded-xl border border-slate-200 bg-slate-50/50 p-6 shadow-xs hover:border-[#145a32]/50 transition-all">
+                <div>
+                  <div className="flex items-center gap-3.5 mb-4">
+                    <div className="relative h-16 w-16 sm:h-18 sm:w-18 shrink-0 overflow-hidden rounded-xl border-2 border-[#145a32]/40 shadow-sm">
+                      <img
+                        src={collegeInfo.presidentImage}
+                        alt={collegeInfo.presidentName}
+                        className="h-full w-full object-cover object-top"
+                      />
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-[#145a32]">
+                        Student Leadership
+                      </span>
+                      <h3 className="font-display text-base font-bold text-slate-900 leading-snug">
+                        {collegeInfo.presidentName}
+                      </h3>
+                      <p className="text-[11px] text-slate-500">
+                        {collegeInfo.presidentTitle}
+                      </p>
+                    </div>
+                  </div>
+
+                  <p className="text-xs sm:text-[13px] leading-relaxed text-slate-700 italic border-l-2 border-[#145a32]/50 pl-3">
+                    "{collegeInfo.presidentSpeech}"
+                  </p>
+                </div>
+
+                <div className="mt-6 pt-4 border-t border-slate-200/70 flex items-center justify-between text-xs">
+                  <span className="font-semibold text-slate-600 text-[11px]">
+                    NASS Student Executive Council
+                  </span>
                   <Link
-                    to={item.path}
-                    className="group flex h-full flex-col sm:flex-row items-center sm:items-center gap-2 sm:gap-4 rounded-2xl border border-border bg-card p-3 sm:p-4 text-center sm:text-left shadow-sm transition-all hover:shadow-md"
+                    to="/about"
+                    className="inline-flex items-center gap-1 font-semibold text-[#145a32] hover:text-[#0c3e21] text-[11px]"
                   >
-                    <div className="flex h-9 w-9 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                      <item.icon className="h-4 w-4" />
-                    </div>
-
-                    <div className="min-w-0 flex-1">
-                      <h3 className="text-[11px] sm:text-sm font-bold text-foreground">
-                        {item.label}
-                      </h3>
-                      <p className="hidden sm:block mt-1 text-[11px] leading-5 text-muted-foreground">
-                        {item.desc}
-                      </p>
-                    </div>
-
-                    <ChevronRight className="hidden sm:block h-4 w-4 shrink-0 text-muted-foreground/50 transition-colors group-hover:text-foreground" />
+                    <span>Read Story</span>
+                    <ArrowRight className="h-3.5 w-3.5" />
                   </Link>
-                ) : (
-                  <button
-                    onClick={() => handleAction(item)}
-                    className="w-full h-full group flex flex-col sm:flex-row items-center sm:items-center gap-2 sm:gap-4 rounded-2xl border border-border bg-card p-3 sm:p-4 text-center sm:text-left shadow-sm transition-all hover:shadow-md"
-                  >
-                    <div className="flex h-9 w-9 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                      <item.icon className="h-4 w-4" />
-                    </div>
-
-                    <div className="min-w-0 flex-1">
-                      <h3 className="text-[11px] sm:text-sm font-bold text-foreground">
-                        {item.action === "login" && isLoggedIn ? (item.targetTab === "overview" ? "Visit Portal" : item.label) : item.label}
-                      </h3>
-                      <p className="hidden sm:block mt-1 text-[11px] leading-5 text-muted-foreground">
-                        {item.action === "login" && isLoggedIn ? (item.targetTab === "overview" ? "You are currently logged in" : item.desc) : item.desc}
-                      </p>
-                    </div>
-
-                    <ChevronRight className="hidden sm:block h-4 w-4 shrink-0 text-muted-foreground/50 transition-colors group-hover:text-foreground" />
-                  </button>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* About */}
-      <section className="py-16 md:py-24 lg:py-28">
-        <div className="container">
-          <div className="grid items-center gap-14 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
-            <div className="max-w-2xl">
-              <SectionHeading
-                label="About Our Chapter"
-                title="Innovation at LASUSTECH"
-                align="left"
-              />
-              <div className="mt-6 space-y-4 text-sm leading-7 text-muted-foreground md:text-[15px]">
-                <p>
-                  The LASUSTECH Chapter of NACOS (Nigeria Association of Computing Students) is a vibrant community of passionate learners and innovators. While we belong to the largest organized student body in Africa with over a million members nationwide, our local chapter is focused on building a specialized ecosystem for computer scientists at LASUSTECH.
-                </p>
-                <p>
-                  Our mission is to bridge the gap between classroom theory and industry excellence. We provide our members with the resources, leadership opportunities, and technical workshops needed to thrive in the global tech landscape. From 100lvl to 400lvl, every student is integral to our vision of becoming a leading tech hub within the university and beyond.
-                </p>
-                <p>
-                  Through mentorship, chapter-wide events, and a strong sense of community, we ensure that NACOS LASUSTECH is more than just an association—it's a home where future tech leaders are refined and empowered.
-                </p>
+                </div>
               </div>
             </div>
-
-            <div 
-              className="relative flex items-center justify-center [perspective:1000px]"
-              onMouseEnter={() => setIsHoveringLogos(true)}
-              onMouseLeave={() => setIsHoveringLogos(false)}
-            >
-              <motion.div 
-                drag
-                dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
-                dragElastic={0.1}
-                onDrag={handleDrag}
-                onDragEnd={handleDragEnd}
-                className={`relative h-60 w-60 md:h-80 md:w-80 lg:h-96 lg:w-96 [transform-style:preserve-3d] ${!isHoveringLogos ? "animate-flip-horizontal" : ""}`}
-                style={{ 
-                  rotateX, 
-                  rotateY,
-                  animationPlayState: isHoveringLogos ? "paused" : "running"
-                }}
-              >
-                {/* Front Side - NACOS Logo */}
-                <a 
-                  href="https://nacos.org.ng"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  title="NACOS NATIONAL"
-                  className="absolute inset-0 [backface-visibility:hidden] flex items-center justify-center rounded-full border-4 border-primary/30 bg-gradient-to-br from-primary/30 to-primary/10 shadow-2xl transition-opacity hover:opacity-90"
-                >
-                  <img
-                    src={nacosLogo}
-                    alt="NACOS Logo"
-                    loading="lazy"
-                    className="h-40 w-40 object-contain md:h-60 md:w-60 lg:h-72 lg:w-72"
-                  />
-                </a>
-
-                {/* Back Side - LASUSTECH Logo */}
-                <a 
-                  href="https://lasustech.edu.ng"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  title="LASUSTECH"
-                  className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)] flex items-center justify-center rounded-full border-4 border-primary/30 bg-gradient-to-br from-primary/30 to-primary/10 shadow-2xl transition-opacity hover:opacity-90"
-                >
-                  <img
-                    src={lasustechLogo}
-                    alt="LASUSTECH Logo"
-                    loading="lazy"
-                    className="h-40 w-40 object-contain md:h-60 md:w-60 lg:h-72 lg:w-72"
-                  />
-                </a>
-              </motion.div>
-            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Executives Preview */}
-      <section className="bg-muted py-16 md:py-24 lg:py-28">
-        <div className="container">
-          <SectionHeading
-            label="Leadership"
-            title="Executive Council"
-            description="Meet the student leaders steering the chapter toward excellence."
-          />
-          <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-5">
-            {data.executives.slice(0, 5).map((exec) => (
-              <ExecutiveCard key={exec.id || exec.post} {...exec} />
-            ))}
-          </div>
-          <div className="mt-8 text-center text-black">
-            <Link to="/executives" className="text-black">
-              <Button variant="outline" className="gap-2 text-xs font-semibold">
-                View All Executives <ArrowRight className="h-3.5 w-3.5" />
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Events Preview */}
-      <section className="py-16 md:py-24 lg:py-28">
-        <div className="container">
-          <SectionHeading
-            label="Happenings"
-            title={data.events.some(e => e.upcoming !== false) ? "Upcoming Events" : "Recent Events"}
-            description="Stay updated with the latest programs, workshops, and gatherings."
-          />
-          <div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-            {data.events.slice(0, 3).map((event) => (
-              <EventCard key={event.id} {...event} />
-            ))}
-          </div>
-          <div className="mt-8 text-center">
-            <Link to="/events">
-              <Button variant="outline" className="gap-2 text-xs font-semibold font-black text-black">
-                View All Events <ArrowRight className="h-3.5 w-3.5" />
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
-
-
-
-      {/* Gallery Preview */}
-      <section className="bg-muted py-16 md:py-24 lg:py-28">
-        <div className="container">
-          <SectionHeading
-            label="Gallery"
-            title="Chapter Moments"
-            description="A curated look into our activities, events, and community."
-          />
-          <div className="mt-10 grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
-            {galleryImages.map((img, i) => (
-              <div key={i} className="overflow-hidden rounded-2xl">
-                <img
-                  src={img}
-                  alt={`Gallery ${i + 1}`}
-                  loading="lazy"
-                  className="aspect-square w-full object-cover"
-                />
+        {/* ======================================================== */}
+        {/* SIGNATURE FEATURE: CONSTITUENT DEPARTMENTS & AFFILIATED BODIES */}
+        {/* ======================================================== */}
+        <section className="py-8 md:py-12 bg-[#f8faf8] border-b border-slate-200/80">
+          <div className="container">
+            {/* Header + Filter Row */}
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-5 sm:mb-6">
+              <div>
+                <span className="text-[11px] font-bold uppercase tracking-wider text-[#145a32]">
+                  Academic Organization
+                </span>
+                <h2 className="mt-1 font-display text-2xl sm:text-3xl font-bold text-slate-900">
+                  Academic Departments of the College
+                </h2>
+                <p className="mt-2 text-xs sm:text-sm text-slate-600 max-w-xl">
+                  Accredited academic departments offering specialized undergraduate degrees in computing, physical, mathematical, and life sciences.
+                </p>
               </div>
-            ))}
-          </div>
-          <div className="mt-8 text-center">
-            <Link to="/events">
-              <Button variant="outline" className="gap-2 text-xs font-semibold text-black">
-                View Full Gallery <ArrowRight className="h-3.5 w-3.5" />
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
 
-      {/* Constitution Preview */}
-      <section className="py-16 md:py-20 lg:py-24">
-        <div className="container">
-          <div className="mx-auto max-w-3xl rounded-3xl border border-border bg-card px-6 py-10 text-center shadow-sm md:px-10 md:py-14">
-            <SectionHeading
-              label="Document"
-              title="Chapter Constitution"
-              description="The official governing document of NACOS LASUSTECH Chapter. Read or download the full constitution."
-            />
-            <div className="mt-6">
-              <Link to="/constitution">
-                <Button className="gap-2 font-semibold">
-                  Read Constitution <ArrowRight className="h-3.5 w-3.5" />
+              <Link to="/associations">
+                <Button className="h-9 gap-1.5 rounded-lg bg-[#145a32] hover:bg-[#0c3e21] text-white text-xs font-semibold">
+                  <span>Full Directory Details</span>
+                  <ArrowRight className="h-3.5 w-3.5" />
                 </Button>
               </Link>
             </div>
-          </div>
-        </div>
-      </section>
 
-      {/* Contact Strip */}
-      <section className="relative isolate overflow-hidden bg-primary py-16 md:py-20 lg:py-24">
-  {/* Subtle gradient overlay */}
-  <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(22,155,45,0.95)_0%,rgba(22,155,45,0.85)_50%,rgba(31,95,175,0.85)_100%)]" />
-
-  {/* Soft “bubble” lights (very subtle, not childish) */}
-  <div className="absolute inset-0 pointer-events-none">
-    <div className="absolute -top-10 -right-10 h-40 w-40 rounded-full bg-white/10 blur-3xl" />
-    <div className="absolute top-1/2 -left-10 h-48 w-48 rounded-full bg-[#1F5FAF]/20 blur-3xl" />
-    <div className="absolute bottom-0 right-1/3 h-36 w-36 rounded-full bg-white/5 blur-2xl" />
-  </div>
-
-  {/* Content */}
-  <div className="container relative z-10 text-center">
-    <h2 className="font-display text-2xl font-bold text-white md:text-3xl lg:text-4xl">
-      Empower Our Collective Future
-    </h2>
-
-    <p className="mx-auto mt-4 max-w-xl text-sm leading-7 text-white/80 md:text-base">
-      Support your fellow computing students and stay active in the chapter to unlock new opportunities for growth and leadership.
-    </p>
-
-          <div className="mt-10 flex flex-row justify-center gap-3">
-            <a href="https://portal.nacos.org.ng/register" target="_blank" rel="noopener noreferrer" className="flex-1 sm:flex-initial">
-              <Button
-                size="lg"
-                className="w-full bg-white font-bold text-primary hover:bg-white/90 shadow-xl shadow-black/10 p-2 sm:p-6 text-[10px] sm:text-base"
+            {/* Department Quick Filter Tabs */}
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-3 mb-6 scrollbar-none">
+              <button
+                onClick={() => setSelectedDeptFilter("all")}
+                className={`rounded-lg px-3.5 py-1.5 text-xs font-semibold transition-colors shrink-0 ${
+                  selectedDeptFilter === "all"
+                    ? "bg-[#145a32] text-white"
+                    : "bg-white border border-slate-200 text-slate-700 hover:bg-slate-50"
+                }`}
               >
-                Join NACOS National
-              </Button>
-            </a>
-            <Button
-              size="lg"
-              variant="outline"
-              onClick={() => isLoggedIn ? navigate("/dashboard", { state: { tab: "overview" } }) : setLoginOpen(true)}
-              className="flex-1 sm:flex-initial border-white/30 font-bold text-secondary hover:bg-white/10 p-2 sm:p-6 text-[10px] sm:text-base"
-            >
-              {isLoggedIn ? "Visit Portal" : "Member Portal"}
-            </Button>
+                All Departments ({departments.length})
+              </button>
+              {departments.map((d) => (
+                <button
+                  key={d.id}
+                  onClick={() => setSelectedDeptFilter(d.id)}
+                  className={`rounded-lg px-3.5 py-1.5 text-xs font-semibold transition-colors shrink-0 ${
+                    selectedDeptFilter === d.id
+                      ? "bg-[#145a32] text-white"
+                      : "bg-white border border-slate-200 text-slate-700 hover:bg-slate-50"
+                  }`}
+                >
+                  {d.code} • {d.name.replace("Department of ", "")}
+                </button>
+              ))}
+            </div>
+
+            {/* Department Cards Grid */}
+            <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+              {filteredDepts.map((dept, idx) => (
+                <AssociationCard key={dept.id} dept={dept} index={idx} />
+              ))}
+            </div>
+
+            {/* SEPARATED SECTION: AFFILIATED ASSOCIATIONS */}
+            <div className="mt-14 pt-10 border-t border-slate-200/90">
+              <div className="mb-6">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-[#1a4480]">
+                  Collegiate Student Bodies
+                </span>
+                <h3 className="mt-1 font-display text-xl sm:text-2xl font-bold text-slate-900">
+                  Affiliated Associations
+                </h3>
+                <p className="mt-1 text-xs text-slate-600 max-w-2xl">
+                  Officially chartered student professional associations operating under NASS LASUSTECH Chapter jurisdiction across the basic sciences.
+                </p>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {affiliatedInstitutions.map((inst) => (
+                  <div
+                    key={inst.id}
+                    className="rounded-xl border border-slate-200 bg-white p-5 shadow-2xs hover:border-[#1a4480]/40 transition-all flex flex-col justify-between"
+                  >
+                    <div>
+                      <div className="flex items-center justify-between gap-2 mb-2">
+                        <span className={`rounded-md px-2.5 py-0.5 text-xs font-bold border ${inst.badgeColor}`}>
+                          {inst.acronym}
+                        </span>
+                        <span className="text-[10.5px] font-medium text-slate-500">
+                          {inst.studentCount}
+                        </span>
+                      </div>
+                      <h4 className="font-display text-sm font-bold text-slate-900 mt-2">
+                        {inst.name}
+                      </h4>
+                      <p className="text-xs text-slate-600 mt-1.5 leading-relaxed line-clamp-3">
+                        {inst.description}
+                      </p>
+                    </div>
+
+                    <div className="mt-4 pt-3 border-t border-slate-100">
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">
+                        Serving Departments
+                      </p>
+                      <div className="flex flex-wrap gap-1">
+                        {inst.servedDepartments.map((dep) => (
+                          <span
+                            key={dep}
+                            className="rounded bg-slate-100 px-2 py-0.5 text-[10px] font-medium text-slate-700"
+                          >
+                            {dep.replace("Department of ", "")}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
-    </div>
-</section>
+        </section>
+
+        {/* ======================================================== */}
+        {/* STUDENT EXECUTIVE COUNCIL PREVIEW */}
+        {/* ======================================================== */}
+        <section className="py-8 md:py-12 bg-white border-b border-slate-200/80">
+          <div className="container">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-5 sm:mb-6">
+              <div>
+                <span className="text-[11px] font-bold uppercase tracking-wider text-[#145a32]">
+                  Collegiate Leadership
+                </span>
+                <h2 className="mt-1 font-display text-2xl sm:text-3xl font-bold text-slate-900">
+                  NASS LASUSTECH Student Executive Council
+                </h2>
+                <p className="mt-1 text-xs sm:text-sm text-slate-600">
+                  Elected officers representing science students across all constituent departments.
+                </p>
+              </div>
+              <Link to="/executives">
+                <Button variant="outline" className="h-9 gap-1.5 rounded-lg border-slate-300 text-xs font-semibold">
+                  <span>View All Council Members</span>
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </Button>
+              </Link>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+              {staticExecutives.slice(0, 5).map((exec) => (
+                <ExecutiveCard key={exec.name + exec.post} {...exec} />
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ======================================================== */}
+        {/* COLLEGE HAPPENINGS & ACADEMIC CALENDAR */}
+        {/* ======================================================== */}
+        <section className="py-8 md:py-12 bg-[#f8faf8] border-b border-slate-200/80">
+          <div className="container">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-5 sm:mb-6">
+              <div>
+                <span className="text-[11px] font-bold uppercase tracking-wider text-[#145a32]">
+                  Calendar & Happenings
+                </span>
+                <h2 className="mt-1 font-display text-2xl sm:text-3xl font-bold text-slate-900">
+                  Upcoming Events & Programs
+                </h2>
+                <p className="mt-1 text-xs sm:text-sm text-slate-600">
+                  Academic symposiums, Science Week celebrations, tech bootcamps, and research seminars.
+                </p>
+              </div>
+              <Link to="/events">
+                <Button variant="outline" className="h-9 gap-1.5 rounded-lg border-slate-300 text-xs font-semibold">
+                  <span>Full Events Calendar</span>
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </Button>
+              </Link>
+            </div>
+
+            {/* Proposed Schedule Notice */}
+            <div className="mb-4 rounded-xl border border-amber-200/80 bg-amber-50/70 p-3 text-xs text-amber-900 flex items-center justify-between gap-3">
+              <span className="flex items-center gap-2">
+                <span className="h-2 w-2 rounded-full bg-amber-500 animate-pulse shrink-0" />
+                <span><strong>Proposed Schedule:</strong> Event dates and milestones are proposed collegiate schedules and subject to administrative adjustment.</span>
+              </span>
+              <Link to="/events" className="text-amber-800 font-bold hover:underline shrink-0 text-[11px] hidden sm:inline">
+                Full Details →
+              </Link>
+            </div>
+
+            {/* Editorial Event Timeline List */}
+            <div className="space-y-3">
+              {staticEvents.slice(0, 3).map((event) => (
+                <div
+                  key={event.id}
+                  className="rounded-xl border border-slate-200 bg-white p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all hover:border-[#145a32]/30 hover:shadow-xs"
+                >
+                  <div className="flex items-start gap-4">
+                    {/* Date Block */}
+                    <div className="flex h-14 w-14 shrink-0 flex-col items-center justify-center rounded-lg bg-emerald-50 text-[#145a32] border border-emerald-800/15">
+                      <span className="text-[10px] font-bold uppercase tracking-wider leading-none">
+                        {event.date.split(" ")[0]}
+                      </span>
+                      <span className="font-display text-lg font-extrabold leading-tight">
+                        {event.date.split(" ")[1]?.replace(",", "") || "15"}
+                      </span>
+                    </div>
+
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="rounded bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-700">
+                          {event.category || "Academic"}
+                        </span>
+                        <span className="text-xs text-slate-500 flex items-center gap-1">
+                          <MapPin className="h-3 w-3 text-slate-400" />
+                          {event.venue || "LASUSTECH Campus"}
+                        </span>
+                      </div>
+                      <h3 className="mt-1 font-display text-base font-bold text-slate-900">
+                        {event.title}
+                      </h3>
+                      <p className="mt-1 text-xs text-slate-600 line-clamp-1">
+                        {event.description}
+                      </p>
+                    </div>
+                  </div>
+
+                  <Link to={`/events#${event.id}`} className="shrink-0 self-end md:self-center">
+                    <Button variant="ghost" size="sm" className="h-8 gap-1 text-xs font-semibold text-[#145a32] hover:bg-emerald-50">
+                      <span>Event Details</span>
+                      <ArrowRight className="h-3.5 w-3.5" />
+                    </Button>
+                  </Link>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ======================================================== */}
+        {/* COLLEGE MOMENTS & RESEARCH ACTIVITIES */}
+        {/* ======================================================== */}
+        <section className="py-8 md:py-12 bg-white border-b border-slate-200/80">
+          <div className="container">
+            <div className="max-w-2xl mb-5 sm:mb-6">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-[#145a32]">
+                Campus Life
+              </span>
+              <h2 className="mt-1 font-display text-2xl sm:text-3xl font-bold text-slate-900">
+                Science Students in Action
+              </h2>
+              <p className="mt-1 text-xs sm:text-sm text-slate-600">
+                Snapshots from inter-departmental laboratory sessions, student summits, and campus workshops.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5">
+              {galleryImages.map((img, i) => (
+                <div
+                  key={i}
+                  className="group relative overflow-hidden rounded-lg border border-slate-200 bg-slate-100 aspect-square"
+                >
+                  <img
+                    src={img.src}
+                    alt={img.caption}
+                    loading="lazy"
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-3 flex items-end">
+                    <p className="text-[11px] font-medium text-white leading-snug">
+                      {img.caption}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+
+
+        {/* ======================================================== */}
+        {/* INSTITUTIONAL CALLOUT & SECRETARIAT ACCESS */}
+        {/* ======================================================== */}
+        <section className="bg-[#0b2918] py-8 md:py-12 text-white">
+          <div className="container text-center">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-300">
+              Lagos State University of Science and Technology
+            </span>
+            <h2 className="mt-2 font-display text-2xl sm:text-3xl font-extrabold tracking-tight">
+              Advancing Scientific Discovery & Leadership
+            </h2>
+            <p className="mx-auto mt-3 max-w-xl text-xs sm:text-sm leading-relaxed text-slate-300">
+              Engage with your departmental student association, access past examination papers, participate in college-wide research, and manage your student dues through the verified portal.
+            </p>
+
+            <div className="mt-6 flex flex-wrap justify-center gap-3">
+              <Link to="/associations">
+                <Button className="h-10 rounded-lg bg-white font-semibold text-[#0b2918] hover:bg-slate-100 px-5 text-xs">
+                  <span>Explore Department Directory</span>
+                </Button>
+              </Link>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  if (isLoggedIn) {
+                    navigate("/dashboard");
+                  } else {
+                    setLoginOpen(true);
+                  }
+                }}
+                className="h-10 rounded-lg border-emerald-600/40 text-emerald-200 hover:bg-white/10 hover:text-white px-5 text-xs font-semibold"
+              >
+                <span>Access Student Portal</span>
+              </Button>
+            </div>
+          </div>
+        </section>
       </Layout>
     </>
   );

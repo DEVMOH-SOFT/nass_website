@@ -1,0 +1,133 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <defs>
+    <linearGradient id="nassGreenGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a3a20" />
+      <stop offset="50%" stop-color="#145a32" />
+      <stop offset="100%" stop-color="#0b2e1b" />
+    </linearGradient>
+    <linearGradient id="nassGoldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f59e0b" />
+      <stop offset="50%" stop-color="#fbbf24" />
+      <stop offset="100%" stop-color="#d97706" />
+    </linearGradient>
+    <linearGradient id="nassShieldGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="100%" stop-color="#f0fdf4" />
+    </linearGradient>
+    <filter id="nassShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.25" />
+    </filter>
+  </defs>
+
+  <!-- Outer Ring Shadow -->
+  <circle cx="200" cy="200" r="190" fill="none" stroke="url(#nassGoldGrad)" stroke-width="4" filter="url(#nassShadow)" />
+
+  <!-- Outer Circular Band -->
+  <circle cx="200" cy="200" r="182" fill="url(#nassGreenGrad)" stroke="#f59e0b" stroke-width="3" />
+  <circle cx="200" cy="200" r="142" fill="none" stroke="url(#nassGoldGrad)" stroke-width="2.5" stroke-dasharray="4,2" />
+
+  <!-- Circular Text Path -->
+  <path id="textCircleTop" d="M 50,200 A 150,150 0 1,1 350,200" fill="none" />
+  <path id="textCircleBottom" d="M 350,200 A 150,150 0 0,1 50,200" fill="none" />
+
+  <text font-family="'Outfit', 'Inter', sans-serif" font-size="14.5" font-weight="800" fill="#ffffff" letter-spacing="2.5">
+    <textPath href="#textCircleTop" startOffset="50%" text-anchor="middle">
+      NATIONAL ASSOCIATION OF SCIENCE STUDENTS
+    </textPath>
+  </text>
+  <text font-family="'Outfit', 'Inter', sans-serif" font-size="14" font-weight="700" fill="#fbbf24" letter-spacing="3.2">
+    <textPath href="#textCircleBottom" startOffset="50%" text-anchor="middle">
+      ★ NASS LASUSTECH CHAPTER ★
+    </textPath>
+  </text>
+
+  <!-- Inner Circle Background -->
+  <circle cx="200" cy="200" r="136" fill="url(#nassShieldGrad)" stroke="#145a32" stroke-width="3" />
+
+  <!-- Scientific Sub-radial glow -->
+  <circle cx="200" cy="200" r="128" fill="#ecfdf5" opacity="0.6" />
+
+  <!-- College of Basic Sciences Banner Arch -->
+  <path d="M 100,126 Q 200,105 300,126" fill="none" stroke="#15803d" stroke-width="1.5" />
+  <text x="200" y="122" font-family="'Outfit', sans-serif" font-size="10.5" font-weight="700" fill="#145a32" text-anchor="middle" letter-spacing="1.5">
+    COLLEGE OF BASIC SCIENCES
+  </text>
+
+  <!-- Laurel Wreath Leaves (Left) -->
+  <g fill="#16a34a" opacity="0.85">
+    <path d="M105,190 C95,175 102,160 108,162 C114,164 112,180 105,190 Z" />
+    <path d="M96,220 C88,205 97,192 102,194 C107,196 103,212 96,220 Z" />
+    <path d="M102,248 C96,235 106,224 111,226 C116,228 110,242 102,248 Z" />
+    <path d="M118,272 C114,260 126,252 130,256 C134,260 124,270 118,272 Z" />
+  </g>
+
+  <!-- Laurel Wreath Leaves (Right) -->
+  <g fill="#16a34a" opacity="0.85">
+    <path d="M295,190 C305,175 298,160 292,162 C286,164 288,180 295,190 Z" />
+    <path d="M304,220 C312,205 303,192 298,194 C293,196 297,212 304,220 Z" />
+    <path d="M298,248 C304,235 294,224 289,226 C284,228 290,242 298,248 Z" />
+    <path d="M282,272 C286,260 274,252 270,256 C266,260 276,270 282,272 Z" />
+  </g>
+
+  <!-- Atomic Orbits (Science Symbol) -->
+  <g transform="translate(200,192)">
+    <!-- Orbit 1 -->
+    <ellipse cx="0" cy="0" rx="64" ry="24" fill="none" stroke="#0284c7" stroke-width="2.5" opacity="0.75" transform="rotate(30)" />
+    <circle cx="48" cy="18" r="4" fill="#0284c7" />
+
+    <!-- Orbit 2 -->
+    <ellipse cx="0" cy="0" rx="64" ry="24" fill="none" stroke="#16a34a" stroke-width="2.5" opacity="0.75" transform="rotate(-30)" />
+    <circle cx="-48" cy="18" r="4" fill="#16a34a" />
+
+    <!-- Orbit 3 -->
+    <ellipse cx="0" cy="0" rx="64" ry="24" fill="none" stroke="#d97706" stroke-width="2.5" opacity="0.75" transform="rotate(90)" />
+    <circle cx="0" cy="-24" r="4" fill="#d97706" />
+
+    <!-- Central Nucleus -->
+    <circle cx="0" cy="0" r="9" fill="url(#nassGoldGrad)" stroke="#145a32" stroke-width="2" />
+  </g>
+
+  <!-- Laboratory Flask / Beaker (Chemistry & Biology) -->
+  <g transform="translate(160, 160) scale(0.65)" filter="url(#nassShadow)">
+    <!-- Flask neck -->
+    <rect x="52" y="18" width="16" height="34" rx="2" fill="#0284c7" opacity="0.2" stroke="#0369a1" stroke-width="3" />
+    <!-- Lip -->
+    <rect x="48" y="14" width="24" height="6" rx="2" fill="#0369a1" />
+    <!-- Flask body -->
+    <path d="M52,50 L20,105 C15,114 22,122 32,122 L88,122 C98,122 105,114 100,105 L68,50 Z" 
+          fill="#e0f2fe" stroke="#0369a1" stroke-width="3" />
+    <!-- Liquid -->
+    <path d="M35,85 L26,102 C23,108 27,114 34,114 L86,114 C93,114 97,108 94,102 L85,85 Q60,92 35,85 Z" 
+          fill="url(#nassGreenGrad)" opacity="0.85" />
+    <!-- Bubbles -->
+    <circle cx="50" cy="98" r="3.5" fill="#ffffff" opacity="0.7" />
+    <circle cx="68" cy="103" r="2.5" fill="#ffffff" opacity="0.7" />
+    <circle cx="58" cy="88" r="2" fill="#ffffff" opacity="0.7" />
+  </g>
+
+  <!-- Open Book of Wisdom & Mathematics (Bottom of inner circle) -->
+  <g transform="translate(200, 260) scale(0.85)">
+    <!-- Book pages -->
+    <path d="M-45,-4 C-25,-12 -8,-4 0,4 C8,-4 25,-12 45,-4 L42,22 C24,14 8,22 0,28 C-8,22 -24,14 -42,22 Z" 
+          fill="#ffffff" stroke="#145a32" stroke-width="2.5" />
+    <!-- Spine line -->
+    <line x1="0" y1="4" x2="0" y2="28" stroke="#145a32" stroke-width="2.5" />
+    <!-- Page lines -->
+    <line x1="-34" y1="3" x2="-8" y2="-2" stroke="#16a34a" stroke-width="1.5" stroke-linecap="round" />
+    <line x1="-32" y1="9" x2="-8" y2="4" stroke="#16a34a" stroke-width="1.5" stroke-linecap="round" />
+    <line x1="-30" y1="15" x2="-8" y2="10" stroke="#16a34a" stroke-width="1.5" stroke-linecap="round" />
+
+    <line x1="8" y1="-2" x2="34" y2="3" stroke="#16a34a" stroke-width="1.5" stroke-linecap="round" />
+    <line x1="8" y1="4" x2="32" y2="9" stroke="#16a34a" stroke-width="1.5" stroke-linecap="round" />
+    <line x1="8" y1="10" x2="30" y2="15" stroke="#16a34a" stroke-width="1.5" stroke-linecap="round" />
+  </g>
+
+  <!-- Motto Ribbon at Base -->
+  <g transform="translate(200, 312)">
+    <path d="M-125,0 L-105,-12 L-95,-4 L95,-4 L105,-12 L125,0 L110,16 L95,6 L-95,6 L-110,16 Z" 
+          fill="url(#nassGoldGrad)" stroke="#b45309" stroke-width="1.5" filter="url(#nassShadow)" />
+    <text x="0" y="2.5" font-family="'Outfit', sans-serif" font-size="9" font-weight="800" fill="#0f291e" text-anchor="middle" letter-spacing="1.2">
+      DISCOVERY • INNOVATION • EXCELLENCE
+    </text>
+  </g>
+</svg>

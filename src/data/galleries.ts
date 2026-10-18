@@ -32,7 +32,7 @@ export interface GallerySection {
 export const eventGalleries: Record<string, GallerySection> = {
   "bootcamp-onboarding": {
     eventId: "bootcamp-onboarding",
-    title: "NACOS UPSCALING BOOTCAMP ONBOARDING EVENT",
+    title: "NASS TECH & SCIENCE ONBOARDING EVENT",
     description: "High-quality captures from our recent bootcamp onboarding and orientation session.",
     images: [
       { src: bootcamp1, alt: "Bootcamp Onboarding 1" },
@@ -49,7 +49,7 @@ export const eventGalleries: Record<string, GallerySection> = {
   },
   "1": {
     eventId: "1",
-    title: "NACOS Tech Summit Highlights",
+    title: "NASS Science & Tech Summit Highlights",
     description: "Memories from the annual Tech Summit gathering.",
     images: [
       { src: event1, alt: "Tech Summit Keynote" },

@@ -83,7 +83,7 @@ This document outlines the required API endpoints and data payloads for the stud
 ```json
 {
   "status": "success",
-  "reference": "NACOS-ref-12345",
+  "reference": "NASS-ref-12345",
   "authorization_url": "https://checkout.paystack.com/..."
 }
 ```

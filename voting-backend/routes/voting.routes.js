@@ -268,7 +268,7 @@ router.post("/transactions/initialize", async (req, res, next) => {
     }
 
     const amount = votes * Number(settings.votePrice || config.voting.votePrice);
-    const reference = `NACOS-VOTE-${Date.now()}`;
+    const reference = `NASS-VOTE-${Date.now()}`;
 
     await pool.query(
       `INSERT INTO voting_transactions

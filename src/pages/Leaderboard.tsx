@@ -29,15 +29,15 @@ const BarRow = ({
 }) => {
   const pct = maxVotes > 0 ? Math.max(10, (nominee.voteCount / maxVotes) * 100) : 10;
   const rankColors = [
-    "from-amber-400 to-yellow-300",
+    "from-blue-600 to-sky-400",
     "from-slate-400 to-slate-300",
-    "from-orange-500 to-amber-400",
+    "from-emerald-600 to-teal-400",
   ];
   const barColor = rankColors[rank - 1] ?? "from-primary to-blue-400";
   const badgeColors = [
-    "bg-amber-400 text-white",
+    "bg-[#1a4480] text-white",
     "bg-slate-300 text-white",
-    "bg-orange-400 text-white",
+    "bg-emerald-600 text-white",
   ];
   const badgeColor = badgeColors[rank - 1] ?? "bg-slate-100 text-slate-500";
   const rankLabel = rank === 1 ? "Rank 1" : rank === 2 ? "Rank 2" : rank === 3 ? "Rank 3" : `Rank ${rank}`;
@@ -325,9 +325,9 @@ const Leaderboard = () => {
   return (
     <Layout>
 
-      <div className="bg-slate-50 min-h-screen pb-24">
+      <div className="bg-slate-50 min-h-screen pb-12">
 
-        <div className="bg-[#08111d] pt-32 pb-24 relative overflow-hidden">
+        <div className="bg-[#08111d] pt-12 sm:pt-16 pb-12 sm:pb-16 relative overflow-hidden">
           <div className="absolute inset-0 opacity-15">
             <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-primary rounded-full blur-[130px]" />
             <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-blue-500 rounded-full blur-[130px]" />
@@ -336,21 +336,21 @@ const Leaderboard = () => {
           <div className="container px-4 relative z-10">
             <Link
               to="/awards"
-              className="inline-flex items-center gap-2 mb-6 px-5 py-2.5 rounded-full bg-white text-slate-900 font-black text-sm shadow-lg hover:bg-primary hover:text-white transition-all hover:-translate-x-1"
+              className="inline-flex items-center gap-2 mb-4 px-4 py-2 rounded-full bg-white text-slate-900 font-black text-xs sm:text-sm shadow-lg hover:bg-primary hover:text-white transition-all hover:-translate-x-1"
             >
               <ArrowRight className="h-4 w-4 rotate-180" />
               Back to Awards
             </Link>
 
-            <div className="flex items-start gap-6">
-              <div className="h-16 w-16 rounded-2xl bg-amber-400 flex items-center justify-center shadow-2xl shrink-0">
-                <Crown className="h-8 w-8 text-white" />
+            <div className="flex items-start gap-4 sm:gap-6">
+              <div className="h-12 w-12 sm:h-14 sm:w-14 rounded-2xl bg-[#1a4480] flex items-center justify-center shadow-xl shrink-0 border border-blue-400/30">
+                <Crown className="h-6 w-6 sm:h-7 sm:w-7 text-sky-300" />
               </div>
               <div>
-                <h1 className="text-4xl sm:text-6xl font-black text-white uppercase tracking-tight">
+                <h1 className="text-3xl sm:text-5xl font-black text-white uppercase tracking-tight">
                   Real‑Time <span className="text-primary">Leaderboard</span>
                 </h1>
-                <p className="text-white/50 mt-3 text-lg max-w-2xl">
+                <p className="text-white/50 mt-1.5 text-sm sm:text-base max-w-2xl">
                   Live standings across all award categories — watch who is pulling ahead.
                 </p>
               </div>
@@ -358,16 +358,16 @@ const Leaderboard = () => {
           </div>
         </div>
 
-        <div className="container px-4 mt-[-3rem] relative z-10">
-          <div className="bg-white rounded-[2.5rem] border border-slate-200 shadow-2xl overflow-hidden">
+        <div className="container px-4 mt-[-1.5rem] relative z-10">
+          <div className="bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden">
 
-            <div className="p-6 sm:p-8 border-b border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
+            <div className="p-5 sm:p-6 border-b border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
-                  <BarChart2 className="h-5 w-5" />
+                <div className="h-9 w-9 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                  <BarChart2 className="h-4 w-4" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-black text-slate-900">Global Standings</h2>
+                  <h2 className="text-lg sm:text-xl font-black text-slate-900">Global Standings</h2>
                   <p className="text-xs text-slate-400 font-medium">{filtered.length} nominees · position only, no vote counts</p>
                 </div>
               </div>

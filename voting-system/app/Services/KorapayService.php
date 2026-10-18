@@ -35,6 +35,7 @@ class KorapayService
                     'amount' => $amountNaira,
                     'currency' => 'NGN',
                     'reference' => $data['reference'],
+                    'merchant_bears_cost' => false,
                     'customer' => [
                         'email' => $data['email'],
                         'name' => $data['name'] ?? null,

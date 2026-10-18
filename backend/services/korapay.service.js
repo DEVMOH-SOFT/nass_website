@@ -3,7 +3,10 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const KORAPAY_SECRET = process.env.KORAPAY_SECRET_KEY;
+const isTestMode = process.env.KORAPAY_MODE === 'test' || process.env.KORAPAY_SECRET_KEY?.startsWith('sk_test_');
+const KORAPAY_SECRET = isTestMode
+  ? (process.env.KORAPAY_TEST_SECRET_KEY || process.env.KORAPAY_SECRET_KEY)
+  : (process.env.KORAPAY_SECRET_KEY || process.env.KORAPAY_TEST_SECRET_KEY);
 const KORAPAY_URL = process.env.KORAPAY_BASE_URL || 'https://api.korapay.com/merchant/api/v1';
 
 /**
@@ -24,15 +27,15 @@ class KorapayService {
         {
           amount: data.amount,
           currency: 'NGN',
-          reference: data.reference || `NACOS-${Date.now()}`,
+          reference: data.reference || `NASS-${Date.now()}`,
+          merchant_bears_cost: data.merchant_bears_cost !== undefined ? data.merchant_bears_cost : false,
           customer: {
             email: data.email,
-            name: data.full_name || 'NACOS Student'
+            name: data.full_name || 'NASS Student'
           },
           notification_url: `${process.env.BACKEND_URL || 'http://localhost:5000'}/api/payments/webhook`,
           redirect_url: `${process.env.FRONTEND_URL || 'http://localhost:8080'}/dashboard`,
           metadata: data.metadata || {}
-
         },
         {
           headers: {

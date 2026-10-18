@@ -57,10 +57,10 @@ const groupMetadata: { [key: string]: { icon: any, gradient: string, bg: string,
   },
   "leadership-impact": {
     icon: Award,
-    gradient: "from-amber-500 to-orange-400",
-    bg: "bg-amber-50",
-    text: "text-amber-600",
-    border: "border-amber-200",
+    gradient: "from-blue-600 to-indigo-500",
+    bg: "bg-blue-50",
+    text: "text-blue-600",
+    border: "border-blue-200",
   },
   "social-personality": {
     icon: Users,
@@ -106,9 +106,9 @@ const BarRaceChart = ({ nominees }: { nominees: Nominee[] }) => {
   const sorted = [...nominees].sort((a, b) => b.voteCount - a.voteCount);
   const maxVotes = sorted[0]?.voteCount || 1;
   const rankColors = [
-    "from-amber-400 to-yellow-300",
+    "from-blue-600 to-sky-400",
     "from-slate-400 to-slate-300",
-    "from-orange-500 to-amber-400",
+    "from-emerald-600 to-teal-400",
   ];
   const defaultColor = "from-primary to-blue-400";
 
@@ -139,7 +139,7 @@ const BarRaceChart = ({ nominees }: { nominees: Nominee[] }) => {
               className="flex items-center gap-3"
             >
               <div className={`h-8 w-8 shrink-0 rounded-xl flex items-center justify-center text-xs font-black shadow-sm
-                ${i === 0 ? "bg-amber-400 text-white" : i === 1 ? "bg-slate-300 text-white" : i === 2 ? "bg-orange-400 text-white" : "bg-slate-100 text-slate-500"}`}>
+                ${i === 0 ? "bg-[#1a4480] text-white" : i === 1 ? "bg-slate-300 text-white" : i === 2 ? "bg-emerald-600 text-white" : "bg-slate-100 text-slate-500"}`}>
                 {i + 1}
               </div>
 
@@ -317,13 +317,14 @@ const getCategoryFlyer = (slug: string) => {
     normalized = "content_creator_of_the_year";
   }
  
-   try {
-     return new URL(`../assets/voting/${normalized}.JPG`, import.meta.url).href;
-   } catch (e) {
-     return "/placeholder.svg";
-   }
- };
+    try {
+      return new URL(`../assets/voting/${normalized}.JPG`, import.meta.url).href;
+    } catch (e) {
+      return "/placeholder.svg";
+    }
+  };
 
+type View = "groups" | "subcats" | "nominees";
 
 const VotingCategories = () => {
   const [view, setView] = useState<View>("groups");
@@ -440,8 +441,8 @@ const VotingCategories = () => {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-slate-50 pb-32 font-sans">
-        <div className="relative pt-32 pb-24 overflow-hidden bg-[#0a0f18]">
+      <div className="min-h-screen bg-slate-50 pb-16 font-sans">
+        <div className="relative pt-12 sm:pt-16 pb-12 sm:pb-14 overflow-hidden bg-[#0a0f18]">
           <div className="absolute inset-0 z-0">
             <img src="/awards_gala_night_bg_1778965666277.png" alt="" className="h-full w-full object-cover opacity-[0.12] mix-blend-screen" />
             <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#0a0f18]/80 to-slate-50" />
@@ -450,7 +451,7 @@ const VotingCategories = () => {
           </div>
 
           <div className="container px-4 relative z-10 text-center">
-            <Link to="/awards" className="inline-flex items-center gap-2 mb-8 px-5 py-2.5 rounded-full bg-white text-slate-900 font-black text-sm shadow-lg hover:bg-primary hover:text-white transition-all">
+            <Link to="/awards" className="inline-flex items-center gap-2 mb-5 px-4 py-2 rounded-full bg-white text-slate-900 font-black text-xs sm:text-sm shadow-lg hover:bg-primary hover:text-white transition-all">
               <ArrowRight className="h-4 w-4 rotate-180" />
               Back to Awards
             </Link>
@@ -458,7 +459,7 @@ const VotingCategories = () => {
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-5xl sm:text-7xl font-black text-white uppercase tracking-tighter"
+              className="text-4xl sm:text-6xl font-black text-white uppercase tracking-tighter"
             >
               Cast Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-emerald-400">Vote</span>
             </motion.h1>
@@ -466,7 +467,7 @@ const VotingCategories = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.15 }}
-              className="text-white/60 mt-4 text-lg max-w-xl mx-auto"
+              className="text-white/60 mt-2.5 text-base sm:text-lg max-w-xl mx-auto"
             >
               Select a category group, pick an award, then support your favorite nominee.
             </motion.p>
@@ -475,16 +476,16 @@ const VotingCategories = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.25 }}
-              className="mt-12 w-full max-w-2xl mx-auto"
+              className="mt-7 w-full max-w-2xl mx-auto"
             >
-              <div className="flex items-center justify-center gap-2 mb-4">
+              <div className="flex items-center justify-center gap-2 mb-3">
                 <Timer className="h-4 w-4 text-primary animate-pulse" />
                 <span className="text-xs font-black text-primary uppercase tracking-[0.3em]">Voting Closes In</span>
               </div>
               {countdown.expired ? (
                 <p className="text-white/60 font-bold text-xl">Voting has closed</p>
               ) : (
-                <div className="grid grid-cols-4 gap-3 sm:gap-5">
+                <div className="grid grid-cols-4 gap-2.5 sm:gap-4">
                   {[
                     { value: countdown.days, label: "Days" },
                     { value: countdown.hours, label: "Hours" },
@@ -492,25 +493,25 @@ const VotingCategories = () => {
                     { value: countdown.seconds, label: "Secs" },
                   ].map(({ value, label }) => (
                     <div key={label} className="relative group">
-                      <div className="absolute -inset-1 bg-gradient-to-b from-primary/40 to-blue-500/20 rounded-[1.5rem] blur-md opacity-70" />
-                      <div className="relative bg-white/5 border border-white/10 backdrop-blur-xl rounded-[1.5rem] py-5 sm:py-7 flex flex-col items-center shadow-2xl">
-                        <span className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tabular-nums leading-none">
+                      <div className="absolute -inset-1 bg-gradient-to-b from-primary/40 to-blue-500/20 rounded-2xl blur-md opacity-70" />
+                      <div className="relative bg-white/5 border border-white/10 backdrop-blur-xl rounded-2xl py-3 sm:py-4 flex flex-col items-center shadow-xl">
+                        <span className="text-2xl sm:text-4xl lg:text-5xl font-black text-white tabular-nums leading-none">
                           {String(value).padStart(2, "0")}
                         </span>
-                        <span className="mt-2 text-[10px] font-black text-white uppercase tracking-[0.25em]">{label}</span>
+                        <span className="mt-1 text-[9px] sm:text-[10px] font-black text-white uppercase tracking-[0.2em]">{label}</span>
                       </div>
                     </div>
                   ))}
                 </div>
               )}
-              <p className="mt-5 text-white/40 text-xs font-medium">
+              <p className="mt-3.5 text-white/40 text-xs font-medium">
                 Ends <span className="text-white/70 font-bold">7th June 2026</span> - N{pricePerVote} per vote - Secured by Korapay
               </p>
             </motion.div>
           </div>
         </div>
 
-        <div className="container px-4 mt-[-2rem] relative z-10">
+        <div className="container px-4 mt-[-1.5rem] relative z-10">
           <AnimatePresence>
             {view !== "groups" && (
               <motion.div
@@ -550,11 +551,11 @@ const VotingCategories = () => {
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.35 }}
               >
-                <div className="text-center mb-10">
-                  <h2 className="text-3xl font-black text-slate-900 uppercase tracking-tight">Award Categories</h2>
-                  <p className="text-slate-500 mt-2">Choose a group to explore individual awards</p>
+                <div className="text-center mb-6">
+                  <h2 className="text-2xl sm:text-3xl font-black text-slate-900 uppercase tracking-tight">Award Categories</h2>
+                  <p className="text-slate-500 mt-1.5 text-sm sm:text-base">Choose a group to explore individual awards</p>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                   {groupsList.map((group, i) => {
                     const meta = getGroupMeta(group.key);
                     const matchedSection = sections.find((s) => s.section_key === group.key);
@@ -566,9 +567,9 @@ const VotingCategories = () => {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: i * 0.07 }}
-                        whileHover={{ y: -8, scale: 1.02 }}
+                        whileHover={{ y: -6, scale: 1.01 }}
                         onClick={() => goGroup(group.key)}
-                        className={`cursor-pointer group relative bg-white rounded-[2.5rem] p-8 border ${meta.border} shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden min-h-[280px] flex flex-col justify-end`}
+                        className={`cursor-pointer group relative bg-white rounded-3xl p-6 border ${meta.border} shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden min-h-[240px] flex flex-col justify-end`}
                       >
                         {/* Flyer backdrop representation */}
                         <div className="absolute inset-0 z-0 bg-slate-900 overflow-hidden">
@@ -585,16 +586,16 @@ const VotingCategories = () => {
                         </div>
 
                         <div className="relative z-10">
-                          <div className={`mb-4 h-14 w-14 rounded-2xl bg-gradient-to-br ${meta.gradient} flex items-center justify-center text-white shadow-lg`}>
-                            <meta.icon className="h-7 w-7" />
+                          <div className={`mb-3.5 h-12 w-12 rounded-xl bg-gradient-to-br ${meta.gradient} flex items-center justify-center text-white shadow-md`}>
+                            <meta.icon className="h-6 w-6" />
                           </div>
 
-                          <h3 className="text-2xl font-black text-white mb-1 group-hover:text-primary transition-colors">{group.name}</h3>
-                          <p className="text-sm text-white/60 mb-4">{group.count} Award Categories</p>
+                          <h3 className="text-xl font-black text-white mb-1 group-hover:text-primary transition-colors">{group.name}</h3>
+                          <p className="text-xs text-white/60 mb-3">{group.count} Award Categories</p>
 
-                          <div className={`flex items-center gap-2 font-black text-sm ${meta.text}`}>
+                          <div className={`flex items-center gap-1.5 font-black text-xs ${meta.text}`}>
                             Explore
-                            <ChevronRight className="h-4 w-4 group-hover:translate-x-1.5 transition-transform" />
+                            <ChevronRight className="h-3.5 w-3.5 group-hover:translate-x-1.5 transition-transform" />
                           </div>
                         </div>
                       </motion.div>
@@ -612,7 +613,7 @@ const VotingCategories = () => {
                 exit={{ opacity: 0, x: -40 }}
                 transition={{ duration: 0.35 }}
               >
-                <div className="flex items-center gap-4 mb-10">
+                <div className="flex items-center gap-4 mb-6">
                   {(() => {
                     const meta = getGroupMeta(activeGroup.key);
                     return (
@@ -689,13 +690,13 @@ const VotingCategories = () => {
                 exit={{ opacity: 0, x: -40 }}
                 transition={{ duration: 0.35 }}
               >
-                <div className="flex flex-col md:flex-row items-center gap-6 mb-10 bg-white p-6 border border-slate-200 rounded-[2rem] shadow-sm">
+                <div className="flex flex-col md:flex-row items-center gap-5 mb-6 bg-white p-5 border border-slate-200 rounded-3xl shadow-sm">
                   {/* Category Flyer preview banner */}
-                  <div className="w-full md:w-44 shrink-0 rounded-2xl overflow-hidden border border-slate-100 bg-slate-50 flex items-center justify-center shadow-inner select-none">
+                  <div className="w-full md:w-36 shrink-0 rounded-2xl overflow-hidden border border-slate-100 bg-slate-50 flex items-center justify-center shadow-inner select-none">
                     <img 
                       src={getCategoryFlyer(activeSub.slug)} 
                       alt={activeSub.name} 
-                      className="w-full h-auto object-contain max-h-[160px]"
+                      className="w-full h-auto object-contain max-h-[140px]"
                       onError={(e) => {
                         // Hide flyer preview beautifully if not found
                         (e.target as HTMLImageElement).style.display = 'none';
@@ -704,40 +705,40 @@ const VotingCategories = () => {
                     />
                   </div>
                   <div className="flex-1 text-center md:text-left">
-                    <h2 className="text-3xl font-black text-slate-900 uppercase tracking-tight leading-none mb-3">{activeSub.name}</h2>
-                    <p className="text-slate-500 text-sm leading-relaxed">{activeSub.description}</p>
+                    <h2 className="text-2xl sm:text-3xl font-black text-slate-900 uppercase tracking-tight leading-none mb-2">{activeSub.name}</h2>
+                    <p className="text-slate-500 text-xs sm:text-sm leading-relaxed">{activeSub.description}</p>
                   </div>
                 </div>
 
                 {nomineesLoading ? (
-                  <div className="py-20 text-center text-slate-400 font-bold">
+                  <div className="py-12 text-center text-slate-400 font-bold">
                     Loading category nominees...
                   </div>
                 ) : nominees.length > 0 ? (
-                  <div className="grid lg:grid-cols-[1fr_420px] gap-8 items-start">
+                  <div className="grid lg:grid-cols-[1fr_380px] gap-6 items-start">
                     <div>
-                      <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-5">
+                      <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">
                         {nominees.length} Nominees - Click a card to vote
                       </p>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         {nominees.map((n) => (
                           <NomineeCard key={n.id} nominee={n} pricePerVote={pricePerVote} />
                         ))}
                       </div>
                     </div>
 
-                    <div className="lg:sticky lg:top-32">
+                    <div className="lg:sticky lg:top-24">
                       <BarRaceChart nominees={nominees} />
-                      <p className="text-center text-xs text-slate-400 mt-4 font-medium">
+                      <p className="text-center text-xs text-slate-400 mt-3 font-medium">
                         N{pricePerVote} per vote - Standings update in real-time
                       </p>
                     </div>
                   </div>
                 ) : (
-                  <div className="bg-white rounded-[2.5rem] border border-slate-200 p-16 flex flex-col items-center gap-4 text-center shadow-sm">
-                    <UserCircle2 className="h-16 w-16 text-slate-200" />
-                    <h3 className="text-xl font-black text-slate-600">No Nominees Yet</h3>
-                    <p className="text-slate-400 max-w-sm">Nominees for this category will appear here once added in the Admin Portal.</p>
+                  <div className="bg-white rounded-3xl border border-slate-200 p-8 sm:p-12 flex flex-col items-center gap-3 text-center shadow-sm">
+                    <UserCircle2 className="h-12 w-12 text-slate-200" />
+                    <h3 className="text-lg font-black text-slate-600">No Nominees Yet</h3>
+                    <p className="text-xs sm:text-sm text-slate-400 max-w-sm">Nominees for this category will appear here once added in the Admin Portal.</p>
                   </div>
                 )}
               </motion.div>

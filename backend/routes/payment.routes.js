@@ -19,11 +19,12 @@ router.post('/donate', async (req, res) => {
   const { email, amount, full_name } = req.body;
 
   try {
-    const reference = `DONATE-${Date.now()}`;
+    const reference = `NASS-DONATE-${Date.now()}`;
     const paymentData = await KorapayService.initializeTransaction({
       email,
       amount,
       reference,
+      merchant_bears_cost: false,
       full_name: full_name || 'Anonymous Donor',
       metadata: { type: 'donation' }
     });
@@ -39,11 +40,12 @@ router.post('/initialize', protect, async (req, res) => {
   const { email, amount, payment_type } = req.body;
 
   try {
-    const reference = `NACOS-${req.user.matric}-${Date.now()}`;
+    const reference = `NASS-${req.user.matric}-${Date.now()}`;
     const paymentData = await KorapayService.initializeTransaction({
       email,
       amount,
       reference,
+      merchant_bears_cost: false,
       full_name: req.user.name,
       metadata: { studentId: req.user.id, matric: req.user.matric, type: payment_type || 'dues' }
     });

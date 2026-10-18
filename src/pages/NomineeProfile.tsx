@@ -4,6 +4,7 @@ import Layout from "@/components/Layout";
 import { ArrowRight, CheckCircle2, Vote, Trophy, Heart, Copy } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { fetchVotingApi, resolveImageUrl } from "@/lib/api";
+import { triggerKorapayCheckout } from "@/lib/korapay";
 
 const VOTE_OPTIONS = [20, 40, 60, 80, 100];
 const PRICE_PER_VOTE = 100;
@@ -95,8 +96,8 @@ const NomineeProfile = () => {
 
   const [selectedVotes, setSelectedVotes] = useState<number | null>(null);
   const [customVotes, setCustomVotes] = useState("");
-  const [voterName, setVoterName] = useState("NACOS Voter");
-  const [voterEmail, setVoterEmail] = useState("voter@nacos.lasustech.edu.ng");
+  const [voterName, setVoterName] = useState("NASS Voter");
+  const [voterEmail, setVoterEmail] = useState("voter@nasslasustech.org.ng");
   const [copied, setCopied] = useState(false);
   const [initializingPayment, setInitializingPayment] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -146,7 +147,7 @@ const NomineeProfile = () => {
     if (!nominee) return;
 
     // Update document title dynamically
-    document.title = `Vote for ${nominee.name} | NACOS Awards`;
+    document.title = `Vote for ${nominee.name} | NASS Awards`;
 
     // Helper to set meta content safely
     const setMetaContent = (selector: string, content: string) => {
@@ -171,21 +172,21 @@ const NomineeProfile = () => {
     const resolvedPhoto = resolveImageUrl(nominee.photo);
     
     // Set dynamic Open Graph and Twitter Card tags
-    setMetaContent('meta[property="og:title"]', `Vote for ${nominee.name} | NACOS Awards`);
+    setMetaContent('meta[property="og:title"]', `Vote for ${nominee.name} | NASS Awards`);
     setMetaContent('meta[property="og:description"]', `Support ${nominee.name} in the category of "${nominee.categoryName || nominee.category}"!`);
     setMetaContent('meta[property="og:image"]', resolvedPhoto);
-    setMetaContent('meta[name="twitter:title"]', `Vote for ${nominee.name} | NACOS Awards`);
+    setMetaContent('meta[name="twitter:title"]', `Vote for ${nominee.name} | NASS Awards`);
     setMetaContent('meta[name="twitter:description"]', `Support ${nominee.name} in the category of "${nominee.categoryName || nominee.category}"!`);
     setMetaContent('meta[name="twitter:image"]', resolvedPhoto);
 
     // Clean up to restore defaults when unmounted or changing candidates
     return () => {
-      document.title = "NACOS LASUSTECH | Official Website";
-      setMetaContent('meta[property="og:title"]', "NACOS LASUSTECH Website");
-      setMetaContent('meta[property="og:description"]', "The official platform for computing students at LASUSTECH. Access resources, pay dues, and join our tech community.");
+      document.title = "NASS LASUSTECH | Official Website";
+      setMetaContent('meta[property="og:title"]', "NASS LASUSTECH Website");
+      setMetaContent('meta[property="og:description"]', "The official platform for science students at LASUSTECH. Access resources, pay dues, and join our academic community.");
       setMetaContent('meta[property="og:image"]', "/og-image.png");
-      setMetaContent('meta[name="twitter:title"]', "NACOS LASUSTECH Website");
-      setMetaContent('meta[name="twitter:description"]', "Empowering the next generation of computing leaders at LASUSTECH.");
+      setMetaContent('meta[name="twitter:title"]', "NASS LASUSTECH Website");
+      setMetaContent('meta[name="twitter:description"]', "Empowering the next generation of scientific innovators at LASUSTECH.");
       setMetaContent('meta[name="twitter:image"]', "/og-image.png");
     };
   }, [nominee]);
@@ -205,7 +206,7 @@ const NomineeProfile = () => {
   };
 
   const shareUrl = encodeURIComponent(window.location.href);
-  const rawShareText = `Vote for ${nominee?.name} contesting for ${nominee?.categoryName || nominee?.category || "NACOS Awards 2026"}.
+  const rawShareText = `Vote for ${nominee?.name} contesting for ${nominee?.categoryName || nominee?.category || "NASS Awards 2026"}.
 
 5 Votes: ₦500
 10 Votes: ₦1,000
@@ -237,13 +238,37 @@ Your support will be highly appreciated, and God bless you as you do so. Please 
       });
 
       if (response?.checkoutUrl) {
-        // Redirect to Korapay Checkout
         window.location.href = response.checkoutUrl;
-      } else {
-        throw new Error("Could not initialize payment gateway.");
+        return;
       }
     } catch (err: any) {
-      setErrorMessage(err.message || "Failed to initialize payment. Please try again.");
+      console.warn("Voting server offline, attempting direct Korapay checkout:", err.message);
+    }
+
+    // Direct inline Korapay modal checkout
+    const totalAmount = effectiveVotes * votePrice;
+    const opened = await triggerKorapayCheckout({
+      amount: totalAmount,
+      email: voterEmail.trim(),
+      name: voterName.trim(),
+      narration: `NASS Awards Vote - ${effectiveVotes} votes for ${nominee.name}`,
+      reference: `NASS-VOTE-${nominee.id.slice(0, 8)}-${Date.now()}`,
+      merchant_bears_cost: false,
+      onSuccess: () => {
+        setInitializingPayment(false);
+        navigate("/awards");
+      },
+      onClose: () => {
+        setInitializingPayment(false);
+      },
+      onFailed: (err: any) => {
+        setErrorMessage(err?.message || "Payment could not be completed.");
+        setInitializingPayment(false);
+      },
+    });
+
+    if (!opened) {
+      setErrorMessage("Could not launch payment gateway. Please verify network access.");
       setInitializingPayment(false);
     }
   };
@@ -277,10 +302,10 @@ Your support will be highly appreciated, and God bless you as you do so. Please 
 
   return (
     <Layout>
-      <div className="min-h-screen bg-slate-50 pb-24">
+      <div className="min-h-screen bg-slate-50 pb-12">
 
         {/* ── Hero Banner ── */}
-        <div className="relative h-[380px] sm:h-[440px] overflow-hidden bg-[#08111d]">
+        <div className="relative h-[280px] sm:h-[340px] overflow-hidden bg-[#08111d]">
           {/* Category flyer backdrop */}
           <div className="absolute inset-0 z-0 select-none pointer-events-none">
             <img 
@@ -301,10 +326,10 @@ Your support will be highly appreciated, and God bless you as you do so. Please 
           <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-600/5 rounded-full blur-[100px] z-10 select-none pointer-events-none" />
 
           {/* Back button — top left */}
-          <div className="absolute top-8 left-0 right-0 container px-4 z-30">
+          <div className="absolute top-6 left-0 right-0 container px-4 z-30">
             <button
               onClick={handleBack}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white text-slate-900 font-black text-sm shadow-lg hover:bg-primary hover:text-white transition-all hover:-translate-x-1"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white text-slate-900 font-black text-xs sm:text-sm shadow-lg hover:bg-primary hover:text-white transition-all hover:-translate-x-1"
             >
               <ArrowRight className="h-4 w-4 rotate-180" />
               Go Back
@@ -312,36 +337,36 @@ Your support will be highly appreciated, and God bless you as you do so. Please 
           </div>
 
           {/* Award category label — bottom of banner */}
-          <div className="absolute bottom-0 left-0 right-0 container px-4 z-30 pb-20">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="h-8 w-8 rounded-xl bg-primary flex items-center justify-center shadow-lg">
-                <Trophy className="h-4 w-4 text-white" />
+          <div className="absolute bottom-0 left-0 right-0 container px-4 z-30 pb-10">
+            <div className="flex items-center gap-2.5 mb-2">
+              <div className="h-7 w-7 rounded-lg bg-primary flex items-center justify-center shadow-lg">
+                <Trophy className="h-3.5 w-3.5 text-white" />
               </div>
-              <span className="text-xs font-black text-primary uppercase tracking-[0.25em]">
-                NACOS Awards Day 2026
+              <span className="text-[11px] font-black text-primary uppercase tracking-[0.25em]">
+                NASS Awards Day 2026
               </span>
             </div>
-            <h2 className="text-2xl sm:text-4xl font-black text-white leading-tight max-w-2xl">
+            <h2 className="text-xl sm:text-3xl font-black text-white leading-tight max-w-2xl">
               {nominee.categoryName || nominee.categorySlug}
             </h2>
           </div>
         </div>
 
         {/* ── Profile card ── */}
-        <div className="container px-4 mt-[-3rem] relative z-30">
+        <div className="container px-4 mt-[-1.5rem] relative z-30">
           <div className="max-w-3xl mx-auto">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-white rounded-[2.5rem] border border-slate-200 shadow-2xl overflow-hidden"
+              className="bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden"
             >
               {/* ── Nominee identity strip ── */}
-              <div className="relative flex flex-col sm:flex-row items-center sm:items-start gap-6 p-8 sm:p-10 border-b border-slate-100">
-                <div className="hidden sm:block absolute left-0 top-0 bottom-0 w-1.5 bg-gradient-to-b from-primary via-blue-400 to-primary/30 rounded-l-[2.5rem]" />
+              <div className="relative flex flex-col sm:flex-row items-center sm:items-start gap-5 p-6 sm:p-8 border-b border-slate-100">
+                <div className="hidden sm:block absolute left-0 top-0 bottom-0 w-1.5 bg-gradient-to-b from-primary via-blue-400 to-primary/30 rounded-l-3xl" />
 
                 {/* Avatar */}
                 <div className="relative shrink-0">
-                  <div className="h-32 w-32 sm:h-36 sm:w-36 rounded-[1.8rem] border-4 border-white shadow-2xl overflow-hidden bg-slate-100 ring-4 ring-primary/10">
+                  <div className="h-28 w-28 sm:h-32 sm:w-32 rounded-2xl border-4 border-white shadow-xl overflow-hidden bg-slate-100 ring-4 ring-primary/10">
                     <img
                       src={resolveImageUrl(nominee.photo)}
                       alt={nominee.name}
@@ -352,7 +377,7 @@ Your support will be highly appreciated, and God bless you as you do so. Please 
                       }}
                     />
                   </div>
-                  <div className="absolute -bottom-2 -right-2 h-9 w-9 rounded-xl bg-amber-400 flex items-center justify-center shadow-lg border-2 border-white">
+                  <div className="absolute -bottom-2 -right-2 h-9 w-9 rounded-xl bg-[#1a4480] flex items-center justify-center shadow-lg border-2 border-white">
                     <span className="text-white text-xs font-black">{nominee.ranking || "1"}</span>
                   </div>
                 </div>
@@ -383,7 +408,7 @@ Your support will be highly appreciated, and God bless you as you do so. Please 
               </div>
 
               {/* Share row */}
-              <div className="px-8 sm:px-10 py-6 border-b border-slate-100 flex flex-wrap items-center gap-3">
+              <div className="px-5 sm:px-8 py-3.5 border-b border-slate-100 flex flex-wrap items-center gap-2.5">
                 <span className="text-xs font-black text-slate-400 uppercase tracking-widest mr-auto">
                   Share and Support
                 </span>
@@ -393,9 +418,9 @@ Your support will be highly appreciated, and God bless you as you do so. Please 
                   href={`https://api.whatsapp.com/send?text=${shareText}%20${shareUrl}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded-full bg-[#25D366] hover:bg-[#1ebe5d] text-white font-bold text-sm px-5 py-2.5 transition-all hover:-translate-y-0.5 shadow-sm"
+                  className="inline-flex items-center gap-1.5 rounded-full bg-[#25D366] hover:bg-[#1ebe5d] text-white font-bold text-xs sm:text-sm px-4 py-2 transition-all hover:-translate-y-0.5 shadow-sm"
                 >
-                  <svg className="h-4 w-4 fill-current" viewBox="0 0 24 24">
+                  <svg className="h-3.5 w-3.5 fill-current" viewBox="0 0 24 24">
                     <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
                     <path d="M12 0C5.373 0 0 5.373 0 12c0 2.125.557 4.118 1.533 5.845L0 24l6.335-1.652A11.954 11.954 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.006-1.374l-.358-.213-3.76.981.999-3.648-.232-.375A9.818 9.818 0 1112 21.818z" />
                   </svg>
@@ -407,9 +432,9 @@ Your support will be highly appreciated, and God bless you as you do so. Please 
                   href={`https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded-full bg-[#1877F2] hover:bg-[#1565d8] text-white font-bold text-sm px-5 py-2.5 transition-all hover:-translate-y-0.5 shadow-sm"
+                  className="inline-flex items-center gap-1.5 rounded-full bg-[#1877F2] hover:bg-[#1565d8] text-white font-bold text-xs sm:text-sm px-4 py-2 transition-all hover:-translate-y-0.5 shadow-sm"
                 >
-                  <svg className="h-4 w-4 fill-current" viewBox="0 0 24 24">
+                  <svg className="h-3.5 w-3.5 fill-current" viewBox="0 0 24 24">
                     <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
                   </svg>
                   Facebook
@@ -420,9 +445,9 @@ Your support will be highly appreciated, and God bless you as you do so. Please 
                   href={`https://twitter.com/intent/tweet?text=${shareText}&url=${shareUrl}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded-full bg-black hover:bg-slate-900 text-white font-bold text-sm px-5 py-2.5 transition-all hover:-translate-y-0.5 shadow-sm"
+                  className="inline-flex items-center gap-1.5 rounded-full bg-black hover:bg-slate-900 text-white font-bold text-xs sm:text-sm px-4 py-2 transition-all hover:-translate-y-0.5 shadow-sm"
                 >
-                  <svg className="h-4 w-4 fill-current" viewBox="0 0 24 24">
+                  <svg className="h-3.5 w-3.5 fill-current" viewBox="0 0 24 24">
                     <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
                   </svg>
                   Twitter / X
@@ -431,19 +456,19 @@ Your support will be highly appreciated, and God bless you as you do so. Please 
                 {/* Copy link */}
                 <button
                   onClick={handleCopy}
-                  className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-sm px-5 py-2.5 transition-all hover:-translate-y-0.5"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-xs sm:text-sm px-4 py-2 transition-all hover:-translate-y-0.5"
                 >
                   {copied ? (
-                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                    <CheckCircle2 className="h-3.5 w-3.5 text-green-500" />
                   ) : (
-                    <Copy className="h-4 w-4" />
+                    <Copy className="h-3.5 w-3.5" />
                   )}
                   {copied ? "Copied!" : "Copy Link"}
                 </button>
               </div>
 
               {/* ── Voting section ── */}
-              <div className="px-8 sm:px-10 py-8">
+              <div className="px-5 sm:px-8 py-5 sm:py-6">
                 <div className="flex items-center gap-3 mb-6">
                   <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
                     <Vote className="h-5 w-5" />

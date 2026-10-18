@@ -32,7 +32,7 @@ class VotingService
     public function generateReference(): string
     {
         do {
-            $reference = 'NCV-' . strtoupper(Str::random(10)) . '-' . time();
+            $reference = 'NASS-VOTE-' . strtoupper(Str::random(10)) . '-' . time();
         } while (VoteTransaction::where('reference', $reference)->exists());
 
         return $reference;

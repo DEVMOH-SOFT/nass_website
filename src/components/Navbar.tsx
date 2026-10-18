@@ -3,46 +3,36 @@ import { Link, useLocation } from "react-router-dom";
 import {
   Menu,
   X,
-  LogIn,
   ChevronRight,
-  Home,
-  Users,
-  CalendarDays,
-  FileText,
-  CreditCard,
-  IdCard,
-  BookOpen,
-  Phone,
   LogOut,
-  MapPin,
-  Award,
-  Heart,
+  Shield,
+  ExternalLink,
+  GraduationCap,
+  ShieldCheck,
+  Building2,
+  Users,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import LoginModal from "@/components/LoginModal";
-import { isAwardsHost } from "@/lib/api";
-
-import nacosLogo from "@/assets/nacos_logo.png";
+import { logoutStudent } from "@/lib/student-auth";
+import nassLogo from "@/assets/nass_logo.png";
 import lasustechLogo from "@/assets/lasustech_logo.png";
 
-const getNavLinks = () => {
-  if (isAwardsHost()) {
-    return [];
-  }
-  return [
-    { label: "Home", path: "/", icon: Home },
-    { label: "Executives", path: "/executives", icon: Users },
-    { label: "Events", path: "/events", icon: CalendarDays },
-    { label: "Awards", path: "https://awards.nacoslasustech.org.ng", icon: Award, external: true },
-    { label: "Constitution", path: "/constitution", icon: BookOpen },
-    { label: "Contact", path: "/contact", icon: Phone },
-  ];
-};
+const navLinks = [
+  { label: "Home", path: "/" },
+  { label: "College Profile", path: "/about" },
+  { label: "Departments", path: "/associations" },
+  { label: "Executives", path: "/executives" },
+  { label: "Events", path: "/events" },
+  { label: "Sponsorship", path: "/donate" },
+  { label: "Contact", path: "/contact" },
+];
 
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [loginOpen, setLoginOpen] = useState(false);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
@@ -50,7 +40,14 @@ const Navbar = () => {
     setProfileMenuOpen(false);
   }, [location.pathname]);
 
-  // Handle outside click for profile menu
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 30);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   useEffect(() => {
     const handleOutsideClick = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
@@ -58,344 +55,255 @@ const Navbar = () => {
         setProfileMenuOpen(false);
       }
     };
-
     document.addEventListener("mousedown", handleOutsideClick);
     return () => document.removeEventListener("mousedown", handleOutsideClick);
   }, [profileMenuOpen]);
 
+  const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+
   return (
     <>
-      <nav className="sticky top-0 z-50 border-b border-border/70 bg-white/88 backdrop-blur-xl">
-        <div className="container">
-          <div className="flex h-16 items-center justify-between lg:h-[76px]">
-
-            {/* Logo + Name */}
-            <div className="flex items-center gap-3">
-              <a 
-                href="https://nacos.org.ng" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                title="NACOS NATIONAL"
-                className="transition-opacity hover:opacity-80"
-              >
-                <img
-                  src={nacosLogo}
-                  alt="NACOS NATIONAL"
-                  className="h-7 sm:h-10 w-auto object-contain transition-transform hover:scale-105"
-                />
-              </a>
-
-              <a 
-                href="https://lasustech.edu.ng" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                title="LASUSTECH"
-                className="transition-opacity hover:opacity-80"
-              >
-                <img
-                  src={lasustechLogo}
-                  alt="LASUSTECH"
-                  className="h-7 sm:h-10 w-auto object-contain transition-transform hover:scale-105"
-                />
-              </a>
-
-              <Link to="/" className="ml-1 flex flex-col leading-tight cursor-pointer">
-                <span className="font-display text-[12px] sm:text-sm font-bold tracking-tight text-foreground uppercase">
-                  NACOS LASUSTECH
-                </span>
-                <span className="text-[10px] sm:text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
-                  Chapter
-                </span>
-              </Link>
-            </div>
-
-            {/* Desktop Nav */}
-            {!isAwardsHost() && (
-              <div className="hidden items-center rounded-full border border-border/70 bg-background/80 p-1 lg:flex">
-                {getNavLinks().map((link) => {
-                  const isActive = location.pathname === link.path;
-                  const Icon = link.icon;
-
-                  return link.external ? (
-                    <a
-                      key={link.path}
-                      href={link.path}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={`flex items-center gap-2 rounded-full px-4 py-2 text-[13px] font-medium transition text-muted-foreground hover:text-foreground`}
-                    >
-                      <Icon className="h-3.5 w-3.5" />
-                      {link.label}
-                    </a>
-                  ) : (
-                    <Link
-                      key={link.path}
-                      to={link.path}
-                      className={`flex items-center gap-2 rounded-full px-4 py-2 text-[13px] font-medium transition ${
-                        isActive
-                          ? "bg-accent text-foreground shadow-sm"
-                          : "text-muted-foreground hover:text-foreground"
-                      }`}
-                    >
-                      <Icon className="h-3.5 w-3.5" />
-                      {link.label}
-                    </Link>
-                  );
-                })}
-              </div>
-            )}
-
-            {/* Right */}
-            <div className="flex items-center gap-2">
-              {isAwardsHost() ? (
-                <a
-                  href="https://nacoslasustech.org.ng"
-                  className="hidden h-10 items-center justify-center gap-2 rounded-full bg-[#1F5FAF] px-5 text-xs font-black text-white hover:bg-[#184d90] sm:inline-flex"
+      {/* Unified Sticky Header: Keeps the white masthead & nav bar permanently visible while scrolling */}
+      <header className="sticky top-0 z-50 shadow-sm">
+        {/* ======================================================== */}
+        {/* TIER 1: SLIM INSTITUTIONAL IDENTITY MASTHEAD (WHITE)     */}
+        {/* ======================================================== */}
+        <div className="bg-white border-b border-slate-200 select-none py-2">
+          <div className="container flex items-center justify-between gap-4">
+            {/* Left: Academic Collegiate Identity */}
+            <Link
+              to="/"
+              className="flex items-center gap-2 sm:gap-3 transition-opacity hover:opacity-95 min-w-0"
+            >
+              {/* Dual Seals */}
+              <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                <div
+                  className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-white p-0.5 border-2 border-emerald-900/40 shadow-2xs overflow-hidden shrink-0 ring-1 ring-emerald-500/20"
+                  style={{ clipPath: "circle(50% at 50% 50%)" }}
                 >
-                  Visit Website
-                </a>
-              ) : localStorage.getItem("isLoggedIn") === "true" ? (
-                <div className="flex items-center gap-3">
-                  <div className="relative group profile-menu-container">
-                    <button 
-                      onClick={() => setProfileMenuOpen(!profileMenuOpen)}
-                      className="flex h-10 w-10 overflow-hidden rounded-full border-2 border-primary/20 transition-all hover:border-primary/50 bg-muted items-center justify-center"
-                    >
-                      {(() => {
-                        try {
-                          const userStr = localStorage.getItem("user");
-                          const user = (userStr && userStr !== "null") ? JSON.parse(userStr) : {};
-                          if (!user || typeof user !== 'object') return <div className="h-full w-full flex items-center justify-center bg-muted"><Users className="h-4 w-4 text-muted-foreground/40" /></div>;
-                          
-                          const profileImage = user.profile_image || user.profileImage;
-                          if (profileImage && typeof profileImage === 'string') {
-                            const src = profileImage.startsWith('http') 
-                              ? profileImage 
-                              : `https://nacosid.tmb.it.com/${profileImage.startsWith('/') ? profileImage.substring(1) : profileImage}`;
-                            return <img src={src} alt="Profile" className="h-full w-full object-cover" />;
-                          }
-                        } catch (e) {
-                          console.error("Navbar Image Error:", e);
-                        }
-                        return <div className="h-full w-full flex items-center justify-center bg-muted"><Users className="h-4 w-4 text-muted-foreground/40" /></div>;
-                      })()}
-                    </button>
-                    {/* Simplified Dropdown */}
-                    {(profileMenuOpen || false) && (
-                      <div className="absolute right-0 top-full mt-2 w-48 rounded-2xl border border-border bg-card p-2 shadow-xl animate-reveal lg:group-hover:block">
-                        <Link 
-                          to="/dashboard" 
-                          onClick={() => setProfileMenuOpen(false)}
-                          className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm text-foreground hover:bg-accent"
-                        >
-                          Dashboard
-                        </Link>
-                        <button 
-                          onClick={() => {
-                            localStorage.removeItem("isLoggedIn");
-                            window.location.href = "/";
-                          }}
-                          className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm text-red-500 hover:bg-red-50"
-                        >
-                          Logout
-                        </button>
+                  <img
+                    src={nassLogo}
+                    alt="NASS Emblem"
+                    className="h-full w-full object-contain rounded-full"
+                    style={{ clipPath: "circle(50% at 50% 50%)" }}
+                  />
+                </div>
+
+                <div className="h-6 w-[1px] bg-slate-200 hidden sm:block" />
+
+                <div className="hidden sm:flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-white p-0.5 border-2 border-[#1a4480]/50 shadow-2xs shrink-0 ring-1 ring-blue-500/20">
+                  <img
+                    src={lasustechLogo}
+                    alt="LASUSTECH Crest"
+                    className="h-full w-full object-contain"
+                  />
+                </div>
+              </div>
+
+              {/* Typography */}
+              <div className="flex flex-col min-w-0">
+                <div className="flex items-center gap-1.5">
+                  <span className="font-display text-xs sm:text-base font-extrabold text-slate-900 tracking-tight leading-tight truncate">
+                    COLLEGE OF BASIC SCIENCES
+                  </span>
+                  <span className="hidden md:inline-flex items-center gap-1 rounded bg-blue-50 px-2 py-0.5 text-[9.5px] font-bold text-[#1a4480] border border-blue-200">
+                    LASUSTECH
+                  </span>
+                </div>
+                <span className="text-[9px] sm:text-[11px] font-semibold text-emerald-800 tracking-normal leading-tight truncate">
+                  Nigerian Association of Science Students
+                </span>
+              </div>
+            </Link>
+
+            {/* Right: Compact Utilities & Action */}
+            <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+              {/* Session Pill */}
+              <div className="hidden lg:flex items-center gap-1.5 rounded border border-emerald-700/20 bg-emerald-50/60 px-2.5 py-1 text-[10.5px] text-emerald-900 font-bold">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-600 animate-pulse" />
+                <span>DEVMOH Led Administration • 2026/2027</span>
+              </div>
+
+              {/* University Portal Link (LASUSTECH Blue) */}
+              <a
+                href="https://lasustech.edu.ng"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#1a4480] hover:text-[#0f2952] transition-colors hidden md:inline-flex items-center gap-1 text-[11px] font-bold bg-blue-50/70 hover:bg-blue-100/60 border border-blue-200/80 px-2.5 py-1 rounded"
+              >
+                <span>University Portal</span>
+                <ExternalLink className="h-2.5 w-2.5 opacity-80" />
+              </a>
+
+              {/* Student Portal Button */}
+              {isLoggedIn ? (
+                <div className="relative group profile-menu-container">
+                  <button
+                    onClick={() => setProfileMenuOpen(!profileMenuOpen)}
+                    className="flex h-8 w-8 overflow-hidden rounded-md border border-emerald-700/40 transition-all hover:border-emerald-700 bg-slate-100 items-center justify-center shadow-xs"
+                  >
+                    <Users className="h-3.5 w-3.5 text-emerald-800" />
+                  </button>
+                  {profileMenuOpen && (
+                    <div className="absolute right-0 top-full mt-2 w-52 rounded-lg border border-slate-200 bg-white p-1.5 shadow-xl animate-reveal z-50">
+                      <div className="px-3 py-2 border-b border-slate-100 mb-1">
+                        <p className="text-xs font-bold text-slate-900 truncate uppercase">
+                          {(() => {
+                            try {
+                              const u = JSON.parse(localStorage.getItem("user") || "{}");
+                              return String(u.full_name || u.name || "Science Scholar").toUpperCase();
+                            } catch (e) {
+                              return "SCIENCE SCHOLAR";
+                            }
+                          })()}
+                        </p>
+                        <p className="text-[10px] text-slate-500 font-mono truncate">
+                          {localStorage.getItem("student_matric") || "Collegiate Portal"}
+                        </p>
                       </div>
-                    )}
-                  </div>
+                      <Link
+                        to="/dashboard"
+                        onClick={() => setProfileMenuOpen(false)}
+                        className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-slate-900"
+                      >
+                        <Shield className="h-3.5 w-3.5 text-emerald-700" />
+                        Dashboard
+                      </Link>
+                      <button
+                        onClick={() => {
+                          logoutStudent();
+                          window.location.href = "/";
+                        }}
+                        className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-xs font-semibold text-red-600 hover:bg-red-50"
+                      >
+                        <LogOut className="h-3.5 w-3.5" />
+                        Sign Out
+                      </button>
+                    </div>
+                  )}
                 </div>
               ) : (
-                <Button
-                  size="sm"
+                <button
                   onClick={() => setLoginOpen(true)}
-                  className="hidden h-10 gap-2 rounded-full bg-[#1F5FAF] px-4 text-xs font-semibold text-white hover:bg-[#184d90] sm:inline-flex"
+                  className="hidden sm:inline-flex items-center gap-1.5 rounded-md bg-[#1a4480] hover:bg-[#143766] text-white border border-blue-400/40 px-3 py-1.5 text-[11px] font-bold tracking-wide shadow-2xs transition-colors"
                 >
-                  <LogIn className="h-3.5 w-3.5" />
-                  Login
-                </Button>
+                  <GraduationCap className="h-3.5 w-3.5 text-sky-200" />
+                  <span>Access Portal</span>
+                </button>
               )}
 
+              {/* Mobile menu toggle */}
               <button
                 onClick={() => setMobileOpen(!mobileOpen)}
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border/70 bg-background lg:hidden"
+                aria-label="Toggle menu"
+                className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-slate-200 text-slate-700 hover:bg-slate-50 lg:hidden shrink-0"
               >
-                {mobileOpen ? (
-                  <X className="h-5 w-5" />
-                ) : (
-                  <Menu className="h-5 w-5" />
-                )}
+                {mobileOpen ? <X className="h-4.5 w-4.5" /> : <Menu className="h-4.5 w-4.5" />}
               </button>
             </div>
           </div>
         </div>
 
-        {/* Mobile */}
-        {/* Mobile */}
-        <div 
-          className={`fixed inset-0 z-40 bg-foreground/20 backdrop-blur-sm transition-opacity duration-300 lg:hidden ${
-            mobileOpen ? "opacity-100" : "pointer-events-none opacity-0"
-          }`}
-          onClick={() => setMobileOpen(false)}
-        />
-
-        <div 
-          className={`fixed inset-x-0 top-0 z-50 transform border-b border-border/70 bg-white/95 backdrop-blur-xl transition-transform duration-500 ease-out lg:hidden ${
-            mobileOpen ? "translate-y-0" : "-translate-y-full"
-          }`}
-        >
-          <div className="container py-6">
-            <div className="flex items-center justify-between pb-6 border-b border-border/50">
-              <div className="flex items-center gap-3">
-                {localStorage.getItem("isLoggedIn") === "true" ? (
-                  <div className="flex items-center gap-3">
-                    {(() => {
-                      try {
-                        const userStr = localStorage.getItem("user");
-                        const user = (userStr && userStr !== "null") ? JSON.parse(userStr) : {};
-                        if (!user || typeof user !== 'object') return <div className="h-10 w-10 rounded-full border-2 border-primary/20 bg-muted flex items-center justify-center"><Users className="h-4 w-4 text-muted-foreground/40" /></div>;
-                        
-                        const profileImage = user.profile_image || user.profileImage;
-                        if (profileImage && typeof profileImage === 'string') {
-                          const src = profileImage.startsWith('http') 
-                            ? profileImage 
-                            : `https://nacosid.tmb.it.com/${profileImage.startsWith('/') ? profileImage.substring(1) : profileImage}`;
-                          return <img src={src} alt="Profile" className="h-10 w-10 rounded-full border-2 border-primary/20 object-cover" />;
-                        }
-                      } catch (e) {
-                        console.error("Mobile Navbar Image Error:", e);
-                      }
-                      return <div className="h-10 w-10 rounded-full border-2 border-primary/20 bg-muted flex items-center justify-center"><Users className="h-4 w-4 text-muted-foreground/40" /></div>;
-                    })()}
-                    <div className="flex flex-col">
-                      <span className="font-display font-bold text-sm">
-                        {(() => {
-                          try {
-                            const userStr = localStorage.getItem("user");
-                            const user = (userStr && userStr !== "null") ? JSON.parse(userStr) : {};
-                            return String(user.name || "Member");
-                          } catch (e) {
-                            return "Member";
-                          }
-                        })()}
-                      </span>
-                      <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">
-                        {(() => {
-                          try {
-                            const userStr = localStorage.getItem("user");
-                            const user = (userStr && userStr !== "null") ? JSON.parse(userStr) : {};
-                            if (!user || typeof user !== 'object') return "Verified Member";
-                            return (user.post && typeof user.post === 'string' && user.post.toLowerCase() !== 'student') ? user.post : "Verified Member";
-                          } catch (e) {
-                            return "Verified Member";
-                          }
-                        })() || "Verified Member"}
-                      </span>
-                    </div>
-                  </div>
-                ) : (
-                  <>
-                  <div className="flex items-center gap-3">
-                    <img src={nacosLogo} alt="NACOS Logo" className="h-7 w-auto" />
-                    <img src={lasustechLogo} alt="LASUSTECH Logo" className="h-7 w-auto" />
-                    <div className="flex flex-col">
-                      <span className="font-display font-bold text-xs">NACOS LASUSTECH</span>
-                      <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-widest">Chapter</span>
-                    </div>
-                  </div>
-                  </>
-                )}
-              </div>
-              <button 
-                onClick={() => setMobileOpen(false)}
-                className="flex h-10 w-10 items-center justify-center rounded-full bg-accent"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-
-            <div className="mt-8 grid gap-2">
-              {getNavLinks().map((link, i) => {
+        {/* ======================================================== */}
+        {/* TIER 2: CRISP COLLEGIATE FOREST NAVIGATION BAR           */}
+        {/* ======================================================== */}
+        <div className="bg-[#061d10] text-slate-100 border-t-2 border-[#1a4480] shadow-xs">
+          <div className="container">
+          <div className="flex h-10 items-center justify-between">
+            {/* Desktop Navigation Links */}
+            <nav className="hidden lg:flex items-center h-full">
+              {navLinks.map((link) => {
                 const isActive = location.pathname === link.path;
-                const Icon = link.icon;
 
-                return link.external ? (
-                  <a
-                    key={link.path}
-                    href={link.path}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{ transitionDelay: `${i * 50}ms` }}
-                    className={`flex items-center justify-between rounded-2xl px-5 py-4 transition-all duration-300 text-muted-foreground hover:bg-accent hover:text-foreground ${mobileOpen ? "translate-x-0 opacity-100" : "-translate-x-4 opacity-0"}`}
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                        <Icon className="h-5 w-5" />
-                      </div>
-                      <span className="font-semibold">{link.label}</span>
-                    </div>
-                    <ChevronRight className={`h-4 w-4 opacity-30`} />
-                  </a>
-                ) : (
+                return (
                   <Link
                     key={link.path}
                     to={link.path}
-                    style={{ transitionDelay: `${i * 50}ms` }}
-                    className={`flex items-center justify-between rounded-2xl px-5 py-4 transition-all duration-300 ${
+                    className={`h-full text-[11px] uppercase font-bold tracking-wider px-3.5 transition-all flex items-center ${
                       isActive
-                        ? "bg-primary text-white shadow-lg shadow-primary/20"
-                        : "text-muted-foreground hover:bg-accent hover:text-foreground"
-                    } ${mobileOpen ? "translate-x-0 opacity-100" : "-translate-x-4 opacity-0"}`}
+                        ? "text-sky-300 bg-blue-950/50 border-b-2 border-blue-500 font-extrabold"
+                        : "text-slate-200/90 hover:text-white hover:bg-white/5"
+                    }`}
                   >
-                    <div className="flex items-center gap-4">
-                      <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${
-                        isActive ? "bg-white/20" : "bg-primary/10 text-primary"
-                      }`}>
-                        <Icon className="h-5 w-5" />
-                      </div>
-                      <span className="font-semibold">{link.label}</span>
-                    </div>
-                    <ChevronRight className={`h-4 w-4 ${isActive ? "opacity-100" : "opacity-30"}`} />
+                    <span>{link.label}</span>
+                  </Link>
+                );
+              })}
+            </nav>
+
+            {/* Right: Quick Collegiate Status in Nav Bar */}
+            <div className="hidden lg:flex items-center gap-2 text-[10.5px] font-semibold text-emerald-300/80">
+              <ShieldCheck className="h-3.5 w-3.5 text-sky-400" />
+              <span>5 Accredited Science Departments</span>
+            </div>
+
+            {/* Mobile Bar representation */}
+            <div className="flex lg:hidden items-center justify-between w-full h-full text-xs">
+              <span className="text-sky-300 font-bold uppercase tracking-wider text-[10px] sm:text-[10.5px] flex items-center gap-1.5">
+                <ShieldCheck className="h-3 w-3 text-sky-400" />
+                <span>DEVMOH Led Administration</span>
+              </span>
+              <button
+                onClick={() => setLoginOpen(true)}
+                className="text-[10px] font-bold uppercase tracking-wider text-sky-300 hover:underline"
+              >
+                Access Portal →
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile Navigation Drawer */}
+        {mobileOpen && (
+          <div className="border-t border-emerald-950 bg-[#072414] px-4 py-3 lg:hidden animate-reveal text-white">
+            <div className="space-y-1">
+              {navLinks.map((link) => {
+                const isActive = location.pathname === link.path;
+
+                return (
+                  <Link
+                    key={link.path}
+                    to={link.path}
+                    className={`flex items-center justify-between rounded-md px-3 py-2 text-xs font-bold uppercase tracking-wider transition-colors ${
+                      isActive
+                        ? "bg-blue-600/25 text-sky-300 border-l-3 border-blue-500 font-extrabold"
+                        : "text-slate-200 hover:bg-white/5"
+                    }`}
+                  >
+                    <span>{link.label}</span>
+                    <ChevronRight className="h-3.5 w-3.5 text-emerald-600" />
                   </Link>
                 );
               })}
             </div>
 
-            <div className={`mt-8 pt-6 border-t border-border/50 transition-all duration-500 delay-300 ${
-              mobileOpen ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
-            }`}>
-              {isAwardsHost() ? (
-                <a
-                  href="https://nacoslasustech.org.ng"
-                  className="flex h-14 w-full items-center justify-center gap-3 rounded-2xl bg-[#1F5FAF] text-base font-bold text-white shadow-xl shadow-blue-500/20 hover:bg-[#184d90]"
+            <div className="mt-3 pt-2.5 border-t border-emerald-900/60">
+              {isLoggedIn ? (
+                <Link
+                  to="/dashboard"
+                  onClick={() => setMobileOpen(false)}
+                  className="flex h-9 w-full items-center justify-center gap-2 rounded-md bg-[#1a4480] hover:bg-[#143766] text-xs font-extrabold uppercase tracking-wider text-white shadow-xs"
                 >
-                  Visit Main Website
-                </a>
-              ) : localStorage.getItem("isLoggedIn") === "true" ? (
-                <Button
-                  onClick={() => {
-                    localStorage.removeItem("isLoggedIn");
-                    window.location.href = "/";
-                  }}
-                  className="h-14 w-full gap-3 rounded-2xl bg-red-500 text-base font-bold text-white shadow-xl shadow-red-500/20 hover:bg-red-600"
-                >
-                  <LogOut className="h-5 w-5" />
-                  Logout Account
-                </Button>
+                  <Shield className="h-3.5 w-3.5" />
+                  <span>Open Student Dashboard</span>
+                </Link>
               ) : (
                 <Button
                   onClick={() => {
                     setMobileOpen(false);
                     setLoginOpen(true);
                   }}
-                  className="h-14 w-full gap-3 rounded-2xl bg-[#1F5FAF] text-base font-bold text-white shadow-xl shadow-blue-500/20 hover:bg-[#184d90]"
+                  className="flex h-9 w-full items-center justify-center gap-2 rounded-md bg-[#1a4480] hover:bg-[#143766] text-xs font-extrabold uppercase tracking-wider text-white shadow-xs"
                 >
-                  <LogIn className="h-5 w-5" />
-                  Access Member Portal
+                  <GraduationCap className="h-3.5 w-3.5 text-sky-200" />
+                  <span>Access Student Portal</span>
                 </Button>
               )}
             </div>
           </div>
+        )}
         </div>
-      </nav>
+      </header>
 
       <LoginModal open={loginOpen} onClose={() => setLoginOpen(false)} />
     </>

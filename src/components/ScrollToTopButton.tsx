@@ -50,7 +50,7 @@ const ScrollToTopButton = () => {
           exit={{ opacity: 0, scale: 0.5, y: 20 }}
           transition={{ duration: 0.3 }}
           onClick={scrollToTop}
-          className="fixed bottom-6 right-6 z-50 flex items-center justify-center focus:outline-none group"
+          className="fixed bottom-36 sm:bottom-24 right-4 sm:right-6 z-40 flex items-center justify-center focus:outline-none group"
           aria-label="Scroll to top"
         >
           {/* SVG Progress Circle */}

@@ -9,6 +9,7 @@ class KorapayService {
         amount,
         currency: config.voting.currency,
         reference,
+        merchant_bears_cost: false,
         customer: {
           email,
           name,
