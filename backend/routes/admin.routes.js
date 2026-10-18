@@ -52,8 +52,7 @@ const safeRemoteGet = async (action) => {
 
 router.get('/dashboard', async (_req, res, next) => {
   try {
-    const [students, flags, executives, events, blogs, academicSettings] = await Promise.all([
-      safeRemoteGet('get_all_students'),
+    const [flags, executives, events, blogs, academicSettings] = await Promise.all([
       getStudentFlags(),
       listExecutives({ includeInactive: true }),
       listEvents({ includeInactive: true }),
@@ -62,12 +61,12 @@ router.get('/dashboard', async (_req, res, next) => {
     ]);
 
     const stats = await getAdminSummary({
-      totalStudents: Array.isArray(students) ? students.length : 0,
+      totalStudents: 0,
     });
 
     res.json({
       stats,
-      students: Array.isArray(students) ? students : [],
+      students: [],
       flags,
       executives,
       events,
@@ -81,9 +80,8 @@ router.get('/dashboard', async (_req, res, next) => {
 
 router.get('/stats', async (_req, res, next) => {
   try {
-    const students = await safeRemoteGet('get_all_students');
     const stats = await getAdminSummary({
-      totalStudents: Array.isArray(students) ? students.length : 0,
+      totalStudents: 0,
     });
     res.json(stats);
   } catch (error) {
@@ -93,27 +91,13 @@ router.get('/stats', async (_req, res, next) => {
 
 router.get('/students', async (_req, res, next) => {
   try {
-    const [students, flags] = await Promise.all([
-      safeRemoteGet('get_all_students'),
-      getStudentFlags(),
-    ]);
+    const flags = await getStudentFlags();
 
     const flagsByMatric = new Map(
       flags.map((flag) => [String(flag.matric_number).trim(), flag]),
     );
 
-    const merged = Array.isArray(students)
-      ? students.map((student) => {
-          const matric =
-            String(student.matric_number || student.matric_no || student.matric || '').trim();
-          return {
-            ...student,
-            activeFlag: flagsByMatric.get(matric) || null,
-          };
-        })
-      : [];
-
-    res.json(merged);
+    res.json([]);
   } catch (error) {
     next(error);
   }

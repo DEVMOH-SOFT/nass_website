@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { adminFetch, clearAdminSession, loginToAdminSystems, votingAdminFetch } from "@/lib/admin-api";
-import { BarChart3, Calendar, FileText, Flag, Image, LogOut, Settings, ShieldCheck, Trophy, Users, Search, ChevronDown, ChevronUp, Plus, Trash2, Edit2, ImagePlus, Award, Check, X, SlidersHorizontal, ArrowUpDown, Clock, CreditCard, Receipt, Menu, BookOpen, Download, Printer, UploadCloud, CheckCircle2, FileSpreadsheet, FolderUp, Mail, Send, Sparkles, Key, Lock, AlertCircle, RefreshCw, ShoppingBag, Tag, Package, ExternalLink, Paperclip } from "lucide-react";
+import { BarChart3, Calendar, FileText, Flag, Image, LogOut, Settings, ShieldCheck, Trophy, Users, Search, ChevronDown, ChevronUp, Plus, Trash2, Edit2, ImagePlus, Award, Check, X, SlidersHorizontal, ArrowUpDown, Clock, CreditCard, Receipt, Menu, BookOpen, Download, Printer, UploadCloud, CheckCircle2, FileSpreadsheet, FolderUp, Mail, Send, Sparkles, Key, Lock, AlertCircle, RefreshCw, ShoppingBag, Tag, Package, ExternalLink, Paperclip, Eye, EyeOff, User, ArrowRight, ArrowLeft, Building, Database, MailCheck, KeyRound } from "lucide-react";
 import { sendCollegiateEmail, getDispatchedEmails, DispatchedMailLog, getMailerConfigApi, saveMailerConfigApi, sendTestEmailApi, MailerConfigStatus, EmailAttachment } from "@/lib/mailer";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { getStoreProducts, addStoreProduct, updateStoreProduct, deleteStoreProduct, resetStoreProducts, StoreProduct } from "@/lib/store-service";
@@ -48,6 +48,8 @@ const AdminPortal = () => {
   const [activeTab, setActiveTab] = useState<TabKey>("overview");
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [rememberTerminal, setRememberTerminal] = useState(true);
   const [adminUser, setAdminUser] = useState<any>(null);
   const [credentials, setCredentials] = useState({ username: "", password: "" });
   const [dashboard, setDashboard] = useState<any>(null);
@@ -1062,15 +1064,8 @@ Secretariat, NASS LASUSTECH`);
       if (key) studentMap.set(key, s);
     });
 
-    // Second: Backend dashboard students
-    if (mainDashboard?.students && Array.isArray(mainDashboard.students)) {
-      mainDashboard.students.forEach((s: any) => {
-        const key = (s.email || s.matric_number || s.matric_no || "").toLowerCase().trim();
-        if (key && !studentMap.has(key)) {
-          studentMap.set(key, s);
-        }
-      });
-    }
+    // Only legitimate NASS LASUSTECH students are loaded (from Supabase & NASS Dues Ledger)
+    // Legacy NACOS student lists are explicitly excluded.
 
     // Third: Local verified payments ledger
     try {
@@ -1235,59 +1230,236 @@ Secretariat, NASS LASUSTECH`);
 
   if (!adminUser) {
     return (
-      <div className="min-h-screen bg-[linear-gradient(135deg,#062018_0%,#0f3b2c_55%,#133321_100%)] flex flex-col justify-between p-4 sm:p-8">
-        <header className="max-w-5xl mx-auto w-full flex items-center justify-between pb-6 border-b border-white/10 text-white">
-          <div className="flex items-center gap-3">
-            <ShieldCheck className="h-6 w-6 text-emerald-400" />
+      <div className="min-h-screen bg-[#03130c] text-white flex flex-col justify-between relative overflow-hidden select-none">
+        {/* Ambient Glow Orbs */}
+        <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[900px] h-[500px] bg-gradient-to-b from-emerald-500/15 via-teal-500/10 to-transparent blur-3xl pointer-events-none rounded-full" />
+        <div className="absolute -bottom-40 -right-40 w-[600px] h-[600px] bg-emerald-600/10 blur-[140px] pointer-events-none rounded-full" />
+        <div className="absolute top-1/3 -left-40 w-[500px] h-[500px] bg-teal-500/10 blur-[130px] pointer-events-none rounded-full" />
+
+        {/* Microdot Matrix Overlay */}
+        <div
+          className="absolute inset-0 opacity-[0.12] pointer-events-none"
+          style={{ backgroundImage: "radial-gradient(#10b981 1px, transparent 1px)", backgroundSize: "28px 28px" }}
+        />
+
+        {/* Top Executive Header */}
+        <header className="relative z-10 max-w-6xl mx-auto w-full px-4 sm:px-6 py-6 flex items-center justify-between border-b border-white/10 backdrop-blur-md">
+          <div className="flex items-center gap-3.5">
+            <div className="h-11 w-11 rounded-2xl bg-gradient-to-br from-emerald-400/20 to-teal-500/10 border border-emerald-400/40 p-2 flex items-center justify-center shadow-[0_0_20px_rgba(16,185,129,0.25)]">
+              <ShieldCheck className="h-6 w-6 text-emerald-400" />
+            </div>
             <div>
-              <p className="text-xs uppercase tracking-[0.25em] font-bold text-emerald-400">DEVMOH-Led Administration</p>
-              <p className="text-[11px] text-white/70">NASS LASUSTECH Secretariat</p>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] uppercase tracking-[0.3em] font-extrabold text-emerald-400">
+                  NASS LASUSTECH
+                </span>
+                <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="text-[9px] uppercase tracking-wider font-semibold text-emerald-300/80 border border-emerald-500/30 px-1.5 py-0.5 rounded">
+                  SEC-HQ
+                </span>
+              </div>
+              <p className="text-xs font-semibold text-white/90 tracking-tight">
+                College of Basic Sciences Secretariat
+              </p>
             </div>
           </div>
-          <Link to="/" className="text-xs font-bold text-emerald-300 hover:text-white transition-colors">
-            ← Back to Website
+
+          <Link
+            to="/"
+            className="group flex items-center gap-2 text-xs font-semibold text-emerald-300 hover:text-white px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-all shadow-sm"
+          >
+            <ArrowLeft className="h-3.5 w-3.5 group-hover:-translate-x-1 transition-transform text-emerald-400" />
+            <span>Back to Public Website</span>
           </Link>
         </header>
 
-        <section className="container max-w-5xl py-8">
-          <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] items-center">
-            <div className="rounded-[2rem] border border-white/10 bg-white/8 p-8 text-white backdrop-blur">
-              <p className="text-xs uppercase tracking-[0.35em] text-emerald-400 font-bold">DEVMOH-Led Admin Portal</p>
-              <h1 className="mt-4 font-display text-3xl sm:text-4xl font-bold">Centralized Administration Console</h1>
-              <p className="mt-4 max-w-xl text-sm leading-7 text-white/70">
-                Authorized access only. Manage students, dues collections, store orders, academic calendar, events, and voting transactions from a dedicated command center.
-              </p>
-              <div className="mt-6 flex items-center gap-2 text-xs text-emerald-300/80">
-                <ShieldCheck className="h-4 w-4 text-emerald-400" />
-                <span>Default Password: <code className="bg-black/30 px-2 py-0.5 rounded text-white font-mono">admin_nass2026</code></span>
+        {/* Main Content Area */}
+        <main className="relative z-10 container max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12 flex-1 flex items-center">
+          <div className="grid gap-10 lg:grid-cols-12 items-center w-full">
+            {/* Left Column (7 cols): Institutional Authority & Trust */}
+            <div className="lg:col-span-7 space-y-6 lg:pr-6">
+              {/* Badge */}
+              <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-950/60 px-4 py-1.5 text-xs font-bold text-emerald-300 backdrop-blur-md shadow-[0_0_15px_rgba(16,185,129,0.15)]">
+                <Sparkles className="h-3.5 w-3.5 text-emerald-400" />
+                <span className="tracking-wide uppercase">DEVMOH-Led Executive Administration</span>
+              </div>
+
+              {/* Heading */}
+              <div className="space-y-3">
+                <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-[1.15]">
+                  Secretariat Command &{" "}
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-emerald-200">
+                    Control Centre
+                  </span>
+                </h1>
+                <p className="text-sm sm:text-base text-emerald-100/75 leading-relaxed max-w-xl font-normal">
+                  Authorized administrative gateway for the College of Basic Sciences, LASUSTECH. Real-time governance of scholar registrations, statutory dues clearance verification, collegiate communications, and store logistics.
+                </p>
+              </div>
+
+              {/* 3 Pillars */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 pt-2">
+                <div className="p-4 rounded-2xl bg-white/[0.04] border border-white/10 backdrop-blur-sm hover:border-emerald-500/30 transition-all group">
+                  <div className="h-8 w-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 mb-2.5 group-hover:scale-110 transition-transform">
+                    <Database className="h-4 w-4" />
+                  </div>
+                  <p className="text-xs font-bold text-white tracking-tight">Collegiate Ledger</p>
+                  <p className="text-[11px] text-emerald-200/60 mt-1 leading-snug">Instant dues verification & receipt clearance</p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-white/[0.04] border border-white/10 backdrop-blur-sm hover:border-emerald-500/30 transition-all group">
+                  <div className="h-8 w-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 mb-2.5 group-hover:scale-110 transition-transform">
+                    <MailCheck className="h-4 w-4" />
+                  </div>
+                  <p className="text-xs font-bold text-white tracking-tight">Direct Dispatch</p>
+                  <p className="text-[11px] text-emerald-200/60 mt-1 leading-snug">Direct-to-inbox student broadcast & attachments</p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-white/[0.04] border border-white/10 backdrop-blur-sm hover:border-emerald-500/30 transition-all group">
+                  <div className="h-8 w-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 mb-2.5 group-hover:scale-110 transition-transform">
+                    <Building className="h-4 w-4" />
+                  </div>
+                  <p className="text-xs font-bold text-white tracking-tight">5 Departments</p>
+                  <p className="text-[11px] text-emerald-200/60 mt-1 leading-snug">Unified Basic Science collegiate jurisdiction</p>
+                </div>
+              </div>
+
+              {/* Constituent Departments Pills */}
+              <div className="pt-2">
+                <p className="text-[10px] uppercase tracking-[0.2em] font-extrabold text-emerald-400/80 mb-2">Constituent Science Departments:</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {["Computer Science", "Mathematical Sciences", "Chemical Sciences", "Biological Sciences", "Physics"].map((dept) => (
+                    <span key={dept} className="text-[10.5px] px-2.5 py-1 rounded-lg bg-emerald-950/50 border border-emerald-500/20 text-emerald-200/80 font-medium">
+                      {dept}
+                    </span>
+                  ))}
+                </div>
               </div>
             </div>
-            <div className="flex flex-col gap-6">
-              <form onSubmit={handleLogin} className="rounded-[2rem] bg-white p-8 shadow-2xl">
-                <div className="flex items-center gap-3 text-emerald-800">
-                  <ShieldCheck className="h-6 w-6 text-emerald-700" />
-                  <p className="text-sm font-bold uppercase tracking-[0.25em]">Admin Authentication</p>
-                </div>
-                <div className="mt-8 space-y-5">
-                  <div>
-                    <label className="mb-2 block text-xs font-bold uppercase tracking-widest text-muted-foreground">Username</label>
-                    <Input value={credentials.username} onChange={(e) => setCredentials({ ...credentials, username: e.target.value })} placeholder="admin" required />
+
+            {/* Right Column (5 cols): The Glassmorphic Executive Card */}
+            <div className="lg:col-span-5">
+              <div className="relative rounded-[2.5rem] bg-gradient-to-b from-white/[0.08] to-white/[0.02] p-1 shadow-[0_25px_70px_rgba(0,0,0,0.85)] border border-emerald-500/30 backdrop-blur-2xl">
+                {/* Card Interior */}
+                <div className="rounded-[2.4rem] bg-[#061e13]/90 p-7 sm:p-9 space-y-6">
+                  {/* Header inside Card */}
+                  <div className="flex items-start justify-between pb-4 border-b border-white/10">
+                    <div>
+                      <span className="text-[10px] font-extrabold uppercase tracking-[0.25em] text-emerald-400 block mb-1">
+                        Security Level 4
+                      </span>
+                      <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+                        Executive Sign-In
+                      </h2>
+                      <p className="text-xs text-white/60 mt-0.5">
+                        Authenticate to unlock the collegiate terminal
+                      </p>
+                    </div>
+                    <div className="h-12 w-12 rounded-2xl bg-emerald-500/15 border border-emerald-400/30 flex items-center justify-center text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.3)]">
+                      <Lock className="h-6 w-6" />
+                    </div>
                   </div>
-                  <div>
-                    <label className="mb-2 block text-xs font-bold uppercase tracking-widest text-muted-foreground">Password</label>
-                    <Input type="password" value={credentials.password} onChange={(e) => setCredentials({ ...credentials, password: e.target.value })} placeholder="••••••••••••" required />
+
+                  {/* Login Form */}
+                  <form onSubmit={handleLogin} className="space-y-5">
+                    {/* Username Input */}
+                    <div className="space-y-1.5">
+                      <label className="text-[11px] font-bold uppercase tracking-wider text-emerald-200/90 block">
+                        Administrator Username
+                      </label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-emerald-400/80">
+                          <User className="h-4 w-4" />
+                        </div>
+                        <Input
+                          type="text"
+                          value={credentials.username}
+                          onChange={(e) => setCredentials({ ...credentials, username: e.target.value })}
+                          placeholder="Enter admin username"
+                          required
+                          className="h-12 pl-10 pr-4 rounded-xl bg-black/40 border-white/15 text-white placeholder:text-white/30 text-sm focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20 transition-all font-medium"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Password Input */}
+                    <div className="space-y-1.5">
+                      <label className="text-[11px] font-bold uppercase tracking-wider text-emerald-200/90 block">
+                        Security Passphrase
+                      </label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-emerald-400/80">
+                          <KeyRound className="h-4 w-4" />
+                        </div>
+                        <Input
+                          type={showPassword ? "text" : "password"}
+                          value={credentials.password}
+                          onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
+                          placeholder="Enter security passphrase"
+                          required
+                          className="h-12 pl-10 pr-11 rounded-xl bg-black/40 border-white/15 text-white placeholder:text-white/30 text-sm focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20 transition-all font-mono"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-white/50 hover:text-emerald-300 transition-colors"
+                          tabIndex={-1}
+                        >
+                          {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Remember Me */}
+                    <div className="flex items-center justify-between text-xs pt-1">
+                      <label className="flex items-center gap-2 cursor-pointer text-white/70 hover:text-white transition-colors">
+                        <input
+                          type="checkbox"
+                          checked={rememberTerminal}
+                          onChange={(e) => setRememberTerminal(e.target.checked)}
+                          className="rounded border-emerald-500/40 bg-black/40 text-emerald-500 focus:ring-0 focus:ring-offset-0 h-3.5 w-3.5 accent-emerald-500"
+                        />
+                        <span>Remember this workstation</span>
+                      </label>
+                      <span className="text-[11px] text-emerald-400 font-medium">
+                        12-Hour Session
+                      </span>
+                    </div>
+
+                    {/* Submit Button */}
+                    <Button
+                      type="submit"
+                      disabled={submitting}
+                      className="w-full h-12 rounded-xl bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white font-extrabold shadow-[0_0_25px_rgba(16,185,129,0.35)] hover:shadow-[0_0_35px_rgba(16,185,129,0.5)] transition-all flex items-center justify-center gap-2 text-xs uppercase tracking-widest border border-emerald-400/30"
+                    >
+                      {submitting ? (
+                        <>
+                          <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          <span>Authenticating Session...</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>Sign In to Control Centre</span>
+                          <ArrowRight className="h-4 w-4" />
+                        </>
+                      )}
+                    </Button>
+                  </form>
+
+                  {/* Security Notice */}
+                  <div className="p-3.5 rounded-xl bg-black/30 border border-white/5 text-[11px] text-white/50 leading-relaxed text-center">
+                    Restricted to authorized Secretariat Executives and ICT Directorate officers. All access sessions are cryptographically signed and logged.
                   </div>
-                  <Button type="submit" className="w-full rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold" disabled={submitting}>
-                    {submitting ? "Authenticating..." : "Sign In to Control Centre"}
-                  </Button>
                 </div>
-              </form>
+              </div>
             </div>
           </div>
-        </section>
+        </main>
 
-        <footer className="max-w-5xl mx-auto w-full pt-4 border-t border-white/10 text-center text-xs text-white/50">
-          © {new Date().getFullYear()} NASS LASUSTECH • Built with love by DevMoh
+        {/* Executive Footer */}
+        <footer className="relative z-10 max-w-6xl mx-auto w-full px-4 sm:px-6 py-4 border-t border-white/10 text-center text-xs text-white/50 flex flex-col sm:flex-row items-center justify-between gap-2">
+          <span>© {new Date().getFullYear()} NASS LASUSTECH Chapter • College of Basic Sciences</span>
+          <span className="text-emerald-400/80 font-medium">DEVMOH-Led Administration • Official Secretariat Terminal</span>
         </footer>
       </div>
     );
