@@ -52,6 +52,7 @@ export interface MailerConfigStatus {
 }
 
 const STORAGE_KEY = "nass_dispatched_emails";
+const SMTP_CACHE_KEY = "nass_admin_smtp_cache";
 
 // Uses VITE_API_URL when set (production); otherwise the relative /api path that the Vite dev proxy forwards.
 const MAILER_BASE = `${(import.meta.env.VITE_API_URL || "/api").replace(/\/$/, "")}/mailer`;
@@ -94,14 +95,25 @@ const logSentEmail = (log: DispatchedMailLog) => {
 };
 
 /**
- * Fetch Mailer SMTP status from backend
+ * Fetch Mailer SMTP status from backend with resilient local cache fallback
  */
 export const getMailerConfigApi = async (): Promise<MailerConfigStatus> => {
+  let cached: MailerConfigStatus | null = null;
+  try {
+    const raw = localStorage.getItem(SMTP_CACHE_KEY);
+    if (raw) cached = JSON.parse(raw);
+  } catch {}
+
   try {
     const res = await fetch(`${MAILER_BASE}/config`, { headers: mailerHeaders() });
-    if (!res.ok) throw new Error("Could not reach mailer service");
-    return await res.json();
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data: MailerConfigStatus = await res.json();
+    try {
+      localStorage.setItem(SMTP_CACHE_KEY, JSON.stringify(data));
+    } catch {}
+    return data;
   } catch (err: any) {
+    if (cached) return cached;
     return {
       configured: false,
       host: "smtp.gmail.com",
@@ -122,29 +134,79 @@ export const saveMailerConfigApi = async (config: {
   user: string;
   pass?: string;
   fromName?: string;
+  fromEmail?: string;
 }): Promise<{ success: boolean; message: string; configured?: boolean }> => {
-  const res = await fetch(`${MAILER_BASE}/config`, {
-    method: "POST",
-    headers: mailerHeaders(),
-    body: JSON.stringify(config),
-  });
-  return await res.json();
+  // Preserve entered credentials optimistically in local cache so form values are never lost
+  try {
+    const optimistic: MailerConfigStatus = {
+      configured: Boolean(config.user && (config.pass || true)),
+      host: config.host || "smtp.gmail.com",
+      port: config.port || 587,
+      user: config.user ? `${config.user.slice(0, 3)}***@${config.user.split('@')[1] || ''}` : '',
+      rawUser: config.user,
+      fromName: config.fromName || "Nigerian Association of Science Students (NASS LASUSTECH)",
+      fromEmail: config.fromEmail || config.user,
+    };
+    localStorage.setItem(SMTP_CACHE_KEY, JSON.stringify(optimistic));
+  } catch {}
+
+  try {
+    const res = await fetch(`${MAILER_BASE}/config`, {
+      method: "POST",
+      headers: mailerHeaders(),
+      body: JSON.stringify(config),
+    });
+
+    const data = await res.json().catch(() => null);
+
+    if (!res.ok || !data?.success) {
+      const errMsg = data?.message || (res.status === 401
+        ? "Admin authentication required. Please re-login to the Admin Portal."
+        : `Server responded with error (${res.status}).`);
+      return {
+        success: false,
+        message: errMsg,
+      };
+    }
+
+    return {
+      success: true,
+      message: data.message || "Mailer settings updated successfully.",
+      configured: data.configured ?? true,
+    };
+  } catch (err: any) {
+    console.warn("Failed to reach backend mailer config endpoint:", err);
+    return {
+      success: false,
+      message: `Cannot connect to backend at ${MAILER_BASE}. ${err.message || "Network request failed"}. Please ensure the backend server is running.`,
+    };
+  }
 };
 
 /**
  * Send instant test email to verify credentials directly
  */
 export const sendTestEmailApi = async (targetEmail: string): Promise<{ success: boolean; message: string }> => {
-  const res = await fetch(`${MAILER_BASE}/test`, {
-    method: "POST",
-    headers: mailerHeaders(),
-    body: JSON.stringify({ targetEmail }),
-  });
-  const data = await res.json().catch(() => ({ success: false, message: "Server connection failed" }));
-  if (!res.ok || !data.success) {
-    throw new Error(data.message || "Failed to deliver test email");
+  try {
+    const res = await fetch(`${MAILER_BASE}/test`, {
+      method: "POST",
+      headers: mailerHeaders(),
+      body: JSON.stringify({ targetEmail }),
+    });
+    const data = await res.json().catch(() => null);
+    if (!res.ok || !data?.success) {
+      const msg = data?.message || (res.status === 401
+        ? "Admin authentication required. Please log in."
+        : `Email delivery test failed (${res.status}).`);
+      throw new Error(msg);
+    }
+    return data;
+  } catch (err: any) {
+    if (err.name === "TypeError" && err.message?.includes("fetch")) {
+      throw new Error(`Cannot reach mailer server at ${MAILER_BASE}. Please verify that the backend application is started.`);
+    }
+    throw err;
   }
-  return data;
 };
 
 /**
@@ -177,7 +239,9 @@ export const sendCollegiateEmail = async (payload: MailPayload): Promise<{ succe
     const data = await response.json().catch(() => null);
 
     if (!response.ok || !data?.success) {
-      const errMsg = data?.message || "Email server failed to dispatch email to inboxes.";
+      const errMsg = data?.message || (response.status === 401 || response.status === 403
+        ? "Admin authentication required. Please ensure you are logged into the Admin Portal."
+        : `Email server returned error (${response.status})`);
       logSentEmail({
         id: `mail-${Date.now()}-${Math.floor(100 + Math.random() * 900)}`,
         recipients: cleanRecipients,
@@ -209,7 +273,22 @@ export const sendCollegiateEmail = async (payload: MailPayload): Promise<{ succe
     };
   } catch (err: any) {
     console.error("Collegiate email dispatch error:", err);
-    throw err;
+    const friendlyMsg = (err.name === "TypeError" && err.message?.includes("fetch"))
+      ? `Cannot reach backend mailer server at ${MAILER_BASE}. Please ensure the backend server is running and accessible.`
+      : (err.message || "Failed to dispatch email broadcast.");
+
+    logSentEmail({
+      id: `mail-${Date.now()}-${Math.floor(100 + Math.random() * 900)}`,
+      recipients: cleanRecipients,
+      recipientCount: cleanRecipients.length,
+      subject: payload.subject,
+      template: payload.template || "custom",
+      targetGroup: payload.meta?.targetGroup || "Individual Scholar",
+      sentAt: new Date().toISOString(),
+      status: "Failed",
+      error: friendlyMsg,
+    });
+    throw new Error(friendlyMsg);
   }
 };
 

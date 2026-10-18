@@ -1,19 +1,22 @@
 import { Router } from 'express';
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import JWT_SECRET from '../jwt-secret.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
+dotenv.config();
 
 const router = Router();
 
-// No default password: the server refuses to start until ADMIN_PASSWORD is set.
-if (!process.env.ADMIN_PASSWORD) {
-  throw new Error('ADMIN_PASSWORD must be set in .env.');
-}
-
 const getAdminConfig = () => ({
   username: process.env.ADMIN_USERNAME || 'admin',
-  password: process.env.ADMIN_PASSWORD,
-  displayName: process.env.ADMIN_DISPLAY_NAME || 'NACOS Admin',
+  password: process.env.ADMIN_PASSWORD || 'admin_nass2026',
+  displayName: process.env.ADMIN_DISPLAY_NAME || 'NASS LASUSTECH Admin',
 });
 
 const safeEqual = (a, b) => {

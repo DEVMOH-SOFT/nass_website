@@ -1,8 +1,13 @@
 import { Router } from 'express';
 import nodemailer from 'nodemailer';
+import dns from 'dns';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+
+try {
+  dns.setDefaultResultOrder('ipv4first');
+} catch (_e) {}
 import jwt from 'jsonwebtoken';
 import JWT_SECRET from '../jwt-secret.js';
 import rateLimit from 'express-rate-limit';
@@ -204,6 +209,30 @@ const saveMailerConfig = (newConfig) => {
   };
   fs.writeFileSync(CONFIG_FILE, JSON.stringify(merged, null, 2), 'utf8');
   return merged;
+};
+
+/**
+ * Creates a Nodemailer transporter configured with IPv4-first DNS and timeouts
+ */
+const createTransporter = (config) => {
+  return nodemailer.createTransport({
+    host: config.host,
+    port: config.port,
+    secure: config.port === 465,
+    auth: {
+      user: config.user,
+      pass: config.pass,
+    },
+    tls: {
+      rejectUnauthorized: false,
+    },
+    dnsLookup: (hostname, _options, callback) => {
+      dns.lookup(hostname, { family: 4 }, callback);
+    },
+    connectionTimeout: 15000,
+    greetingTimeout: 15000,
+    socketTimeout: 20000,
+  });
 };
 
 /**
@@ -494,18 +523,7 @@ router.post('/test', protect, isAdmin, async (req, res) => {
   }
 
   try {
-    const transporter = nodemailer.createTransport({
-      host: config.host,
-      port: config.port,
-      secure: config.port === 465,
-      auth: {
-        user: config.user,
-        pass: config.pass,
-      },
-      tls: {
-        rejectUnauthorized: false,
-      },
-    });
+    const transporter = createTransporter(config);
 
     const testSubject = '✅ NASS LASUSTECH Mailer: Test Email Delivery Confirmed';
     const testBody = `Congratulations!\n\nYour NASS LASUSTECH Email & Communication gateway is active and successfully delivering messages.\n\nSender: ${config.fromName} (${config.user})\nTimestamp: ${new Date().toLocaleString()}\nGateway Status: Verified, Active & Live.`;
@@ -621,18 +639,7 @@ router.post('/send', publicSendLimiter, async (req, res) => {
   }
 
   try {
-    const transporter = nodemailer.createTransport({
-      host: config.host,
-      port: config.port,
-      secure: config.port === 465,
-      auth: {
-        user: config.user,
-        pass: config.pass,
-      },
-      tls: {
-        rejectUnauthorized: false,
-      },
-    });
+    const transporter = createTransporter(config);
 
     // Parse and prepare incoming attachments
     const rawAttachments = Array.isArray(attachments) ? attachments : [];

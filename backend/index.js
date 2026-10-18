@@ -7,7 +7,12 @@ import rateLimit from 'express-rate-limit';
 import axios from 'axios';
 import path from 'path';
 import fs from 'fs';
+import dns from 'dns';
 import { fileURLToPath } from 'url';
+
+try {
+  dns.setDefaultResultOrder('ipv4first');
+} catch (_e) {}
 
 import paymentRoutes from './routes/payment.routes.js';
 import authRoutes from './routes/auth.routes.js';
@@ -20,15 +25,19 @@ import adminRoutes from './routes/admin.routes.js';
 import mailerRoutes from './routes/mailer.routes.js';
 import BirthdayService from './services/birthday.service.js';
 
-// Load environment variables
+// __dirname equivalent for ES Modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Load environment variables from backend/.env or root .env
+const backendEnv = path.join(__dirname, '.env');
+if (fs.existsSync(backendEnv)) {
+  dotenv.config({ path: backendEnv });
+}
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5001;
-
-// __dirname equivalent for ES Modules
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 // Trust the proxy (Render / Vercel / cPanel)
 app.set('trust proxy', 1);
@@ -204,6 +213,9 @@ app.use('/api/mailer', mailerRoutes);
  * GLOBAL ERROR HANDLER
  */
 app.use((err, req, res, _next) => {
+  if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+    return res.status(400).json({ error: 'Malformed JSON payload in request body' });
+  }
   console.error('🔥 CRITICAL ERROR:', err.stack);
   res.status(500).json({
     error: 'Internal Server Error',

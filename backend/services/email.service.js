@@ -1,5 +1,9 @@
 import nodemailer from 'nodemailer';
 import dns from 'dns';
+
+try {
+  dns.setDefaultResultOrder('ipv4first');
+} catch (_e) {}
 import dotenv from 'dotenv';
 import fs from 'fs';
 import path from 'path';
