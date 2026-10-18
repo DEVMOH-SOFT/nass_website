@@ -222,7 +222,7 @@ const Contact = () => {
 
                     <div>
                       <p className="font-bold text-slate-800">Assistant General Secretary:</p>
-                      <p className="text-slate-600">Quadri Stella Maris</p>
+                      <p className="text-slate-600">Quadri Stella Tolani</p>
                       <a href="tel:09161784349" className="text-emerald-800 hover:underline font-mono">
                         09161784349 / 07086714219
                       </a>
@@ -300,7 +300,15 @@ const Contact = () => {
                     </div>
 
                     <div>
-                      <p className="font-bold text-slate-800">Sports Director:</p>
+                      <p className="font-bold text-slate-800">Sport Director 1:</p>
+                      <p className="text-slate-600">Akinsanya Israel Olaoluwa</p>
+                      <a href="tel:08102333885" className="text-blue-800 hover:underline font-mono">
+                        08102333885
+                      </a>
+                    </div>
+
+                    <div>
+                      <p className="font-bold text-slate-800">Sport Director 2:</p>
                       <p className="text-slate-600">Michael Abel Armani</p>
                       <a href="tel:09069598119" className="text-blue-800 hover:underline font-mono">
                         09069598119
@@ -309,7 +317,7 @@ const Contact = () => {
 
                     <div>
                       <p className="font-bold text-slate-800">Publicity Channels:</p>
-                      <p className="text-slate-600">NASS Broadcast Channel & Social Outlets</p>
+                      <p className="text-slate-600">NASS DCIPR</p>
                     </div>
                   </div>
                 </div>
