@@ -49,7 +49,7 @@ const defaultExecutives = [
   {
     id: "nass-exec-2",
     name: "Adedeji Sofiyyah Anike",
-    preferredName: "Anike",
+    preferredName: "Zophy",
     post: "Vice President",
     level: "400 Level",
     department: "Biological Sciences (Botany)",

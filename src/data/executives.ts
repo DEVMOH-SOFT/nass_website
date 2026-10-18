@@ -60,7 +60,7 @@ export const executives: Executive[] = [
   },
   {
     name: "Adedeji Sofiyyah Anike",
-    preferredName: "Sofiyyah",
+    preferredName: "Zophy",
     post: "Vice President",
     department: "Biological Sciences (Botany)",
     level: "400 Level",
