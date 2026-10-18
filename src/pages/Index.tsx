@@ -110,16 +110,16 @@ const Index = () => {
             <img
               src={cbsFacultyBuilding}
               alt="College of Basic Sciences Complex, LASUSTECH Main Campus"
-              className="h-full w-full object-cover object-[center_35%] md:object-[75%_35%] filter brightness-[0.98] contrast-[1.05] saturate-[1.05]"
+              className="h-full w-full object-cover object-[80%_30%] sm:object-[78%_35%] md:object-[75%_35%] filter brightness-[1.05] contrast-[1.08] saturate-[1.10]"
             />
           </div>
 
           {/* Directional Scrim Overlays for Professional Readability & Architectural Clarity */}
-          {/* 1. Horizontal gradient: Deep institutional scrim on left for crystal-clear text; fades smoothly to reveal architecture on right */}
-          <div className="absolute inset-0 z-0 bg-gradient-to-r from-[#061d10] via-[#072414]/90 sm:via-[#072414]/80 md:via-[#072414]/65 to-transparent" />
+          {/* 1. Scrim gradient: Softened on mobile to showcase the frontal architectural facade while keeping typography readable */}
+          <div className="absolute inset-0 z-0 bg-gradient-to-b from-[#061d10]/88 via-[#072414]/55 to-[#061d10]/82 sm:bg-gradient-to-r sm:from-[#061d10] sm:via-[#072414]/80 md:via-[#072414]/65 sm:to-transparent" />
 
           {/* 2. Vertical vignette: Soft anchoring at top and bottom edges */}
-          <div className="absolute inset-0 z-0 bg-gradient-to-t from-[#061d10] via-transparent to-[#061d10]/40" />
+          <div className="absolute inset-0 z-0 bg-gradient-to-t from-[#061d10]/70 via-transparent to-[#061d10]/30" />
 
           <div className="container relative z-10 w-full">
             <div className="max-w-2xl lg:max-w-3xl">

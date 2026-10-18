@@ -31,10 +31,10 @@
     <!-- DIGNIFIED COLLEGIATE LOADING SCREEN                      -->
     <!-- Authentic College Building Banner + Understated Design   -->
     <!-- ======================================================== -->
-    <div id="loading-screen" style="position:fixed;inset:0;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg, rgba(6, 29, 16, 0.90) 0%, rgba(7, 31, 56, 0.93) 100%), url('/cbs_faculty_building.jpg') center/cover no-repeat;transition:opacity 0.5s ease;overflow:hidden">
+    <div id="loading-screen" class="cbs-loading-bg" style="position:fixed;inset:0;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 0.5s ease;overflow:hidden">
       
       <!-- Subtle Architectural Vignette -->
-      <div style="position:absolute;inset:0;background:radial-gradient(circle at center, transparent 40%, rgba(3, 15, 8, 0.6) 100%);pointer-events:none"></div>
+      <div style="position:absolute;inset:0;background:radial-gradient(circle at center, transparent 35%, rgba(3, 15, 8, 0.55) 100%);pointer-events:none"></div>
 
       <!-- 3D Perspective Stage -->
       <div style="position:relative;width:90px;height:90px;display:flex;align-items:center;justify-content:center;perspective:1000px;z-index:2">
@@ -70,11 +70,19 @@
         <div style="position:absolute;top:0;left:0;bottom:0;width:50%;background:#3b82f6;border-radius:999px;animation:progress-slide 1.5s infinite ease-in-out"></div>
       </div>
 
-      <p style="margin:10px 0 0;color:rgba(255,255,255,0.45);font-size:9px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;font-family:'Inter',sans-serif;z-index:2">
+      <p style="margin:10px 0 0;color:rgba(255,255,255,0.55);font-size:9px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;font-family:'Inter',sans-serif;z-index:2">
         Loading Academic Portal...
       </p>
 
       <style>
+        .cbs-loading-bg {
+          background: linear-gradient(135deg, rgba(6, 29, 16, 0.72) 0%, rgba(7, 31, 56, 0.78) 100%), url('/cbs_faculty_building.jpg') 78% center / cover no-repeat !important;
+        }
+        @media (max-width: 768px) {
+          .cbs-loading-bg {
+            background: linear-gradient(180deg, rgba(6, 29, 16, 0.62) 0%, rgba(7, 31, 56, 0.70) 100%), url('/cbs_faculty_building.jpg') 80% 32% / cover no-repeat !important;
+          }
+        }
         @keyframes flip-3d-medallion {
           0% { transform: rotateY(0deg); }
           50% { transform: rotateY(180deg); }

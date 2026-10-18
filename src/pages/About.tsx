@@ -89,13 +89,13 @@ const About = () => {
       {/* ======================================================== */}
       <section className="relative overflow-hidden bg-[#061d10] text-white py-14 sm:py-18 lg:py-22 border-b border-emerald-950">
         {/* Architectural Facade Watermark */}
-        <div className="absolute inset-0 z-0 opacity-15">
+        <div className="absolute inset-0 z-0 opacity-20">
           <img
             src={cbsFacultyBuilding}
             alt="College of Basic Sciences Complex"
-            className="h-full w-full object-cover mix-blend-luminosity filter blur-xs"
+            className="h-full w-full object-cover object-[80%_32%] md:object-[75%_35%] mix-blend-luminosity filter blur-xs"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#061d10] via-[#061d10]/80 to-[#061d10]/95" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#061d10] via-[#061d10]/75 to-[#061d10]/90" />
         </div>
 
         <div className="container relative z-10">
