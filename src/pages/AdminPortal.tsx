@@ -100,7 +100,7 @@ const AdminPortal = () => {
     user: "",
     pass: "",
     host: "smtp.gmail.com",
-    port: 587,
+    port: 465,
     fromName: "Nigerian Association of Science Students (NASS LASUSTECH)",
   });
   const [testEmailAddress, setTestEmailAddress] = useState("");
@@ -2844,12 +2844,13 @@ Secretariat, NASS LASUSTECH`);
                           </div>
                           <div>
                             <label className="text-[11px] font-bold text-slate-300 block mb-1">
-                              Port
+                              Port <span className="text-emerald-400 font-normal">(465 SSL Recommended)</span>
                             </label>
                             <Input
                               type="number"
                               value={smtpForm.port}
-                              onChange={(e) => setSmtpForm({ ...smtpForm, port: parseInt(e.target.value, 10) || 587 })}
+                              onChange={(e) => setSmtpForm({ ...smtpForm, port: parseInt(e.target.value, 10) || 465 })}
+                              placeholder="465"
                               className="h-9 rounded-xl bg-slate-900 border-white/15 text-white text-xs"
                             />
                           </div>

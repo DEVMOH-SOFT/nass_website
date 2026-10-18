@@ -188,8 +188,8 @@ const getMailerConfig = () => {
 
   return {
     host: fileConfig.host || process.env.SMTP_HOST || 'smtp.gmail.com',
-    port: parseInt(fileConfig.port || process.env.SMTP_PORT || '587', 10),
-    secure: (fileConfig.port || process.env.SMTP_PORT) == 465,
+    port: parseInt(fileConfig.port || process.env.SMTP_PORT || '465', 10),
+    secure: (fileConfig.port || process.env.SMTP_PORT || 465) == 465,
     user: fileConfig.user || process.env.SMTP_USER || '',
     pass: fileConfig.pass || process.env.SMTP_PASS || '',
     fromName: fileConfig.fromName || 'Nigerian Association of Science Students (NASS LASUSTECH)',
@@ -205,20 +205,35 @@ const saveMailerConfig = (newConfig) => {
   const merged = {
     ...current,
     ...newConfig,
-    port: parseInt(newConfig.port || current.port || 587, 10),
+    port: parseInt(newConfig.port || current.port || 465, 10),
   };
   fs.writeFileSync(CONFIG_FILE, JSON.stringify(merged, null, 2), 'utf8');
   return merged;
 };
 
 /**
+ * Translates low-level socket and SMTP error codes into clear actionable advice
+ */
+const humanizeMailerError = (err) => {
+  const msg = err?.message || String(err || '');
+  if (msg.includes('535') || msg.includes('Username and Password not accepted') || msg.includes('BadCredentials')) {
+    return 'Gmail authentication failed: Google requires a 16-character App Password (not your normal Gmail account password). Please generate one at myaccount.google.com/apppasswords.';
+  }
+  if (msg.includes('ECONNREFUSED') || msg.includes('ETIMEDOUT')) {
+    return 'Connection blocked on SMTP port. Your ISP or network is blocking the connection. Port 465 (SSL) is recommended.';
+  }
+  return msg;
+};
+
+/**
  * Creates a Nodemailer transporter configured with IPv4-first DNS and timeouts
  */
 const createTransporter = (config) => {
+  const isPort465 = Number(config.port) === 465;
   return nodemailer.createTransport({
-    host: config.host,
-    port: config.port,
-    secure: config.port === 465,
+    host: config.host || 'smtp.gmail.com',
+    port: Number(config.port) || 465,
+    secure: isPort465,
     auth: {
       user: config.user,
       pass: config.pass,
@@ -233,6 +248,25 @@ const createTransporter = (config) => {
     greetingTimeout: 15000,
     socketTimeout: 20000,
   });
+};
+
+/**
+ * Sends mail with automatic retry on port 465 (SSL) if port 587 is blocked by ISP
+ */
+const sendWithFallback = async (config, mailOptions) => {
+  const transporter = createTransporter(config);
+  try {
+    return await transporter.sendMail(mailOptions);
+  } catch (err) {
+    const isBlocked = err.code === 'ECONNREFUSED' || err.code === 'ETIMEDOUT' || (err.message && err.message.includes('ECONNREFUSED'));
+    if (isBlocked && Number(config.port) !== 465) {
+      console.warn(`[Mailer] Port ${config.port} blocked (${err.message}). Retrying on Port 465 (SSL)...`);
+      const fallbackConfig = { ...config, port: 465, secure: true };
+      const fallbackTransporter = createTransporter(fallbackConfig);
+      return await fallbackTransporter.sendMail(mailOptions);
+    }
+    throw err;
+  }
 };
 
 /**
@@ -545,7 +579,7 @@ router.post('/test', protect, isAdmin, async (req, res) => {
     const domain = config.user.includes('@') ? config.user.split('@')[1] : 'lasustech.edu.ng';
     const messageId = `<nass.test.${Date.now()}.${Math.random().toString(36).substring(2, 9)}@${domain}>`;
 
-    const info = await transporter.sendMail({
+    const info = await sendWithFallback(config, {
       from: `"${config.fromName}" <${config.user}>`,
       replyTo: config.fromEmail || config.user,
       to: targetEmail,
@@ -572,7 +606,7 @@ router.post('/test', protect, isAdmin, async (req, res) => {
     console.error('Test mail delivery failed:', error);
     return res.status(500).json({
       success: false,
-      message: error.message || 'SMTP delivery failed.',
+      message: humanizeMailerError(error),
       code: error.code,
     });
   }
@@ -682,7 +716,7 @@ router.post('/send', publicSendLimiter, async (req, res) => {
     // Send in parallel / chunked
     const sendPromises = validRecipients.map((to) => {
       const messageId = `<nass.${Date.now()}.${Math.random().toString(36).substring(2, 9)}@${domain}>`;
-      return transporter.sendMail({
+      return sendWithFallback(config, {
         from: `"${config.fromName}" <${config.user}>`,
         replyTo: config.fromEmail || config.user,
         to,
@@ -708,7 +742,7 @@ router.post('/send', publicSendLimiter, async (req, res) => {
     const failed = results.filter((r) => r.status === 'rejected');
 
     if (delivered === 0 && failed.length > 0) {
-      const firstError = failed[0]?.reason?.message || 'Failed to dispatch email';
+      const firstError = humanizeMailerError(failed[0]?.reason);
       return res.status(500).json({
         success: false,
         message: `Delivery failed: ${firstError}`,
@@ -728,7 +762,7 @@ router.post('/send', publicSendLimiter, async (req, res) => {
     console.error('Collegiate mail dispatch error:', err);
     return res.status(500).json({
       success: false,
-      message: err.message || 'SMTP communication failure.',
+      message: humanizeMailerError(err),
     });
   }
 });
