@@ -3350,7 +3350,7 @@ const Dashboard = () => {
               <div className="rounded-2xl border border-amber-200/90 bg-amber-50/70 p-4 text-xs text-amber-900 flex items-start gap-3">
                 <AlertCircle className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
                 <p className="leading-relaxed">
-                  <strong>Notice on Event Dates & Schedules:</strong> All dates, times, and venues listed are proposed collegiate schedules and remain subject to administrative adjustment or rescheduling by the CBS Deanery and NASS Executive Council.
+                  <strong>Notice on Event Dates & Schedules:</strong> All dates, times, and schedules listed are proposed collegiate schedules and remain subject to administrative adjustment or rescheduling by the CBS Deanery and NASS Executive Council.
                 </p>
               </div>
 
@@ -3420,10 +3420,6 @@ const Dashboard = () => {
                               <span className="font-bold text-slate-900">{evt.date}</span>
                               <span>•</span>
                               <span className="text-slate-500 font-mono">{evt.time}</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <MapPin className="h-3.5 w-3.5 text-emerald-700 shrink-0" />
-                              <span className="truncate">{evt.venue}</span>
                             </div>
                             <div className="flex items-center gap-2">
                               <Users className="h-3.5 w-3.5 text-emerald-700 shrink-0" />
@@ -4687,10 +4683,6 @@ const Dashboard = () => {
                       <Clock className="h-3.5 w-3.5 text-emerald-700 shrink-0" />
                       <span><strong>Time:</strong> {selectedEvent.time}</span>
                     </div>
-                    <div className="flex items-center gap-2 text-slate-700">
-                      <MapPin className="h-3.5 w-3.5 text-emerald-700 shrink-0" />
-                      <span><strong>Venue:</strong> {selectedEvent.venue}</span>
-                    </div>
                   </div>
 
                   {/* Registered Delegate Information */}
@@ -4780,7 +4772,6 @@ const Dashboard = () => {
                     <div className="mt-3 flex flex-wrap justify-center gap-2 text-[11px] text-slate-600">
                       <span className="bg-slate-100 px-2 py-0.5 rounded font-semibold">{activePass.date}</span>
                       <span className="bg-slate-100 px-2 py-0.5 rounded font-semibold">{activePass.time}</span>
-                      <span className="bg-slate-100 px-2 py-0.5 rounded font-semibold">{activePass.venue}</span>
                     </div>
                   </div>
 

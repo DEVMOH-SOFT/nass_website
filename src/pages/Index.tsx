@@ -16,7 +16,6 @@ import {
   Quote,
   Calendar,
   ExternalLink,
-  MapPin,
   CheckCircle2,
   Mail,
 } from "lucide-react";
@@ -611,10 +610,6 @@ const Index = () => {
                       <div className="flex items-center gap-2">
                         <span className="rounded bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-700">
                           {event.category || "Academic"}
-                        </span>
-                        <span className="text-xs text-slate-500 flex items-center gap-1">
-                          <MapPin className="h-3 w-3 text-slate-400" />
-                          {event.venue || "LASUSTECH Campus"}
                         </span>
                       </div>
                       <h3 className="mt-1 font-display text-base font-bold text-slate-900">
