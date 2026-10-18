@@ -45,7 +45,7 @@ export const executives: Executive[] = [
   // =========================================================================
   {
     name: "Adegoke Muhammed Abiola",
-    preferredName: "Muhammed",
+    preferredName: "DEVMOH",
     post: "President",
     department: "Computer Science",
     level: "400 Level",
@@ -89,7 +89,7 @@ export const executives: Executive[] = [
     objectPosition: "object-top",
   },
   {
-    name: "Quadri Stella Maris",
+    name: "Quadri Stella Tolani",
     preferredName: "Lanny",
     post: "Assistant General Secretary",
     department: "Chemical Sciences (Biochemistry)",
@@ -116,7 +116,7 @@ export const executives: Executive[] = [
     phone: "07067255816",
     whatsapp: "07067255816",
     arm: "SEC",
-    objectPosition: "object-top",
+    objectPosition: "object-[center_18%]",
   },
   {
     name: "Fregene Emmanuel Chukwudi",

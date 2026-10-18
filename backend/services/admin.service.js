@@ -32,7 +32,7 @@ const defaultExecutives = [
   {
     id: "nass-exec-1",
     name: "Comrade Adegoke Muhammed Abiola",
-    preferredName: "Muhammed",
+    preferredName: "DEVMOH",
     post: "President",
     level: "400 Level",
     department: "Computer Science",
@@ -82,7 +82,7 @@ const defaultExecutives = [
   },
   {
     id: "nass-exec-4",
-    name: "Quadri Stella Maris",
+    name: "Quadri Stella Tolani",
     preferredName: "Stella",
     post: "Assistant General Secretary",
     level: "300 Level",

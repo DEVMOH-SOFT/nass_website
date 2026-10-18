@@ -1410,21 +1410,6 @@ Secretariat, NASS LASUSTECH`);
                       </div>
                     </div>
 
-                    {/* Remember Me */}
-                    <div className="flex items-center justify-between text-xs pt-1">
-                      <label className="flex items-center gap-2 cursor-pointer text-white/70 hover:text-white transition-colors">
-                        <input
-                          type="checkbox"
-                          checked={rememberTerminal}
-                          onChange={(e) => setRememberTerminal(e.target.checked)}
-                          className="rounded border-emerald-500/40 bg-black/40 text-emerald-500 focus:ring-0 focus:ring-offset-0 h-3.5 w-3.5 accent-emerald-500"
-                        />
-                        <span>Remember this workstation</span>
-                      </label>
-                      <span className="text-[11px] text-emerald-400 font-medium">
-                        12-Hour Session
-                      </span>
-                    </div>
 
                     {/* Submit Button */}
                     <Button

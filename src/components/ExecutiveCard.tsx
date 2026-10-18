@@ -35,7 +35,17 @@ const ExecutiveCard = ({
           src={image}
           alt={name}
           loading="lazy"
-          className={`h-full w-full object-cover ${objectPosition} transition-transform duration-500 group-hover:scale-[1.02]`}
+          style={
+            objectPosition
+              ? {
+                  objectPosition: objectPosition
+                    .replace(/^object-/, "")
+                    .replace(/\[|\]/g, "")
+                    .replace(/_/g, " "),
+                }
+              : undefined
+          }
+          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
         />
         {preferredName && (
           <span className="absolute bottom-2.5 right-2.5 rounded-md bg-slate-950/80 backdrop-blur-md px-2 py-0.5 text-[10px] font-bold text-emerald-300 shadow-sm border border-emerald-500/30">

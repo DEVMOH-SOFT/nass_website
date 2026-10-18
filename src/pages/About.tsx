@@ -443,13 +443,10 @@ const About = () => {
                     className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                   />
                 </div>
-                <div className="p-4">
+                <div className="p-3.5">
                   <h4 className="font-display text-xs font-bold text-slate-900">
                     {item.title}
                   </h4>
-                  <p className="mt-1 text-[11px] text-slate-500 line-clamp-2">
-                    {item.caption}
-                  </p>
                 </div>
               </div>
             ))}
