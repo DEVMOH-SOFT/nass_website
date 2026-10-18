@@ -161,7 +161,7 @@ export const executives: Executive[] = [
     phone: "08102333885",
     whatsapp: "08102333885",
     arm: "SEC",
-    objectPosition: "object-top",
+    objectPosition: "object-[center_10%]",
   },
   {
     name: "Michael Abel Armani",
@@ -240,7 +240,7 @@ export const executives: Executive[] = [
     phone: "08069574387",
     whatsapp: "08069574387",
     arm: "SRC",
-    objectPosition: "object-top",
+    objectPosition: "object-[center_20%]",
   },
   {
     name: "Asaolu Dolapo Richard",
@@ -270,7 +270,7 @@ export const executives: Executive[] = [
     phone: "07080743607",
     whatsapp: "07080743607",
     arm: "SRC",
-    objectPosition: "object-top",
+    objectPosition: "object-[center_15%]",
   },
   {
     name: "Ojelabi Opeyemi Oluwapelumi",
