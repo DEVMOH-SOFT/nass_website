@@ -1,9 +1,0 @@
-{
-  "host": "smtp.gmail.com",
-  "port": 587,
-  "secure": false,
-  "user": "nasslasustech@gmail.com",
-  "pass": "wsvx itqv muub zhnq",
-  "fromName": "Nigerian Association of Science Students (NASS LASUSTECH)",
-  "fromEmail": "nasslasustech@gmail.com"
-}

@@ -33,7 +33,7 @@ class KorapayService {
             email: data.email,
             name: data.full_name || 'NASS Student'
           },
-          notification_url: `${process.env.BACKEND_URL || 'http://localhost:5000'}/api/payments/webhook`,
+          ...(process.env.KORAPAY_NOTIFICATION_URL ? { notification_url: process.env.KORAPAY_NOTIFICATION_URL } : {}),
           redirect_url: `${process.env.FRONTEND_URL || 'http://localhost:8080'}/dashboard`,
           metadata: data.metadata || {}
         },

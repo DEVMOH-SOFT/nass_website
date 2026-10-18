@@ -41,6 +41,7 @@ const Contact = () => {
         subject: `[Directorate Message - ${form.department}] From: ${form.name}`,
         body: `New Directorate Message Submitted via NASS Science Portal:\n\nSender Name: ${form.name}\nSender Email: ${form.email}\nTarget Directorate/Unit: ${form.department}\nTimestamp: ${new Date().toLocaleString()}\n\nMessage:\n${form.message}`,
         studentName: form.name,
+        template: "contact_notice",
       }).catch((mailErr) => {
         console.warn("Direct mailer dispatch notice:", mailErr);
       });
@@ -51,6 +52,8 @@ const Contact = () => {
           to: form.email,
           subject: `Acknowledgement: Your Inquiry to NASS LASUSTECH Secretariat [${form.department}]`,
           studentName: form.name,
+          template: "contact_ack",
+          meta: { department: form.department, message: form.message },
           body: `Dear ${form.name},\n\nThank you for reaching out to the Nigerian Association of Science Students (NASS LASUSTECH).\n\nYour message addressed to the "${form.department}" has been securely logged and delivered to the Secretariat (nasslasustech@gmail.com).\n\nSummary of Your Inquiry:\n• Designated Unit: ${form.department}\n• Submitted On: ${new Date().toLocaleString()}\n• Your Message:\n"${form.message}"\n\nA representative or executive officer from the Directorate will review your submission and respond to you directly.\n\nWarm regards,\nNASS LASUSTECH Secretariat\nCollege of Basic Science Ground Floor, LASUSTECH Main Campus, Ikorodu`,
         }).catch((err) => {
           console.warn("Auto-reply mailer notice:", err);

@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import JWT_SECRET from '../jwt-secret.js';
 
 /**
  * Auth Middleware
@@ -17,7 +18,7 @@ const protect = (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'nacos_secret_2025');
+    const decoded = jwt.verify(token, JWT_SECRET);
     req.user = decoded; // Attach user info to the request
     next();
   } catch (error) {

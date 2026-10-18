@@ -1,0 +1,8 @@
+backend
+voting-backend
+voting-system
+supabase
+*.zip
+public/*.php
+public/.htaccess
+vite.config.ts.timestamp-*.mjs

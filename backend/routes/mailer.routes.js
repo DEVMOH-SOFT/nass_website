@@ -3,11 +3,170 @@ import nodemailer from 'nodemailer';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import jwt from 'jsonwebtoken';
+import JWT_SECRET from '../jwt-secret.js';
+import rateLimit from 'express-rate-limit';
+import protect from '../middleware/auth.middleware.js';
+import isAdmin from '../middleware/admin.middleware.js';
 
 const router = Router();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const CONFIG_FILE = path.join(__dirname, '../data/mailer_config.json');
+
+/**
+ * Access model
+ * ---------------------------------------------------------
+ * - config / test: admin only.
+ * - send: admins can send anything. Everyone else (contact form, dues
+ *   receipt after payment) may only trigger fixed templates whose content
+ *   is built here on the server, rate limited per IP and per recipient.
+ */
+const isAdminRequest = (req) => {
+  const header = req.headers.authorization || '';
+  if (!header.startsWith('Bearer ')) return false;
+  try {
+    const user = jwt.verify(header.slice(7), JWT_SECRET);
+    return user?.role === 'admin';
+  } catch (_err) {
+    return false;
+  }
+};
+
+const publicSendLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 60,
+  skip: isAdminRequest,
+  message: { success: false, message: 'Too many emails requested. Please try again later.' },
+});
+
+// Max public emails to one recipient per hour (stops using us to spam one inbox).
+const RECIPIENT_LIMIT = 3;
+const recipientHits = new Map();
+const recipientAllowed = (email) => {
+  const now = Date.now();
+  const key = email.toLowerCase();
+  const hits = (recipientHits.get(key) || []).filter((t) => now - t < 60 * 60 * 1000);
+  if (hits.length >= RECIPIENT_LIMIT) {
+    recipientHits.set(key, hits);
+    return false;
+  }
+  hits.push(now);
+  recipientHits.set(key, hits);
+  if (recipientHits.size > 5000) {
+    for (const [k, v] of recipientHits) {
+      if (v.every((t) => now - t >= 60 * 60 * 1000)) recipientHits.delete(k);
+    }
+  }
+  return true;
+};
+
+const escapeHtml = (value) =>
+  String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+
+const clip = (value, max) => String(value ?? '').replace(/\r/g, '').slice(0, max);
+
+/**
+ * Builds the email for a non-admin request, or returns { status, error }.
+ * Nothing the client sends decides who receives the mail or what it says
+ * beyond the fields below.
+ */
+const preparePublicMail = (reqBody, config) => {
+  const { template, recipients, subject, body, student_name, matric_number, meta = {} } = reqBody;
+  const firstRecipient = (Array.isArray(recipients) ? recipients : [recipients])[0];
+  const to = typeof firstRecipient === 'string' ? firstRecipient.trim() : '';
+  const when = new Date().toLocaleString();
+
+  if (template === 'contact_notice') {
+    // Always goes to the NASS secretariat inbox, never to a client-chosen address.
+    return {
+      recipients: [config.fromEmail || config.user],
+      subject: clip(subject, 200),
+      body: clip(body, 5000),
+      studentName: clip(student_name, 120),
+      matricNumber: '',
+    };
+  }
+
+  if (template !== 'dues_receipt' && template !== 'contact_ack') {
+    return { status: 403, error: 'Admin sign-in required to send this email.' };
+  }
+
+  if (!to || to.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) {
+    return { status: 400, error: 'A valid recipient email is required.' };
+  }
+  if (!recipientAllowed(to)) {
+    return { status: 429, error: 'Too many emails sent to this address. Please try again later.' };
+  }
+
+  const name = clip(student_name, 120) || 'Student';
+
+  if (template === 'dues_receipt') {
+    const amount = Number(meta.amount);
+    const reference = clip(meta.reference, 80);
+    if (!Number.isFinite(amount) || amount <= 0 || !reference) {
+      return { status: 400, error: 'Receipt details are incomplete.' };
+    }
+    const department = clip(meta.department, 120);
+    const level = clip(meta.level, 40);
+    const matric = clip(matric_number, 40);
+    return {
+      recipients: [to],
+      subject: `Official Receipt: NASS LASUSTECH Session Dues Clearance - Ref: ${reference}`,
+      studentName: name,
+      matricNumber: matric,
+      body: `Dear ${name},
+
+This is your official payment confirmation from the Nigerian Association of Science Students (NASS), College of Basic Sciences, LASUSTECH.
+
+We confirm receipt of ₦${amount.toLocaleString()} for your 2025/2026 Statutory Session Dues.
+
+Transaction Details:
+• Student Name: ${name}
+• Matric / Scholar ID: ${matric}
+• Department: ${department}
+• Level: ${level}
+• Reference: ${reference}
+• Status: Cleared & Verified
+
+${meta.isFresher ? 'Note for Freshers: Once your permanent LASUSTECH matriculation number is issued by the Academic Affairs Division, log into your portal to update your profile.\n' : ''}
+You can download your verified digital receipt and print your official ID card anytime on your student portal.
+
+Office of the Executive Treasurer,
+DEVMOH-Led Administration, NASS LASUSTECH.`,
+    };
+  }
+
+  // contact_ack
+  const department = clip(meta.department, 160);
+  return {
+    recipients: [to],
+    subject: `Acknowledgement: Your Inquiry to NASS LASUSTECH Secretariat [${department}]`,
+    studentName: name,
+    matricNumber: '',
+    body: `Dear ${name},
+
+Thank you for reaching out to the Nigerian Association of Science Students (NASS LASUSTECH).
+
+Your message addressed to the "${department}" has been securely logged and delivered to the Secretariat (${config.fromEmail || config.user}).
+
+Summary of Your Inquiry:
+• Designated Unit: ${department}
+• Submitted On: ${when}
+• Your Message:
+"${clip(meta.message, 3000)}"
+
+A representative or executive officer from the Directorate will review your submission and respond to you directly.
+
+Warm regards,
+NASS LASUSTECH Secretariat
+College of Basic Science Ground Floor, LASUSTECH Main Campus, Ikorodu`,
+  };
+};
 
 /**
  * Load persisted mailer config from JSON file or environment variables
@@ -275,7 +434,7 @@ Support: ${senderEmail}
  * GET /api/mailer/config
  * Returns current configuration status without exposing sensitive pass
  */
-router.get('/config', (_req, res) => {
+router.get('/config', protect, isAdmin, (_req, res) => {
   const config = getMailerConfig();
   res.json({
     configured: Boolean(config.user && config.pass),
@@ -292,7 +451,7 @@ router.get('/config', (_req, res) => {
  * POST /api/mailer/config
  * Admin updates SMTP settings
  */
-router.post('/config', (req, res) => {
+router.post('/config', protect, isAdmin, (req, res) => {
   const { host, port, user, pass, fromName, fromEmail } = req.body;
   const current = getMailerConfig();
 
@@ -316,7 +475,7 @@ router.post('/config', (req, res) => {
  * POST /api/mailer/test
  * Sends test verification email to admin or specified inbox
  */
-router.post('/test', async (req, res) => {
+router.post('/test', protect, isAdmin, async (req, res) => {
   const { targetEmail } = req.body;
   const config = getMailerConfig();
 
@@ -406,8 +565,9 @@ router.post('/test', async (req, res) => {
  * Main broadcast & single dispatch endpoint
  * Supports attachments (images, PDFs, documents)
  */
-router.post('/send', async (req, res) => {
-  const {
+router.post('/send', publicSendLimiter, async (req, res) => {
+  const admin = isAdminRequest(req);
+  let {
     recipients,
     subject,
     body,
@@ -419,8 +579,21 @@ router.post('/send', async (req, res) => {
 
   const config = {
     ...getMailerConfig(),
-    ...(runtimeConfig || {}),
+    ...(admin ? runtimeConfig || {} : {}),
   };
+
+  if (!admin) {
+    const prepared = preparePublicMail(req.body, config);
+    if (prepared.error) {
+      return res.status(prepared.status).json({ success: false, message: prepared.error });
+    }
+    recipients = prepared.recipients;
+    subject = prepared.subject;
+    body = prepared.body;
+    student_name = prepared.studentName;
+    matric_number = prepared.matricNumber;
+    attachments = [];
+  }
 
   const recipientList = Array.isArray(recipients) ? recipients : [recipients];
   const validRecipients = recipientList.filter((e) => e && typeof e === 'string' && e.includes('@'));
@@ -478,11 +651,12 @@ router.post('/send', async (req, res) => {
         };
       });
 
+    // Admin content is trusted; anything from public callers is escaped in the HTML part.
     const html = buildCollegiateHtml({
       subject,
-      body,
-      studentName: student_name,
-      matricNumber: matric_number,
+      body: admin ? body : escapeHtml(body),
+      studentName: admin ? student_name : escapeHtml(student_name),
+      matricNumber: admin ? matric_number : escapeHtml(matric_number),
       attachments: rawAttachments,
       senderEmail: config.user,
     });

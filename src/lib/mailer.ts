@@ -18,7 +18,13 @@ export interface MailPayload {
   studentName?: string;
   matricNumber?: string;
   body?: string;
-  template?: "dues_receipt" | "matric_update_reminder" | "admin_broadcast" | "general_notice";
+  template?:
+    | "dues_receipt"
+    | "matric_update_reminder"
+    | "admin_broadcast"
+    | "general_notice"
+    | "contact_notice"
+    | "contact_ack";
   meta?: Record<string, any>;
   attachments?: EmailAttachment[];
 }
@@ -46,6 +52,21 @@ export interface MailerConfigStatus {
 }
 
 const STORAGE_KEY = "nass_dispatched_emails";
+
+// Uses VITE_API_URL when set (production); otherwise the relative /api path that the Vite dev proxy forwards.
+const MAILER_BASE = `${(import.meta.env.VITE_API_URL || "/api").replace(/\/$/, "")}/mailer`;
+
+// Admin-only mailer calls carry the admin session token.
+const mailerHeaders = (): Record<string, string> => {
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  try {
+    const token = localStorage.getItem("adminToken");
+    if (token) headers.Authorization = `Bearer ${token}`;
+  } catch {
+    // storage unavailable
+  }
+  return headers;
+};
 
 /**
  * Returns list of previously dispatched admin emails
@@ -77,7 +98,7 @@ const logSentEmail = (log: DispatchedMailLog) => {
  */
 export const getMailerConfigApi = async (): Promise<MailerConfigStatus> => {
   try {
-    const res = await fetch("/api/mailer/config");
+    const res = await fetch(`${MAILER_BASE}/config`, { headers: mailerHeaders() });
     if (!res.ok) throw new Error("Could not reach mailer service");
     return await res.json();
   } catch (err: any) {
@@ -102,9 +123,9 @@ export const saveMailerConfigApi = async (config: {
   pass?: string;
   fromName?: string;
 }): Promise<{ success: boolean; message: string; configured?: boolean }> => {
-  const res = await fetch("/api/mailer/config", {
+  const res = await fetch(`${MAILER_BASE}/config`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: mailerHeaders(),
     body: JSON.stringify(config),
   });
   return await res.json();
@@ -114,9 +135,9 @@ export const saveMailerConfigApi = async (config: {
  * Send instant test email to verify credentials directly
  */
 export const sendTestEmailApi = async (targetEmail: string): Promise<{ success: boolean; message: string }> => {
-  const res = await fetch("/api/mailer/test", {
+  const res = await fetch(`${MAILER_BASE}/test`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: mailerHeaders(),
     body: JSON.stringify({ targetEmail }),
   });
   const data = await res.json().catch(() => ({ success: false, message: "Server connection failed" }));
@@ -138,9 +159,9 @@ export const sendCollegiateEmail = async (payload: MailPayload): Promise<{ succe
   }
 
   try {
-    const response = await fetch("/api/mailer/send", {
+    const response = await fetch(`${MAILER_BASE}/send`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: mailerHeaders(),
       body: JSON.stringify({
         recipients: cleanRecipients,
         subject: payload.subject,

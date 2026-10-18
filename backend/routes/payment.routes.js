@@ -127,53 +127,7 @@ router.get('/verify/:reference', protect, async (req, res) => {
   }
 });
 
-// Korapay Webhook
-router.post('/webhook', async (req, res) => {
-  const { event, data } = req.body;
-  
-  if (event === 'charge.success') {
-    const reference = data.reference;
-    const matric = data.metadata?.matric;
-    
-    try {
-      // Sync to Central System
-      await axios.post(`${ID_SYSTEM_API}?action=log_payment_success`, {
-        matric_number: matric,
-        reference,
-        amount: data.amount,
-        is_webhook: true
-      }, {
-        headers: { 'X-API-KEY': API_KEY }
-      });
-
-      // Send Emails
-      const [email, name] = [data.customer?.email, data.customer?.name];
-      const displayType = data.metadata?.type === 'id_replacement' ? 'ID Card Replacement' : 'NACOS Session Dues';
-
-      if (email) {
-        emailService.sendPaymentReceipt(email, name || 'Student', {
-          amount: data.amount,
-          reference: reference,
-          type: displayType,
-        }).catch(err => console.error('Webhook Receipt Error:', err));
-      }
-
-      emailService.sendPaymentNotificationToAdmin({
-        amount: data.amount,
-        reference: reference,
-        type: displayType,
-      }, {
-        full_name: name || 'Student',
-        matric_number: matric || 'Unknown'
-      }).catch(err => console.error('Webhook Admin Notification Error:', err));
-
-      console.log(`✅ Webhook: Payment success synced for ${matric}`);
-    } catch (error) {
-      console.error('❌ Webhook Sync Error:', error.message);
-    }
-  }
-
-  res.status(200).send('Webhook Received');
-});
+// No webhook route here: payment confirmation happens via GET /verify/:reference (authenticated,
+// checked against Korapay). Webhooks are handled by a separate service.
 
 export default router;

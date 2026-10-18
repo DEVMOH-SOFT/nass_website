@@ -29,3 +29,6 @@ backend/.env
 vite.config.ts.timestamp-*.mjs
 Recent Passport Photo (File responses)/
 /NASS_LASUSTECH_2026-2027_Calendar (1).pdf
+
+# Secrets / runtime data
+backend/data/mailer_config.json

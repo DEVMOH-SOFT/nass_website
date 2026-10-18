@@ -74,8 +74,10 @@ const authLimiter = rateLimit({
 });
 
 app.use(helmet({ crossOriginResourcePolicy: false }));
-app.use(express.json({ limit: '25mb' }));
-app.use(express.urlencoded({ extended: true, limit: '25mb' }));
+// Mailer accepts base64 attachments, so only that router gets the large body limit.
+app.use('/api/mailer', express.json({ limit: '25mb' }));
+app.use(express.json({ limit: '2mb' }));
+app.use(express.urlencoded({ extended: true, limit: '2mb' }));
 app.use(morgan('dev'));
 app.use(limiter);
 
@@ -118,20 +120,28 @@ app.get('/api/download', (req, res) => {
   const fileName = req.query.name || 'download.png';
   if (!filePath) return res.status(400).send('Missing url parameter');
 
-  let cleanName = fileName.replace(/[^a-zA-Z0-9_\-\.]/g, '_');
-  const projectRoot = path.resolve(__dirname, '..');
-  let cleanRelative = filePath.startsWith('/') ? filePath.slice(1) : filePath;
-  cleanRelative = cleanRelative.split('?')[0];
+  let cleanName = String(fileName).replace(/[^a-zA-Z0-9_\-\.]/g, '_');
+  let cleanRelative = String(filePath).split('?')[0].replace(/^\/+/, '').replace(/^uploads\//, '');
 
-  const fullPath = path.resolve(projectRoot, cleanRelative);
-  if (fs.existsSync(fullPath) && fs.statSync(fullPath).isFile()) {
+  // Only files inside the uploads directory may be downloaded.
+  let fullPath;
+  try {
+    const uploadsRoot = fs.realpathSync(uploadsPath);
+    fullPath = fs.realpathSync(path.resolve(uploadsRoot, cleanRelative));
+    if (!fullPath.startsWith(uploadsRoot + path.sep)) {
+      return res.status(403).send('Forbidden');
+    }
+  } catch (_err) {
+    return res.status(404).send('File not found');
+  }
+
+  if (fs.statSync(fullPath).isFile()) {
     const ext = path.extname(fullPath).toLowerCase();
     if (!cleanName.includes('.')) cleanName += ext || '.png';
     res.setHeader('Content-Disposition', `attachment; filename="${cleanName}"`);
     return res.sendFile(fullPath);
-  } else {
-    return res.status(404).send('File not found');
   }
+  return res.status(404).send('File not found');
 });
 
 // Vercel Cron Job endpoint — called daily at 07:00 UTC

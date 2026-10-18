@@ -4,6 +4,7 @@ import axios from 'axios';
 import nodemailer from 'nodemailer';
 import dns from 'dns';
 import protect from '../middleware/auth.middleware.js';
+import JWT_SECRET from '../jwt-secret.js';
 
 const router = Router();
 const ID_SYSTEM_API = 'https://nacosid.tmb.it.com/api.php';
@@ -62,7 +63,7 @@ router.post('/login', async (req, res) => {
 
       const token = jwt.sign(
         { id: user.id, matric, name: user.full_name || user.name, email: user.email, role },
-        process.env.JWT_SECRET || 'nacos_secret_2025',
+        JWT_SECRET,
         { expiresIn: '30d' }
       );
 
