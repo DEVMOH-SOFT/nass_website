@@ -6,6 +6,7 @@ import { blogs as staticBlogs, BlogPost } from "@/data/blogs";
 export interface SupabaseExecutive {
   id: string;
   name: string;
+  preferredName?: string;
   post: string;
   department: string;
   level: string;
@@ -14,6 +15,10 @@ export interface SupabaseExecutive {
   sort_order: number;
   is_active: boolean;
   arm?: "SEC" | "SRC";
+  phone?: string;
+  whatsapp?: string;
+  email?: string;
+  matric_no?: string;
 }
 
 export interface SupabaseEvent {
@@ -60,12 +65,17 @@ export const fetchExecutives = async (): Promise<Executive[]> => {
       if (!error && data && data.length > 0) {
         return data.map((item: SupabaseExecutive) => ({
           name: item.name,
+          preferredName: item.preferredName,
           post: item.post,
           department: item.department || "Basic Sciences",
           level: item.level || "400 Level",
           description: item.description || "",
           image: item.image_url || "/assets/president.jpg",
-          arm: item.arm || (item.post.toLowerCase().includes("speaker") || item.post.toLowerCase().includes("clerk") || item.post.toLowerCase().includes("honorable") || item.post.toLowerCase().includes("honourable") ? "SRC" : "SEC"),
+          phone: item.phone,
+          whatsapp: item.whatsapp,
+          email: item.email,
+          matricNumber: item.matric_no,
+          arm: item.arm || (item.post.toLowerCase().includes("speaker") || item.post.toLowerCase().includes("clerk") || item.post.toLowerCase().includes("whip") || item.post.toLowerCase().includes("honorable") || item.post.toLowerCase().includes("honourable") ? "SRC" : "SEC"),
         }));
       }
     } catch (err) {

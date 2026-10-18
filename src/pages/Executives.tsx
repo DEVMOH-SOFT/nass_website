@@ -17,8 +17,8 @@ const Executives = () => {
 
   const presidium = execList.filter((e) => e.arm === "SEC" && (e.post.toLowerCase().includes("president")));
   const cabinet = execList.filter((e) => e.arm === "SEC" && !e.post.toLowerCase().includes("president"));
-  const srcOfficers = execList.filter((e) => e.arm === "SRC" && (e.post.toLowerCase().includes("speaker") || e.post.toLowerCase().includes("clerk")));
-  const srcMembers = execList.filter((e) => e.arm === "SRC" && !e.post.toLowerCase().includes("speaker") && !e.post.toLowerCase().includes("clerk"));
+  const srcOfficers = execList.filter((e) => e.arm === "SRC" && (e.post.toLowerCase().includes("speaker") || e.post.toLowerCase().includes("clerk") || e.post.toLowerCase().includes("whip")));
+  const srcMembers = execList.filter((e) => e.arm === "SRC" && !e.post.toLowerCase().includes("speaker") && !e.post.toLowerCase().includes("clerk") && !e.post.toLowerCase().includes("whip"));
 
   return (
     <Layout>
@@ -134,7 +134,7 @@ const Executives = () => {
               </p>
             </div>
             <div className="flex justify-center">
-              <div className="grid gap-6 w-full max-w-3xl sm:grid-cols-2">
+              <div className="grid gap-6 w-full max-w-5xl sm:grid-cols-2 lg:grid-cols-4">
                 {srcOfficers.map((exec) => (
                   <ExecutiveCard key={exec.name} {...exec} />
                 ))}
