@@ -103,41 +103,40 @@ const Index = () => {
         {/* ======================================================== */}
         {/* EDITORIAL HERO BANNER (COLLEGE BUILDING AS BACKGROUND) */}
         {/* ======================================================== */}
-        <section className="relative isolate overflow-hidden bg-[#061d10] text-white border-b border-emerald-950/60 pt-5 pb-8 sm:pt-7 sm:pb-10 md:pt-8 md:pb-12 lg:pt-9 lg:pb-14 flex items-center">
-          {/* Authentic College Building Image as Full-Bleed Banner Background */}
+        <section className="relative isolate overflow-hidden bg-[#05180d] text-white border-b border-emerald-950/60 pt-5 pb-8 sm:pt-7 sm:pb-10 md:pt-8 md:pb-12 lg:pt-9 lg:pb-14 flex items-center">
+          {/* Authentic College Building Image with controlled transparency so text is 100% visible */}
           <div className="absolute inset-0 z-0 overflow-hidden">
             <img
               src={cbsFacultyBuilding}
               alt="College of Basic Sciences Complex, LASUSTECH Main Campus"
-              className="h-full w-full object-cover object-[80%_30%] sm:object-[78%_35%] md:object-[75%_35%] filter brightness-[1.05] contrast-[1.08] saturate-[1.10]"
+              className="h-full w-full object-cover object-[80%_30%] sm:object-[78%_35%] md:object-[75%_35%] opacity-40 sm:opacity-55 md:opacity-70 filter brightness-[0.88] contrast-[1.08] saturate-[1.15]"
             />
           </div>
 
-          {/* Directional Scrim Overlays for Professional Readability & Architectural Clarity */}
-          {/* 1. Scrim gradient: Softened on mobile to showcase the frontal architectural facade while keeping typography readable */}
-          <div className="absolute inset-0 z-0 bg-gradient-to-b from-[#061d10]/88 via-[#072414]/55 to-[#061d10]/82 sm:bg-gradient-to-r sm:from-[#061d10] sm:via-[#072414]/80 md:via-[#072414]/65 sm:to-transparent" />
+          {/* Directional Scrim Overlays: Deep dark institutional gradient protecting text readability on mobile and desktop */}
+          <div className="absolute inset-0 z-0 bg-gradient-to-b from-[#05180d]/95 via-[#061d10]/85 to-[#05180d]/90 sm:bg-gradient-to-r sm:from-[#05180d]/98 sm:via-[#061d10]/85 md:via-[#072414]/70 sm:to-transparent" />
 
           {/* 2. Vertical vignette: Soft anchoring at top and bottom edges */}
-          <div className="absolute inset-0 z-0 bg-gradient-to-t from-[#061d10]/70 via-transparent to-[#061d10]/30" />
+          <div className="absolute inset-0 z-0 bg-gradient-to-t from-[#05180d] via-transparent to-[#05180d]/40" />
 
           <div className="container relative z-10 w-full">
             <div className="max-w-2xl lg:max-w-3xl">
               {/* Institutional Eyebrow */}
-              <div className="inline-flex items-center gap-2 rounded-full border border-blue-400/35 bg-[#071d33]/85 px-3.5 py-1 text-xs font-semibold text-sky-300 shadow-sm backdrop-blur-md tracking-wider">
+              <div className="inline-flex items-center gap-2 rounded-full border border-blue-400/35 bg-[#071d33]/90 px-3.5 py-1 text-xs font-semibold text-sky-300 shadow-md backdrop-blur-md tracking-wider">
                 <span className="h-1.5 w-1.5 rounded-full bg-blue-400" />
                 <span>COLLEGE OF BASIC SCIENCES • LASUSTECH</span>
               </div>
 
               {/* Main Headline */}
-              <h1 className="mt-3 font-display text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-[1.12]">
+              <h1 className="mt-3 font-display text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-[1.12] drop-shadow-[0_2px_8px_rgba(0,0,0,0.95)]">
                 Nigerian Association of Science Students
               </h1>
 
-              <p className="mt-1.5 text-sm sm:text-base font-semibold text-emerald-300">
+              <p className="mt-1.5 text-sm sm:text-base font-bold text-emerald-300 drop-shadow-[0_1px_4px_rgba(0,0,0,0.9)]">
                 NASS LASUSTECH Chapter
               </p>
 
-              <p className="mt-3 max-w-xl text-xs sm:text-sm md:text-base leading-relaxed text-slate-200">
+              <p className="mt-3 max-w-xl text-xs sm:text-sm md:text-base leading-relaxed text-white/95 font-medium drop-shadow-[0_1px_4px_rgba(0,0,0,0.95)]">
                 The central collegiate student body uniting undergraduates across 5 accredited scientific departments. Driving empirical research, academic excellence, and student advocacy across Lagos State University of Science and Technology.
               </p>
 

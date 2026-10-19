@@ -16,8 +16,7 @@ import chiefWhipImg from "@/assets/executives/chief_whip_pot_balogun.jpg";
 import honOjelabiImg from "@/assets/executives/hon_ojelabi.jpg";
 import honJesuyonImg from "@/assets/executives/hon_jesuyon.png";
 import honOdusanyaImg from "@/assets/executives/hon_odusanya.jpg";
-import honOlowookereImg from "@/assets/executives/hon_olowookere.jpg";
-import honBabalolaImg from "@/assets/executives/hon_babalola.jpg";
+import nassLogo from "@/assets/nass_logo.png";
 
 export interface Executive {
   name: string;
@@ -324,13 +323,13 @@ export const executives: Executive[] = [
     department: "Chemical Sciences (Biochemistry)",
     level: "300 Level",
     description: "Legislative representative for Chemical Sciences scholars, advocating for laboratory resources, student interests, and faculty synergy.",
-    image: honOlowookereImg,
+    image: nassLogo,
     matricNumber: "240302030048",
     email: "doctoryusuf2001@gmail.com",
     phone: "09045774036",
     whatsapp: "09152646563",
     arm: "SRC",
-    objectPosition: "object-top",
+    objectPosition: "object-center",
   },
   {
     name: "Babalola Abdul-Rahman Olamilekan",
@@ -339,12 +338,12 @@ export const executives: Executive[] = [
     department: "Mathematical Sciences (Mathematics)",
     level: "300 Level",
     description: "Parliamentary representative for Mathematics and Statistics scholars, reviewing student bills and departmental welfare policies.",
-    image: honBabalolaImg,
+    image: nassLogo,
     matricNumber: "240303020027",
     email: "abdulrahmanbabalola822@gmail.com",
     phone: "08038451340",
     whatsapp: "08038451340",
     arm: "SRC",
-    objectPosition: "object-top",
+    objectPosition: "object-center",
   },
 ];
