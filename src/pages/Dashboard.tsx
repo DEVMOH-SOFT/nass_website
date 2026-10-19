@@ -25,6 +25,7 @@ import { events as staticEvents } from "@/data/events";
 import { fetchStudentProfile, updateStudentProfile, logoutStudent, markDuesPaid } from "@/lib/student-auth";
 import { triggerKorapayCheckout } from "@/lib/korapay";
 import { downloadFile, getDownloadUrl } from "@/lib/download";
+import { downloadElementAsPdf } from "@/lib/pdf-service";
 import { getStoreProducts, StoreProduct } from "@/lib/store-service";
 
 import nassLogo from "@/assets/nass_logo.png";
@@ -1388,6 +1389,41 @@ const Dashboard = () => {
     setPassModalOpen(true);
   };
 
+  const [downloadingPdf, setDownloadingPdf] = useState(false);
+
+  const handleDownloadReceiptPdf = async () => {
+    if (!activeReceipt) return;
+    try {
+      setDownloadingPdf(true);
+      toast({
+        title: "Generating PDF Receipt",
+        description: "Preparing your official collegiate payment receipt for download...",
+      });
+      const ref = activeReceipt.reference || activeReceipt.transaction_reference || profile.matricNumber || "RECEIPT";
+      const success = await downloadElementAsPdf("printable-receipt", {
+        filename: `NASS_Receipt_${ref}.pdf`,
+        docTitle: "NASS LASUSTECH - Official Payment Receipt",
+      });
+      if (success) {
+        toast({
+          title: "Download Complete!",
+          description: "Official receipt PDF saved to your device.",
+        });
+      } else {
+        toast({
+          title: "Download Notice",
+          description: "Falling back to print view...",
+        });
+        printElementById("printable-receipt", "NASS LASUSTECH - Official Payment Receipt");
+      }
+    } catch (err) {
+      console.error("PDF download error:", err);
+      printElementById("printable-receipt", "NASS LASUSTECH - Official Payment Receipt");
+    } finally {
+      setDownloadingPdf(false);
+    }
+  };
+
   const printElementById = (elementId: string, docTitle: string = "NASS LASUSTECH Document") => {
     const element = document.getElementById(elementId);
     if (!element) {
@@ -1404,12 +1440,12 @@ const Dashboard = () => {
     const iframe = document.createElement("iframe");
     iframe.id = "nass-print-iframe";
     iframe.style.position = "fixed";
-    iframe.style.right = "0";
-    iframe.style.bottom = "0";
-    iframe.style.width = "0";
-    iframe.style.height = "0";
+    iframe.style.left = "-9999px";
+    iframe.style.top = "0";
+    iframe.style.width = "794px";
+    iframe.style.height = "1123px";
     iframe.style.border = "none";
-    iframe.style.opacity = "0";
+    iframe.style.opacity = "0.01";
     iframe.setAttribute("aria-hidden", "true");
     document.body.appendChild(iframe);
 
@@ -4353,31 +4389,41 @@ const Dashboard = () => {
         {/* MODAL 2: OFFICIAL ELECTRONIC PAYMENT RECEIPT */}
         {/* ======================================================== */}
         <Dialog open={receiptModalOpen} onOpenChange={setReceiptModalOpen}>
-          <DialogContent className="max-w-xl p-0 overflow-hidden border-emerald-950/20 shadow-2xl rounded-3xl max-h-[92vh] overflow-y-auto">
+          <DialogContent className="w-[96vw] max-w-xl p-0 overflow-hidden border-emerald-950/20 shadow-2xl rounded-2xl sm:rounded-3xl max-h-[92vh] flex flex-col bg-white">
             {activeReceipt && (
-              <div className="bg-white">
+              <div className="flex flex-col h-full max-h-[92vh] overflow-hidden bg-white">
                 {/* Print Control Toolbar (Hidden on Print) */}
-                <div className="bg-[#041c14] px-6 py-4 flex items-center justify-between text-white border-b border-emerald-800/40 no-print">
-                  <div className="flex items-center gap-2">
-                    <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-                    <span className="text-xs font-black uppercase tracking-wider text-emerald-300">
+                <div className="bg-[#041c14] px-4 py-3 sm:px-6 sm:py-4 flex items-center justify-between text-white border-b border-emerald-800/40 shrink-0 no-print">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+                    <span className="text-[11px] sm:text-xs font-black uppercase tracking-wider text-emerald-300 truncate">
                       Official Payment Receipt
                     </span>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                    <Button
+                      onClick={handleDownloadReceiptPdf}
+                      disabled={downloadingPdf}
+                      size="sm"
+                      className="h-8 gap-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-xs px-2.5 sm:px-3"
+                    >
+                      <Download className="h-3.5 w-3.5" />
+                      <span>{downloadingPdf ? "Generating..." : "Download PDF"}</span>
+                    </Button>
                     <Button
                       onClick={() => printElementById("printable-receipt", "NASS LASUSTECH - Official Payment Receipt")}
                       size="sm"
-                      className="h-8 gap-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-xs"
+                      variant="outline"
+                      className="h-8 gap-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white border-white/20 font-bold text-xs shadow-xs px-2 sm:px-2.5 hidden sm:inline-flex"
                     >
                       <Printer className="h-3.5 w-3.5" />
-                      <span>Print Official Receipt</span>
+                      <span>Print</span>
                     </Button>
                     <Button
                       onClick={() => setReceiptModalOpen(false)}
                       size="sm"
                       variant="ghost"
-                      className="h-8 text-white/70 hover:text-white hover:bg-white/10 text-xs font-semibold"
+                      className="h-8 text-white/70 hover:text-white hover:bg-white/10 text-xs font-semibold px-2"
                     >
                       Close
                     </Button>
@@ -4385,263 +4431,274 @@ const Dashboard = () => {
                 </div>
 
                 {/* Printable Receipt Body */}
-                <div 
-                  id="printable-receipt"
-                  className="p-6 sm:p-8 bg-white text-slate-900 font-sans relative"
-                >
-                  {/* Decorative Outer Guilloche Frame */}
-                  <div className="border-[2.5px] border-[#145a32] p-5 sm:p-7 rounded-2xl relative bg-white">
-                    {/* Watermark Crest */}
-                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.035] select-none">
-                      <img src={nassLogo} alt="" className="w-72 h-72 object-contain" />
-                    </div>
-
-                    {/* Receipt Header: Logos & Institutional Hierarchy */}
-                    <div className="flex items-center justify-between gap-3 border-b-2 border-[#145a32] pb-4">
-                      {/* LASUSTECH Crest */}
-                      <div className="shrink-0">
-                        <img 
-                          src={lasustechLogo} 
-                          alt="LASUSTECH" 
-                          className="h-16 w-auto object-contain" 
-                        />
+                <div className="overflow-y-auto flex-1 p-2 sm:p-5 bg-slate-100/60">
+                  <div 
+                    id="printable-receipt"
+                    className="p-3 sm:p-6 bg-white text-slate-900 font-sans relative rounded-2xl shadow-xs"
+                  >
+                    {/* Decorative Outer Guilloche Frame */}
+                    <div className="border-[1.5px] sm:border-[2.5px] border-[#145a32] p-3 sm:p-6 rounded-xl sm:rounded-2xl relative bg-white">
+                      {/* Watermark Crest */}
+                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.035] select-none">
+                        <img src={nassLogo} alt="" className="w-56 h-56 sm:w-72 sm:h-72 object-contain" />
                       </div>
 
-                      {/* Header Typography */}
-                      <div className="text-center flex-1 px-1">
-                        <h2 className="text-[11px] sm:text-xs font-serif font-black tracking-wide text-slate-900 uppercase leading-tight">
-                          LAGOS STATE UNIVERSITY OF SCIENCE AND TECHNOLOGY
-                        </h2>
-                        <h3 className="text-[12px] sm:text-sm font-sans font-black text-[#145a32] uppercase tracking-wider mt-0.5">
-                          COLLEGE OF BASIC SCIENCES
-                        </h3>
-                        <h4 className="text-[10px] sm:text-xs font-sans font-extrabold text-slate-800 uppercase tracking-widest mt-0.5">
-                          NIGERIAN ASSOCIATION OF SCIENCE STUDENTS (NASS)
-                        </h4>
-                        <p className="text-[8px] sm:text-[9.5px] text-slate-500 font-medium italic mt-0.5">
-                          Ikorodu Main Campus, Lagos State • Secretariat Desk, College of Basic Science Ground Floor
-                        </p>
-                      </div>
-
-                      {/* NASS Crest */}
-                      <div className="shrink-0">
-                        <img 
-                          src={nassLogo} 
-                          alt="NASS" 
-                          className="h-16 w-16 object-contain rounded-full p-0.5 bg-white border border-[#145a32]/30" 
-                        />
-                      </div>
-                    </div>
-
-                    {/* Receipt Title Ribbon */}
-                    <div className="my-4 text-center">
-                      <div className="inline-block bg-[#145a32] text-white font-serif font-bold text-xs sm:text-sm px-6 py-1 rounded-full uppercase tracking-wider shadow-xs">
-                        OFFICIAL ELECTRONIC PAYMENT RECEIPT
-                      </div>
-                      <div className="flex items-center justify-center gap-3 mt-2 text-[10px] text-slate-500 font-mono">
-                        <span>Ref: <strong className="text-slate-900">{activeReceipt.reference || `NASS-PAY-${(profile.matricNumber || '2026').slice(-4)}`}</strong></span>
-                        <span>•</span>
-                        <span>Issued: <strong className="text-slate-900">{activeReceipt.created_at ? new Date(activeReceipt.created_at).toLocaleDateString() : 'Today'}</strong></span>
-                      </div>
-                    </div>
-
-                    {/* BIG BOLD PAYMENT PURPOSE BANNER (PROMINENT HIGHLIGHT) */}
-                    <div 
-                      style={{ backgroundColor: '#041c14' }}
-                      className="my-3.5 p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-[#041c14] via-[#0b3b24] to-[#145a32] text-white text-center shadow-md border-2 border-emerald-500/40 relative overflow-hidden"
-                    >
-                      <p className="text-[10px] sm:text-[11px] font-black uppercase tracking-widest text-amber-300">
-                        OFFICIAL PURPOSE OF PAYMENT
-                      </p>
-                      <h1 className="text-xl sm:text-2xl md:text-3xl font-serif font-black uppercase tracking-tight text-white mt-1 leading-snug break-words">
-                        {activeReceipt.payment_type ? activeReceipt.payment_type.replace(/_/g, ' ') : "COLLEGE OF BASIC SCIENCES ANNUAL DUES"}
-                      </h1>
-                      <div className="mt-2 inline-flex items-center gap-2 bg-white/10 px-3.5 py-1 rounded-full border border-white/20">
-                        <span className="text-[10px] uppercase tracking-wider text-emerald-200 font-bold">TOTAL VERIFIED:</span>
-                        <span className="font-mono text-base font-black text-amber-300">
-                          ₦{Number(activeReceipt.amount || 0).toLocaleString()} NAIRA
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Verified Status Banner */}
-                    <div className="mb-4 p-3 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <CheckCircle2 className="h-4 w-4 text-emerald-700 shrink-0" />
-                        <div>
-                          <p className="text-[11px] font-black uppercase text-emerald-950">Payment Verified & Settled</p>
-                          <p className="text-[9.5px] text-emerald-700">Processed securely via Korapay Central Gateway</p>
-                        </div>
-                      </div>
-                      <span className="font-mono font-black text-base sm:text-lg text-emerald-900">
-                        ₦{Number(activeReceipt.amount || 0).toLocaleString()}
-                      </span>
-                    </div>
-
-                    {/* Particulars Table */}
-                    <div className="border border-slate-200 rounded-xl overflow-hidden divide-y divide-slate-100 text-xs mb-5">
-                      <div className="grid grid-cols-[130px_1fr] p-2.5 bg-slate-50/70">
-                        <span className="font-bold text-slate-500 uppercase text-[9.5px]">Student Full Name:</span>
-                        <span className="font-bold text-slate-900 uppercase font-serif">
-                          {activeReceipt.student_name || profile.fullName || "Student Scholar"}
-                        </span>
-                      </div>
-                      <div className="grid grid-cols-[130px_1fr] p-2.5">
-                        <span className="font-bold text-slate-500 uppercase text-[9.5px]">
-                          {(activeReceipt.level === "100L" || (activeReceipt.matric_number && activeReceipt.matric_number.startsWith("FSH"))) ? "App / Scholar Ref:" : "Matriculation No:"}
-                        </span>
-                        <div className="flex items-center gap-2">
-                          <span className="font-mono font-bold text-[#1a4480]">
-                            {activeReceipt.matric_number || profile.matricNumber || "N/A"}
-                          </span>
-                          {(activeReceipt.level === "100L" || (activeReceipt.matric_number && activeReceipt.matric_number.startsWith("FSH"))) && (
-                            <span className="text-[8.5px] font-bold text-amber-800 bg-amber-100 px-2 py-0.5 rounded-full border border-amber-300">
-                              Matric: Pending (100L)
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-[130px_1fr] p-2.5 bg-slate-50/70">
-                        <span className="font-bold text-slate-500 uppercase text-[9.5px]">Department & Level:</span>
-                        <span className="font-semibold text-slate-800">
-                          {activeReceipt.department || profile.department || "Basic Sciences"} • {activeReceipt.level || profile.level || "Undergraduate"}
-                        </span>
-                      </div>
-                      <div className="grid grid-cols-[130px_1fr] p-3 bg-amber-50/60 border-y border-amber-200">
-                        <span className="font-black text-amber-950 uppercase text-[9.5px] flex items-center">Item / Purpose:</span>
-                        <span className="font-black text-sm sm:text-base text-slate-900 uppercase font-serif">
-                          {activeReceipt.payment_type || "2025/2026 SESSION DUES"}
-                        </span>
-                      </div>
-
-                      {/* Lab Coat / Jersey Size */}
-                      {activeReceipt.size && (
-                        <div className="grid grid-cols-[130px_1fr] p-2.5 bg-slate-50/70">
-                          <span className="font-bold text-slate-500 uppercase text-[9.5px]">Selected Size:</span>
-                          <span className="font-mono font-bold text-emerald-900">
-                            {activeReceipt.size}
-                          </span>
-                        </div>
-                      )}
-
-                      {/* Lab Coat Custom Embroidered Name */}
-                      {activeReceipt.labcoat_name && (
-                        <div className="grid grid-cols-[130px_1fr] p-2.5 bg-amber-50/40">
-                          <span className="font-bold text-amber-800 uppercase text-[9.5px]">Embroidered Name:</span>
-                          <span className="font-mono font-black text-amber-950 uppercase tracking-wider">
-                            {activeReceipt.labcoat_name}
-                          </span>
-                        </div>
-                      )}
-
-                      {/* Jersey Customization */}
-                      {activeReceipt.jersey_name && (
-                        <div className="grid grid-cols-[130px_1fr] p-2.5 bg-blue-50/40">
-                          <span className="font-bold text-[#1a4480] uppercase text-[9.5px]">Jersey Customization:</span>
-                          <span className="font-mono font-black text-blue-950 uppercase tracking-wider">
-                            {activeReceipt.jersey_name} #{activeReceipt.jersey_number || '10'} {activeReceipt.size ? `(${activeReceipt.size})` : ''}
-                          </span>
-                        </div>
-                      )}
-
-                      {/* WhatsApp Contact */}
-                      <div className="grid grid-cols-[130px_1fr] p-2.5">
-                        <span className="font-bold text-slate-500 uppercase text-[9.5px]">WhatsApp Contact:</span>
-                        <span className="font-mono font-bold text-slate-800">
-                          {activeReceipt.whatsapp_number || profile.whatsappNumber || "Registered on Portal"}
-                        </span>
-                      </div>
-
-                      <div className="grid grid-cols-[130px_1fr] p-2.5 bg-slate-50/70">
-                        <span className="font-bold text-slate-500 uppercase text-[9.5px]">Channel & Gateway:</span>
-                        <span className="font-medium text-slate-700">
-                          Korapay Central Gateway • 256-Bit SSL Encrypted
-                        </span>
-                      </div>
-
-                      <div className="grid grid-cols-[130px_1fr] p-3 bg-emerald-50/60 font-bold">
-                        <span className="uppercase text-[10px] text-emerald-950">Total Amount Paid:</span>
-                        <span className="font-mono text-base font-black text-emerald-900">
-                          ₦{Number(activeReceipt.amount || 0).toLocaleString()} (Naira)
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Pickup / Clearance Notice */}
-                    {activeReceipt.payment_type && !String(activeReceipt.payment_type).toLowerCase().includes("due") ? (
-                      <div className="rounded-xl bg-amber-50 border border-amber-200 p-3 text-[10.5px] text-amber-950 mb-5 leading-relaxed">
-                        <strong>Collection Instructions:</strong> Present this receipt (printed or on your phone) at the <strong>NASS Secretariat, College of Basic Science Ground Floor</strong>. Official dispatch notification will also be sent to your WhatsApp line.
-                      </div>
-                    ) : (
-                      <div className="rounded-xl bg-emerald-50 border border-emerald-200 p-3 text-[10.5px] text-emerald-950 mb-5 leading-relaxed">
-                        <strong>Academic Standing:</strong> This confirms statutory 2025/2026 collegiate dues payment. Valid for presentation during course registration, laboratory practical clearance, and semester examinations.
-                      </div>
-                    )}
-
-                    {/* Signatures & Seal Block: President & Treasurer */}
-                    <div className="pt-4 border-t-2 border-[#145a32]/30 flex items-center justify-between gap-4 text-center">
-                      {/* Executive President Manual Signature Space */}
-                      <div className="flex flex-col items-center min-w-[130px]">
-                        <div className="h-10 w-full" aria-hidden="true" />
-                        <div className="border-t border-slate-700 pt-1 w-full">
-                          <p className="text-[11px] font-bold text-slate-900 leading-tight">Comr. Adegoke Muhammed A.</p>
-                          <p className="text-[8.5px] font-medium text-slate-500 uppercase">Executive President, NASS</p>
-                        </div>
-                      </div>
-
-                      {/* Official Digital Verification QR Code */}
-                      <div className="flex flex-col items-center justify-center">
-                        <div className="p-1.5 bg-white border-2 border-dashed border-[#145a32] rounded-xl shadow-xs flex items-center justify-center">
-                          <img
-                            src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&margin=1&data=${encodeURIComponent(
-                              `${typeof window !== "undefined" ? window.location.origin : "https://nasslasustech.com"}/verify-receipt?ref=${encodeURIComponent(activeReceipt.reference || activeReceipt.transaction_reference || "NASS-DUES")}&matric=${encodeURIComponent(activeReceipt.matric_number || profile.matricNumber || "")}&name=${encodeURIComponent(activeReceipt.full_name || profile.fullName || "")}&dept=${encodeURIComponent(activeReceipt.department || profile.department || "")}&level=${encodeURIComponent(activeReceipt.level || profile.level || "")}&type=${encodeURIComponent(activeReceipt.payment_type || "2025/2026 SESSION DUES")}&amount=${encodeURIComponent(String(activeReceipt.amount || 3000))}&date=${encodeURIComponent(activeReceipt.paid_at || activeReceipt.created_at || new Date().toISOString())}`
-                            )}`}
-                            alt="Receipt Verification QR Code"
-                            className="w-16 h-16 object-contain"
+                      {/* Receipt Header: Logos & Institutional Hierarchy */}
+                      <div className="flex items-center justify-between gap-2 sm:gap-3 border-b-2 border-[#145a32] pb-3 sm:pb-4">
+                        {/* LASUSTECH Crest */}
+                        <div className="shrink-0">
+                          <img 
+                            src={lasustechLogo} 
+                            alt="LASUSTECH" 
+                            className="h-10 sm:h-16 w-auto object-contain" 
                           />
                         </div>
-                        <span className="mt-1 text-[7.5px] font-extrabold text-[#145a32] uppercase tracking-wider">
-                          Scan to Verify
+
+                        {/* Header Typography */}
+                        <div className="text-center flex-1 px-1">
+                          <h2 className="text-[9px] sm:text-xs font-serif font-black tracking-wide text-slate-900 uppercase leading-tight">
+                            LAGOS STATE UNIVERSITY OF SCIENCE AND TECHNOLOGY
+                          </h2>
+                          <h3 className="text-[10.5px] sm:text-sm font-sans font-black text-[#145a32] uppercase tracking-wider mt-0.5">
+                            COLLEGE OF BASIC SCIENCES
+                          </h3>
+                          <h4 className="text-[9px] sm:text-xs font-sans font-extrabold text-slate-800 uppercase tracking-widest mt-0.5">
+                            NIGERIAN ASSOCIATION OF SCIENCE STUDENTS (NASS)
+                          </h4>
+                          <p className="text-[7px] sm:text-[9.5px] text-slate-500 font-medium italic mt-0.5">
+                            Ikorodu Main Campus, Lagos State • Secretariat Desk, CBS Ground Floor
+                          </p>
+                        </div>
+
+                        {/* NASS Crest */}
+                        <div className="shrink-0">
+                          <img 
+                            src={nassLogo} 
+                            alt="NASS" 
+                            className="h-10 w-10 sm:h-16 sm:w-16 object-contain rounded-full p-0.5 bg-white border border-[#145a32]/30" 
+                          />
+                        </div>
+                      </div>
+
+                      {/* Receipt Title Ribbon */}
+                      <div className="my-2.5 sm:my-3.5 text-center">
+                        <div className="inline-block bg-[#145a32] text-white font-serif font-bold text-[10px] sm:text-xs px-4 sm:px-6 py-0.5 sm:py-1 rounded-full uppercase tracking-wider shadow-xs">
+                          OFFICIAL ELECTRONIC PAYMENT RECEIPT
+                        </div>
+                        <div className="flex items-center justify-center gap-2 sm:gap-3 mt-1.5 text-[9px] sm:text-[10px] text-slate-500 font-mono">
+                          <span>Ref: <strong className="text-slate-900">{activeReceipt.reference || `NASS-PAY-${(profile.matricNumber || '2026').slice(-4)}`}</strong></span>
+                          <span>•</span>
+                          <span>Issued: <strong className="text-slate-900">{activeReceipt.created_at ? new Date(activeReceipt.created_at).toLocaleDateString() : 'Today'}</strong></span>
+                        </div>
+                      </div>
+
+                      {/* BIG BOLD PAYMENT PURPOSE BANNER (PROMINENT HIGHLIGHT) */}
+                      <div 
+                        style={{ backgroundColor: '#041c14' }}
+                        className="my-2.5 sm:my-3.5 p-3 sm:p-5 rounded-xl sm:rounded-2xl bg-gradient-to-r from-[#041c14] via-[#0b3b24] to-[#145a32] text-white text-center shadow-md border-2 border-emerald-500/40 relative overflow-hidden"
+                      >
+                        <p className="text-[9px] sm:text-[11px] font-black uppercase tracking-widest text-amber-300">
+                          OFFICIAL PURPOSE OF PAYMENT
+                        </p>
+                        <h1 className="text-base sm:text-2xl md:text-3xl font-serif font-black uppercase tracking-tight text-white mt-1 leading-snug break-words">
+                          {activeReceipt.payment_type ? activeReceipt.payment_type.replace(/_/g, ' ') : "COLLEGE OF BASIC SCIENCES ANNUAL DUES"}
+                        </h1>
+                        <div className="mt-1.5 sm:mt-2 inline-flex items-center gap-1.5 sm:gap-2 bg-white/10 px-2.5 sm:px-3.5 py-0.5 sm:py-1 rounded-full border border-white/20">
+                          <span className="text-[9px] sm:text-[10px] uppercase tracking-wider text-emerald-200 font-bold">TOTAL VERIFIED:</span>
+                          <span className="font-mono text-sm sm:text-base font-black text-amber-300">
+                            ₦{Number(activeReceipt.amount || 0).toLocaleString()} NAIRA
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Verified Status Banner */}
+                      <div className="mb-3 sm:mb-4 p-2.5 sm:p-3 rounded-lg sm:rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <CheckCircle2 className="h-4 w-4 text-emerald-700 shrink-0" />
+                          <div className="min-w-0">
+                            <p className="text-[10px] sm:text-[11px] font-black uppercase text-emerald-950 truncate">Payment Verified & Settled</p>
+                            <p className="text-[8.5px] sm:text-[9.5px] text-emerald-700 truncate">Processed securely via Korapay Central Gateway</p>
+                          </div>
+                        </div>
+                        <span className="font-mono font-black text-sm sm:text-lg text-emerald-900 shrink-0">
+                          ₦{Number(activeReceipt.amount || 0).toLocaleString()}
                         </span>
                       </div>
 
-                      {/* Executive Treasurer Manual Signature Space */}
-                      <div className="flex flex-col items-center min-w-[130px]">
-                        <div className="h-10 w-full" aria-hidden="true" />
-                        <div className="border-t border-slate-700 pt-1 w-full">
-                          <p className="text-[11px] font-bold text-slate-900 leading-tight">Comr. Oladepo Damilare</p>
-                          <p className="text-[8.5px] font-medium text-slate-500 uppercase">Executive Treasurer, NASS</p>
+                      {/* Particulars Table */}
+                      <div className="border border-slate-200 rounded-lg sm:rounded-xl overflow-hidden divide-y divide-slate-100 text-[11px] sm:text-xs mb-3.5 sm:mb-5">
+                        <div className="grid grid-cols-[100px_1fr] sm:grid-cols-[135px_1fr] p-2 sm:p-2.5 bg-slate-50/70 items-center">
+                          <span className="font-bold text-slate-500 uppercase text-[8.5px] sm:text-[9.5px]">Student Full Name:</span>
+                          <span className="font-bold text-slate-900 uppercase font-serif break-words">
+                            {activeReceipt.student_name || profile.fullName || "Student Scholar"}
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-[100px_1fr] sm:grid-cols-[135px_1fr] p-2 sm:p-2.5 items-center">
+                          <span className="font-bold text-slate-500 uppercase text-[8.5px] sm:text-[9.5px]">
+                            {(activeReceipt.level === "100L" || (activeReceipt.matric_number && activeReceipt.matric_number.startsWith("FSH"))) ? "App / Scholar Ref:" : "Matriculation No:"}
+                          </span>
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <span className="font-mono font-bold text-[#1a4480]">
+                              {activeReceipt.matric_number || profile.matricNumber || "N/A"}
+                            </span>
+                            {(activeReceipt.level === "100L" || (activeReceipt.matric_number && activeReceipt.matric_number.startsWith("FSH"))) && (
+                              <span className="text-[8px] sm:text-[8.5px] font-bold text-amber-800 bg-amber-100 px-1.5 py-0.5 rounded-full border border-amber-300">
+                                Matric: Pending (100L)
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-[100px_1fr] sm:grid-cols-[135px_1fr] p-2 sm:p-2.5 bg-slate-50/70 items-center">
+                          <span className="font-bold text-slate-500 uppercase text-[8.5px] sm:text-[9.5px]">Department & Level:</span>
+                          <span className="font-semibold text-slate-800 break-words">
+                            {activeReceipt.department || profile.department || "Basic Sciences"} • {activeReceipt.level || profile.level || "Undergraduate"}
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-[100px_1fr] sm:grid-cols-[135px_1fr] p-2.5 sm:p-3 bg-amber-50/60 border-y border-amber-200 items-center">
+                          <span className="font-black text-amber-950 uppercase text-[8.5px] sm:text-[9.5px]">Item / Purpose:</span>
+                          <span className="font-black text-xs sm:text-base text-slate-900 uppercase font-serif break-words">
+                            {activeReceipt.payment_type || "2025/2026 SESSION DUES"}
+                          </span>
+                        </div>
+
+                        {/* Lab Coat / Jersey Size */}
+                        {activeReceipt.size && (
+                          <div className="grid grid-cols-[100px_1fr] sm:grid-cols-[135px_1fr] p-2 sm:p-2.5 bg-slate-50/70 items-center">
+                            <span className="font-bold text-slate-500 uppercase text-[8.5px] sm:text-[9.5px]">Selected Size:</span>
+                            <span className="font-mono font-bold text-emerald-900">
+                              {activeReceipt.size}
+                            </span>
+                          </div>
+                        )}
+
+                        {/* Lab Coat Custom Embroidered Name */}
+                        {activeReceipt.labcoat_name && (
+                          <div className="grid grid-cols-[100px_1fr] sm:grid-cols-[135px_1fr] p-2 sm:p-2.5 bg-amber-50/40 items-center">
+                            <span className="font-bold text-amber-800 uppercase text-[8.5px] sm:text-[9.5px]">Embroidered Name:</span>
+                            <span className="font-mono font-black text-amber-950 uppercase tracking-wider break-words">
+                              {activeReceipt.labcoat_name}
+                            </span>
+                          </div>
+                        )}
+
+                        {/* Jersey Customization */}
+                        {activeReceipt.jersey_name && (
+                          <div className="grid grid-cols-[100px_1fr] sm:grid-cols-[135px_1fr] p-2 sm:p-2.5 bg-blue-50/40 items-center">
+                            <span className="font-bold text-[#1a4480] uppercase text-[8.5px] sm:text-[9.5px]">Jersey Customization:</span>
+                            <span className="font-mono font-black text-blue-950 uppercase tracking-wider break-words">
+                              {activeReceipt.jersey_name} #{activeReceipt.jersey_number || '10'} {activeReceipt.size ? `(${activeReceipt.size})` : ''}
+                            </span>
+                          </div>
+                        )}
+
+                        {/* WhatsApp Contact */}
+                        <div className="grid grid-cols-[100px_1fr] sm:grid-cols-[135px_1fr] p-2 sm:p-2.5 items-center">
+                          <span className="font-bold text-slate-500 uppercase text-[8.5px] sm:text-[9.5px]">WhatsApp Contact:</span>
+                          <span className="font-mono font-bold text-slate-800 break-words">
+                            {activeReceipt.whatsapp_number || profile.whatsappNumber || "Registered on Portal"}
+                          </span>
+                        </div>
+
+                        <div className="grid grid-cols-[100px_1fr] sm:grid-cols-[135px_1fr] p-2 sm:p-2.5 bg-slate-50/70 items-center">
+                          <span className="font-bold text-slate-500 uppercase text-[8.5px] sm:text-[9.5px]">Channel & Gateway:</span>
+                          <span className="font-medium text-slate-700 text-[10px] sm:text-xs">
+                            Korapay Central Gateway • 256-Bit SSL Encrypted
+                          </span>
+                        </div>
+
+                        <div className="grid grid-cols-[100px_1fr] sm:grid-cols-[135px_1fr] p-2.5 sm:p-3 bg-emerald-50/60 font-bold items-center">
+                          <span className="uppercase text-[9px] sm:text-[10px] text-emerald-950">Total Amount Paid:</span>
+                          <span className="font-mono text-sm sm:text-base font-black text-emerald-900">
+                            ₦{Number(activeReceipt.amount || 0).toLocaleString()} (Naira)
+                          </span>
                         </div>
                       </div>
-                    </div>
 
-                    {/* Footer Verification Notice */}
-                    <div className="mt-4 pt-3 border-t border-slate-200 text-center">
-                      <p className="text-[8.5px] text-slate-400 font-mono">
-                        Official Computer-Generated Receipt • Security Hash: SHA256-{(profile.matricNumber || '2026').slice(-4)}-VALIDATED
-                      </p>
+                      {/* Pickup / Clearance Notice */}
+                      {activeReceipt.payment_type && !String(activeReceipt.payment_type).toLowerCase().includes("due") ? (
+                        <div className="rounded-xl bg-amber-50 border border-amber-200 p-2.5 sm:p-3 text-[9.5px] sm:text-[10.5px] text-amber-950 mb-3.5 sm:mb-5 leading-relaxed">
+                          <strong>Collection Instructions:</strong> Present this receipt (printed or on your phone) at the <strong>NASS Secretariat, College of Basic Science Ground Floor</strong>. Official dispatch notification will also be sent to your WhatsApp line.
+                        </div>
+                      ) : (
+                        <div className="rounded-xl bg-emerald-50 border border-emerald-200 p-2.5 sm:p-3 text-[9.5px] sm:text-[10.5px] text-emerald-950 mb-3.5 sm:mb-5 leading-relaxed">
+                          <strong>Academic Standing:</strong> This confirms statutory 2025/2026 collegiate dues payment. Valid for presentation during course registration, laboratory practical clearance, and semester examinations.
+                        </div>
+                      )}
+
+                      {/* Signatures & Seal Block: President & Treasurer */}
+                      <div className="pt-3 sm:pt-4 border-t-2 border-[#145a32]/30 grid grid-cols-3 items-end gap-1 sm:gap-4 text-center">
+                        {/* Executive President Manual Signature Space */}
+                        <div className="flex flex-col items-center">
+                          <div className="h-6 sm:h-10 w-full" aria-hidden="true" />
+                          <div className="border-t border-slate-700 pt-1 w-full">
+                            <p className="text-[8px] sm:text-[11px] font-bold text-slate-900 leading-tight">Comr. Adegoke Muhammed A.</p>
+                            <p className="text-[6.5px] sm:text-[8.5px] font-medium text-slate-500 uppercase">Executive President, NASS</p>
+                          </div>
+                        </div>
+
+                        {/* Official Digital Verification QR Code */}
+                        <div className="flex flex-col items-center justify-center">
+                          <div className="p-1 sm:p-1.5 bg-white border-2 border-dashed border-[#145a32] rounded-lg sm:rounded-xl shadow-xs flex items-center justify-center">
+                            <img
+                              src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&margin=1&data=${encodeURIComponent(
+                                `${typeof window !== "undefined" ? window.location.origin : "https://nasslasustech.com"}/verify-receipt?ref=${encodeURIComponent(activeReceipt.reference || activeReceipt.transaction_reference || "NASS-DUES")}&matric=${encodeURIComponent(activeReceipt.matric_number || profile.matricNumber || "")}&name=${encodeURIComponent(activeReceipt.full_name || profile.fullName || "")}&dept=${encodeURIComponent(activeReceipt.department || profile.department || "")}&level=${encodeURIComponent(activeReceipt.level || profile.level || "")}&type=${encodeURIComponent(activeReceipt.payment_type || "2025/2026 SESSION DUES")}&amount=${encodeURIComponent(String(activeReceipt.amount || 3000))}&date=${encodeURIComponent(activeReceipt.paid_at || activeReceipt.created_at || new Date().toISOString())}`
+                              )}`}
+                              alt="Receipt Verification QR Code"
+                              className="w-11 h-11 sm:w-16 sm:h-16 object-contain"
+                            />
+                          </div>
+                          <span className="mt-0.5 sm:mt-1 text-[6.5px] sm:text-[7.5px] font-extrabold text-[#145a32] uppercase tracking-wider">
+                            Scan to Verify
+                          </span>
+                        </div>
+
+                        {/* Executive Treasurer Manual Signature Space */}
+                        <div className="flex flex-col items-center">
+                          <div className="h-6 sm:h-10 w-full" aria-hidden="true" />
+                          <div className="border-t border-slate-700 pt-1 w-full">
+                            <p className="text-[8px] sm:text-[11px] font-bold text-slate-900 leading-tight">Comr. Oladepo Damilare</p>
+                            <p className="text-[6.5px] sm:text-[8.5px] font-medium text-slate-500 uppercase">Executive Treasurer, NASS</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Footer Verification Notice */}
+                      <div className="mt-3 sm:mt-4 pt-2 sm:pt-3 border-t border-slate-200 text-center">
+                        <p className="text-[7.5px] sm:text-[8.5px] text-slate-400 font-mono">
+                          Official Computer-Generated Receipt • Security Hash: SHA256-{(profile.matricNumber || '2026').slice(-4)}-VALIDATED
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
 
                 {/* Modal Footer Controls (Hidden on Print) */}
-                <div className="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between gap-3 no-print">
-                  <p className="text-[11px] text-slate-500 flex items-center gap-1.5">
+                <div className="p-3 sm:p-4 bg-slate-50 border-t border-slate-200 flex flex-wrap items-center justify-between gap-2.5 shrink-0 no-print">
+                  <p className="text-[10px] sm:text-[11px] text-slate-500 flex items-center gap-1.5 hidden sm:flex">
                     <Printer className="h-3.5 w-3.5 text-slate-400" />
-                    <span>Formatted for standard A4 paper hard-copy printing</span>
+                    <span>Formatted for standard A4 paper & digital clearance</span>
                   </p>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+                    <Button
+                      onClick={handleDownloadReceiptPdf}
+                      disabled={downloadingPdf}
+                      className="bg-[#145a32] hover:bg-[#0f4426] text-white font-bold text-xs rounded-xl shadow-md gap-1.5 flex-1 sm:flex-initial h-9"
+                    >
+                      <Download className="h-4 w-4" />
+                      <span>{downloadingPdf ? "Downloading..." : "Download PDF Receipt"}</span>
+                    </Button>
                     <Button
                       onClick={() => printElementById("printable-receipt", "NASS LASUSTECH - Official Payment Receipt")}
-                      className="bg-[#145a32] hover:bg-[#0f4426] text-white font-bold text-xs rounded-xl shadow-md gap-1.5"
+                      variant="outline"
+                      className="rounded-xl border-slate-300 font-bold text-xs text-slate-700 gap-1.5 h-9"
                     >
                       <Printer className="h-4 w-4" />
-                      <span>Print Receipt</span>
+                      <span>Print (A4)</span>
                     </Button>
                     <Button
                       onClick={() => setReceiptModalOpen(false)}
-                      variant="outline"
-                      className="rounded-xl border-slate-300 font-bold text-xs text-slate-700"
+                      variant="ghost"
+                      className="rounded-xl font-bold text-xs text-slate-600 h-9"
                     >
                       Done
                     </Button>

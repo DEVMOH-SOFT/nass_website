@@ -103,7 +103,7 @@ const Index = () => {
         {/* ======================================================== */}
         {/* EDITORIAL HERO BANNER (COLLEGE BUILDING AS BACKGROUND) */}
         {/* ======================================================== */}
-        <section className="relative isolate overflow-hidden bg-[#05180d] text-white border-b border-emerald-950/60 pt-5 pb-8 sm:pt-7 sm:pb-10 md:pt-8 md:pb-12 lg:pt-9 lg:pb-14 flex items-center">
+        <section className="relative isolate overflow-hidden bg-[#05180d] text-white border-b border-emerald-950/60 min-h-[calc(100svh-4.5rem)] sm:min-h-0 pt-6 pb-8 sm:pt-7 sm:pb-10 md:pt-8 md:pb-12 lg:pt-9 lg:pb-14 flex flex-col justify-center">
           {/* Authentic College Building Image with controlled transparency so text is 100% visible */}
           <div className="absolute inset-0 z-0 overflow-hidden">
             <img

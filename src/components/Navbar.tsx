@@ -59,7 +59,17 @@ const Navbar = () => {
     return () => document.removeEventListener("mousedown", handleOutsideClick);
   }, [profileMenuOpen]);
 
-  const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    return typeof window !== "undefined" && localStorage.getItem("isLoggedIn") === "true";
+  });
+
+  useEffect(() => {
+    const handleStorage = () => {
+      setIsLoggedIn(localStorage.getItem("isLoggedIn") === "true");
+    };
+    window.addEventListener("storage", handleStorage);
+    return () => window.removeEventListener("storage", handleStorage);
+  }, []);
 
   return (
     <>
@@ -246,12 +256,21 @@ const Navbar = () => {
                 <ShieldCheck className="h-3 w-3 text-sky-400" />
                 <span>DEVMOH Led Administration</span>
               </span>
-              <button
-                onClick={() => setLoginOpen(true)}
-                className="text-[10px] font-bold uppercase tracking-wider text-sky-300 hover:underline"
-              >
-                Access Portal →
-              </button>
+              {isLoggedIn ? (
+                <Link
+                  to="/dashboard"
+                  className="text-[10px] font-bold uppercase tracking-wider text-sky-300 hover:underline flex items-center gap-1"
+                >
+                  <span>Student Portal →</span>
+                </Link>
+              ) : (
+                <button
+                  onClick={() => setLoginOpen(true)}
+                  className="text-[10px] font-bold uppercase tracking-wider text-sky-300 hover:underline"
+                >
+                  Access Portal →
+                </button>
+              )}
             </div>
           </div>
         </div>

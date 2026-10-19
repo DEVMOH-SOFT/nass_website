@@ -9,6 +9,7 @@ import {
   CheckCircle2,
   Loader2,
   Printer,
+  Download,
   Eye,
   EyeOff,
   RotateCcw,
@@ -33,6 +34,7 @@ import {
   COLLEGE_DEPARTMENTS,
 } from "@/lib/student-auth";
 import { triggerKorapayCheckout, isKorapayTestMode } from "@/lib/korapay";
+import { downloadElementAsPdf } from "@/lib/pdf-service";
 import { sendDuesReceiptEmail } from "@/lib/mailer";
 import nassLogo from "@/assets/nass_logo.png";
 import lasustechLogo from "@/assets/lasustech_logo.png";
@@ -361,6 +363,36 @@ const LoginModal = ({ open, onClose, redirectTab, initialMode }: LoginModalProps
   // ─────────────────────────────────────────────────────────────
   // PHASE 3: Print / Download Receipt
   // ─────────────────────────────────────────────────────────────
+  const [downloadingPdf, setDownloadingPdf] = useState(false);
+
+  const handleDownloadReceiptPdf = async () => {
+    if (!issuedReceipt) return;
+    try {
+      setDownloadingPdf(true);
+      toast({
+        title: "Generating PDF Receipt",
+        description: "Preparing your official dues clearance receipt for download...",
+      });
+      const ok = await downloadElementAsPdf("nass-modal-printable-receipt", {
+        filename: `NASS_Dues_Receipt_${issuedReceipt.reference}.pdf`,
+        docTitle: `NASS LASUSTECH - Official Receipt (${issuedReceipt.reference})`,
+      });
+      if (ok) {
+        toast({
+          title: "Receipt Downloaded!",
+          description: "Official receipt PDF saved to your device.",
+        });
+      } else {
+        handlePrintReceipt();
+      }
+    } catch (err) {
+      console.error("PDF download error:", err);
+      handlePrintReceipt();
+    } finally {
+      setDownloadingPdf(false);
+    }
+  };
+
   const handlePrintReceipt = () => {
     const printContent = document.getElementById("nass-modal-printable-receipt");
     if (!printContent) {
@@ -1027,12 +1059,21 @@ const LoginModal = ({ open, onClose, redirectTab, initialMode }: LoginModalProps
                   {/* Actions */}
                   <div className="space-y-2 pt-0.5">
                     <Button
+                      onClick={handleDownloadReceiptPdf}
+                      disabled={downloadingPdf}
+                      className="w-full h-10 sm:h-11 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md gap-2"
+                    >
+                      <Download className="h-4 w-4" />
+                      <span>{downloadingPdf ? "Generating PDF..." : "Download Receipt as PDF"}</span>
+                    </Button>
+
+                    <Button
                       onClick={handlePrintReceipt}
                       variant="outline"
                       className="w-full h-9 sm:h-10 rounded-xl border-emerald-600/50 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 font-bold text-xs gap-2"
                     >
                       <Printer className="h-4 w-4" />
-                      <span>Download / Print Official Receipt (A4)</span>
+                      <span>Print Official Receipt (A4)</span>
                     </Button>
 
                     <Button

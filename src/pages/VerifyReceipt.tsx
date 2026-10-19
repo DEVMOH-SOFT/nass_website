@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { useLocation, Link } from "react-router-dom";
-import { CheckCircle2, ShieldCheck, Printer, ArrowLeft, Building2, Calendar, CreditCard, User, GraduationCap, AlertTriangle, FileCheck2, ExternalLink } from "lucide-react";
+import { CheckCircle2, ShieldCheck, Printer, Download, ArrowLeft, Building2, Calendar, CreditCard, User, GraduationCap, AlertTriangle, FileCheck2, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import nassLogo from "@/assets/nass_logo.png";
 import lasustechLogo from "@/assets/lasustech_logo.png";
 import Layout from "@/components/Layout";
+import { downloadElementAsPdf } from "@/lib/pdf-service";
 
 const VerifyReceipt = () => {
   const location = useLocation();
@@ -72,6 +73,23 @@ const VerifyReceipt = () => {
     }
   }, [location.search]);
 
+  const [downloadingPdf, setDownloadingPdf] = useState(false);
+
+  const handleDownloadPdf = async () => {
+    try {
+      setDownloadingPdf(true);
+      await downloadElementAsPdf("verified-receipt-certificate", {
+        filename: `NASS_Verification_${params.ref || params.matric || "SLIP"}.pdf`,
+        docTitle: "NASS LASUSTECH Official Verification Slip",
+      });
+    } catch (e) {
+      console.error("PDF download failed:", e);
+      window.print();
+    } finally {
+      setDownloadingPdf(false);
+    }
+  };
+
   const handlePrint = () => {
     window.print();
   };
@@ -80,21 +98,32 @@ const VerifyReceipt = () => {
     <Layout>
       <div className="min-h-screen bg-slate-50/70 py-8 md:py-12 px-4 sm:px-6">
         <div className="max-w-2xl mx-auto">
-          {/* Back button */}
-          <div className="mb-4 flex items-center justify-between no-print">
+          {/* Back button & Action buttons */}
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-2.5 no-print">
             <Link to="/" className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-[#145a32] transition-colors">
               <ArrowLeft className="h-4 w-4" />
               <span>Back to Home</span>
             </Link>
-            <Button
-              onClick={handlePrint}
-              variant="outline"
-              size="sm"
-              className="h-8 gap-1.5 text-xs font-semibold rounded-lg border-slate-300 shadow-xs"
-            >
-              <Printer className="h-3.5 w-3.5" />
-              <span>Print Verification Slip</span>
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                onClick={handleDownloadPdf}
+                disabled={downloadingPdf || isValid === false}
+                size="sm"
+                className="h-8 gap-1.5 text-xs font-bold rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs"
+              >
+                <Download className="h-3.5 w-3.5" />
+                <span>{downloadingPdf ? "Generating..." : "Download PDF"}</span>
+              </Button>
+              <Button
+                onClick={handlePrint}
+                variant="outline"
+                size="sm"
+                className="h-8 gap-1.5 text-xs font-semibold rounded-lg border-slate-300 shadow-xs"
+              >
+                <Printer className="h-3.5 w-3.5" />
+                <span>Print Slip</span>
+              </Button>
+            </div>
           </div>
 
           {isValid === false ? (
