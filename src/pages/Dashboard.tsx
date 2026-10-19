@@ -4589,21 +4589,20 @@ const Dashboard = () => {
                         </div>
                       </div>
 
-                      {/* Official Seal Emblem */}
+                      {/* Official Digital Verification QR Code */}
                       <div className="flex flex-col items-center justify-center">
-                        <div className="h-16 w-16 rounded-full border-2 border-dashed border-[#145a32] p-1 flex items-center justify-center bg-emerald-50/60">
-                          <div className="h-full w-full rounded-full border border-[#145a32] flex flex-col items-center justify-center text-center p-0.5 bg-white">
-                            <span className="text-[6.5px] font-black text-[#145a32] uppercase leading-none">
-                              LASUSTECH
-                            </span>
-                            <span className="text-[7.5px] font-black text-emerald-800 uppercase leading-none mt-0.5">
-                              ★ VERIFIED ★
-                            </span>
-                            <span className="text-[6px] font-bold text-[#145a32] mt-0.5">
-                              RECEIPT
-                            </span>
-                          </div>
+                        <div className="p-1.5 bg-white border-2 border-dashed border-[#145a32] rounded-xl shadow-xs flex items-center justify-center">
+                          <img
+                            src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&margin=1&data=${encodeURIComponent(
+                              `${typeof window !== "undefined" ? window.location.origin : "https://nasslasustech.com"}/verify-receipt?ref=${encodeURIComponent(activeReceipt.reference || activeReceipt.transaction_reference || "NASS-DUES")}&matric=${encodeURIComponent(activeReceipt.matric_number || profile.matricNumber || "")}&name=${encodeURIComponent(activeReceipt.full_name || profile.fullName || "")}&dept=${encodeURIComponent(activeReceipt.department || profile.department || "")}&level=${encodeURIComponent(activeReceipt.level || profile.level || "")}&type=${encodeURIComponent(activeReceipt.payment_type || "2025/2026 SESSION DUES")}&amount=${encodeURIComponent(String(activeReceipt.amount || 3000))}&date=${encodeURIComponent(activeReceipt.paid_at || activeReceipt.created_at || new Date().toISOString())}`
+                            )}`}
+                            alt="Receipt Verification QR Code"
+                            className="w-16 h-16 object-contain"
+                          />
                         </div>
+                        <span className="mt-1 text-[7.5px] font-extrabold text-[#145a32] uppercase tracking-wider">
+                          Scan to Verify
+                        </span>
                       </div>
 
                       {/* Executive Treasurer Manual Signature Space */}

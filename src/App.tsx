@@ -19,6 +19,7 @@ import Leaderboard from "./pages/Leaderboard.tsx";
 import NomineeProfile from "./pages/NomineeProfile.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import Donate from "./pages/Donate.tsx";
+import VerifyReceipt from "./pages/VerifyReceipt.tsx";
 import ScrollToTop from "./components/ScrollToTop";
 import ScrollToTopButton from "./components/ScrollToTopButton";
 import FloatingChatWidget from "./components/FloatingChatWidget";
@@ -60,6 +61,8 @@ const App = () => {
             <Route path="/voting/leaderboard" element={<Leaderboard />} />
             <Route path="/voting/:category/:id" element={<NomineeProfile />} />
             <Route path="/donate" element={awardsMode ? <NotFound /> : <Donate />} />
+            <Route path="/verify-receipt" element={<VerifyReceipt />} />
+            <Route path="/receipt/verify" element={<VerifyReceipt />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <ScrollToTopButton />

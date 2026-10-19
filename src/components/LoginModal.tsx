@@ -987,8 +987,38 @@ const LoginModal = ({ open, onClose, redirectTab, initialMode }: LoginModalProps
                       </div>
                     </div>
 
+                    {/* Signatures & Verification QR Code Block */}
+                    <div className="pt-2 border-t border-slate-200 flex items-center justify-between text-center gap-2">
+                      <div className="flex flex-col items-center min-w-[70px]">
+                        <div className="h-3 w-full" />
+                        <div className="border-t border-slate-600 pt-0.5 w-full">
+                          <p className="text-[7.5px] font-bold text-slate-900 leading-tight">Comr. Adegoke Muhammed A.</p>
+                          <p className="text-[6px] font-medium text-slate-500 uppercase">Executive President</p>
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col items-center">
+                        <img
+                          src={`https://api.qrserver.com/v1/create-qr-code/?size=140x140&margin=1&data=${encodeURIComponent(
+                            `${typeof window !== "undefined" ? window.location.origin : "https://nasslasustech.com"}/verify-receipt?ref=${encodeURIComponent(issuedReceipt.reference)}&matric=${encodeURIComponent(issuedReceipt.matricNumber)}&name=${encodeURIComponent(issuedReceipt.studentName)}&dept=${encodeURIComponent(issuedReceipt.department)}&level=${encodeURIComponent(issuedReceipt.level)}&amount=${issuedReceipt.amount}&date=${encodeURIComponent(issuedReceipt.paidAt)}`
+                          )}`}
+                          alt="Verification QR Code"
+                          className="w-11 h-11 object-contain p-0.5 border border-dashed border-[#145a32] rounded bg-white"
+                        />
+                        <span className="text-[6px] font-bold text-[#145a32] uppercase tracking-wider mt-0.5">Scan to Verify</span>
+                      </div>
+
+                      <div className="flex flex-col items-center min-w-[70px]">
+                        <div className="h-3 w-full" />
+                        <div className="border-t border-slate-600 pt-0.5 w-full">
+                          <p className="text-[7.5px] font-bold text-slate-900 leading-tight">Comr. Oladepo Damilare</p>
+                          <p className="text-[6px] font-medium text-slate-500 uppercase">Executive Treasurer</p>
+                        </div>
+                      </div>
+                    </div>
+
                     <div className="rounded-lg border border-dashed border-emerald-600/60 p-1 text-center bg-emerald-50/40">
-                      <p className="text-[8.5px] sm:text-[9px] font-black text-emerald-900 tracking-wider uppercase">
+                      <p className="text-[8px] sm:text-[8.5px] font-black text-emerald-900 tracking-wider uppercase">
                         ★ STATUTORY SESSION DUES CLEARED & VERIFIED ★
                       </p>
                     </div>
