@@ -33,12 +33,12 @@ const ExecutiveCard = ({
   const isLogoPlaceholder = !image || image === nassLogo || image.includes("nass_logo") || image.includes("placeholder");
 
   return (
-    <div className="group rounded-2xl border border-slate-200/90 bg-white overflow-hidden shadow-xs transition-all duration-300 hover:border-emerald-600/40 hover:shadow-xl hover:-translate-y-1 flex flex-col h-full">
+    <div className="group rounded-2xl border border-emerald-900/60 bg-gradient-to-b from-[#072517] via-[#051c11] to-[#04170e] overflow-hidden shadow-lg transition-all duration-300 hover:border-emerald-500/50 hover:shadow-2xl hover:shadow-emerald-950/80 hover:-translate-y-1 flex flex-col h-full text-white">
       {/* Top Collegiate Accent Line */}
       <div className={`h-1 w-full ${arm === "SRC" ? "bg-gradient-to-r from-[#1a4480] via-sky-500 to-[#145a32]" : "bg-gradient-to-r from-[#145a32] via-emerald-500 to-[#1a4480]"}`} />
 
       {/* Portrait Stage */}
-      <div className="aspect-[4/5] overflow-hidden bg-slate-950 relative shrink-0">
+      <div className="aspect-[4/5] overflow-hidden bg-gradient-to-b from-[#062013] to-[#04190e] relative shrink-0">
         {isLogoPlaceholder ? (
           /* Official Parliamentary Chamber Seal for Members without Individual Photo */
           <div className="w-full h-full bg-gradient-to-br from-[#061d10] via-[#09351e] to-[#04190e] flex flex-col items-center justify-center p-6 text-center relative overflow-hidden">
@@ -55,16 +55,16 @@ const ExecutiveCard = ({
             </div>
 
             <div className="mt-4 relative z-10 space-y-1">
-              <span className="inline-block text-[10px] font-black uppercase tracking-widest text-emerald-300 bg-emerald-950/70 border border-emerald-500/30 px-2.5 py-0.5 rounded-full">
+              <span className="inline-block text-[10px] font-black uppercase tracking-widest text-emerald-300 bg-emerald-950/80 border border-emerald-500/30 px-2.5 py-0.5 rounded-full">
                 Parliamentary Chamber
               </span>
-              <p className="text-[10px] text-slate-300 font-medium">
+              <p className="text-[10px] text-emerald-200/70 font-medium">
                 Official Seat of Representation
               </p>
             </div>
           </div>
         ) : (
-          /* High-Definition Executive Studio Portrait with Directional Vignette */
+          /* High-Definition Executive Studio Portrait with Directional Dark Forest Vignette */
           <>
             <img
               src={image}
@@ -84,7 +84,7 @@ const ExecutiveCard = ({
             />
 
             {/* Studio Lighting Vignette: Smooth bottom gradient ensuring badges pop & portraits look editorial */}
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/15 to-transparent pointer-events-none opacity-85 group-hover:opacity-65 transition-opacity duration-300" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#04170e] via-[#04170e]/25 to-transparent pointer-events-none opacity-90 group-hover:opacity-75 transition-opacity duration-300" />
           </>
         )}
 
@@ -112,23 +112,23 @@ const ExecutiveCard = ({
 
       {/* Executive Particulars */}
       <div className="p-4 sm:p-5 flex flex-col grow">
-        <span className="inline-block self-start rounded-md bg-emerald-50 border border-emerald-800/15 px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-[#145a32]">
+        <span className="inline-block self-start rounded-md bg-emerald-950/80 border border-emerald-500/40 px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider text-emerald-300">
           {post}
         </span>
-        <h3 className="mt-2 font-display text-sm sm:text-base font-extrabold text-slate-900 group-hover:text-[#145a32] transition-colors leading-snug">
+        <h3 className="mt-2 font-display text-sm sm:text-base font-extrabold text-white group-hover:text-emerald-300 transition-colors leading-snug">
           {name}
         </h3>
-        <p className="mt-0.5 text-[11.5px] font-medium text-slate-500">
+        <p className="mt-0.5 text-[11.5px] font-medium text-emerald-200/70">
           {department ? `${department} • ${level}` : level}
         </p>
-        <p className="mt-2.5 text-xs leading-relaxed text-slate-600 line-clamp-3">
+        <p className="mt-2.5 text-xs leading-relaxed text-slate-300 line-clamp-3">
           {description}
         </p>
 
         {/* Direct Executive Contact Actions */}
         {(phone || email || whatsapp) && (
-          <div className="mt-auto pt-3.5 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-            <span className="text-[9.5px] uppercase font-bold tracking-wider text-slate-400">
+          <div className="mt-auto pt-3.5 border-t border-emerald-900/40 flex items-center justify-between text-xs text-slate-400">
+            <span className="text-[9.5px] uppercase font-bold tracking-wider text-emerald-300/70">
               Direct Contact
             </span>
             <div className="flex items-center gap-1.5">
@@ -137,7 +137,7 @@ const ExecutiveCard = ({
                   href={`https://wa.me/234${whatsapp.replace(/\D/g, "").replace(/^0/, "")}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center h-7 w-7 rounded-full bg-emerald-50 text-emerald-700 hover:bg-emerald-600 hover:text-white transition-colors shadow-2xs"
+                  className="inline-flex items-center justify-center h-7 w-7 rounded-full bg-emerald-950/90 text-emerald-300 border border-emerald-700/60 hover:bg-emerald-600 hover:text-white transition-colors shadow-2xs"
                   title={`Chat with ${name} on WhatsApp`}
                 >
                   <MessageSquare className="h-3.5 w-3.5" />
@@ -146,7 +146,7 @@ const ExecutiveCard = ({
               {phone && (
                 <a
                   href={`tel:${phone}`}
-                  className="inline-flex items-center justify-center h-7 w-7 rounded-full bg-slate-100 text-slate-700 hover:bg-slate-900 hover:text-white transition-colors shadow-2xs"
+                  className="inline-flex items-center justify-center h-7 w-7 rounded-full bg-slate-900/90 text-slate-200 border border-slate-700 hover:bg-slate-800 hover:text-white transition-colors shadow-2xs"
                   title={`Call ${name} (${phone})`}
                 >
                   <Phone className="h-3.5 w-3.5" />
@@ -155,7 +155,7 @@ const ExecutiveCard = ({
               {email && (
                 <a
                   href={`mailto:${email}`}
-                  className="inline-flex items-center justify-center h-7 w-7 rounded-full bg-blue-50 text-blue-700 hover:bg-blue-600 hover:text-white transition-colors shadow-2xs"
+                  className="inline-flex items-center justify-center h-7 w-7 rounded-full bg-blue-950/90 text-sky-300 border border-blue-700/60 hover:bg-blue-600 hover:text-white transition-colors shadow-2xs"
                   title={`Email ${name}`}
                 >
                   <Mail className="h-3.5 w-3.5" />

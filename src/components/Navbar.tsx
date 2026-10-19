@@ -64,11 +64,11 @@ const Navbar = () => {
   return (
     <>
       {/* Unified Sticky Header: Keeps the white masthead & nav bar permanently visible while scrolling */}
-      <header className="sticky top-0 z-50 shadow-sm">
+      <header className={`sticky top-0 z-50 w-full transition-shadow ${scrolled ? "shadow-md" : "shadow-xs"}`}>
         {/* ======================================================== */}
         {/* TIER 1: SLIM INSTITUTIONAL IDENTITY MASTHEAD (WHITE)     */}
         {/* ======================================================== */}
-        <div className="bg-white border-b border-slate-200 select-none py-2">
+        <div className="bg-white/98 backdrop-blur-md border-b border-slate-200 select-none py-1.5 sm:py-2">
           <div className="container flex items-center justify-between gap-4">
             {/* Left: Academic Collegiate Identity */}
             <Link
@@ -207,7 +207,7 @@ const Navbar = () => {
         {/* ======================================================== */}
         {/* TIER 2: CRISP COLLEGIATE FOREST NAVIGATION BAR           */}
         {/* ======================================================== */}
-        <div className="bg-[#061d10] text-slate-100 border-t-2 border-[#1a4480] shadow-xs">
+        <div className="bg-[#061d10]/98 backdrop-blur-md text-slate-100 border-t-2 border-[#1a4480] shadow-xs">
           <div className="container">
           <div className="flex h-10 items-center justify-between">
             {/* Desktop Navigation Links */}

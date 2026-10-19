@@ -72,21 +72,21 @@ const Executives = () => {
       </section>
 
       {/* Leadership Sections */}
-      <section className="py-8 md:py-10 bg-[#f8faf8]">
-        <div className="container max-w-6xl space-y-8">
+      <section className="py-10 md:py-14 bg-gradient-to-b from-[#061d10] via-[#04170e] to-[#020e07] text-white border-t border-emerald-950">
+        <div className="container max-w-6xl space-y-10">
           {/* ======================================================== */}
           {/* SECTION 1: STUDENT EXECUTIVE COUNCIL (SEC)              */}
           {/* ======================================================== */}
           <div>
-            <div className="mb-4">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-[#1a4480]">
+            <div className="mb-5">
+              <span className="inline-block rounded-full bg-emerald-950/90 border border-emerald-500/40 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-emerald-300">
                 Arm 1: Student Executive Council (SEC)
               </span>
-              <h2 className="mt-1 font-display text-xl sm:text-2xl font-bold text-slate-900">
+              <h2 className="mt-2 font-display text-2xl sm:text-3xl font-extrabold text-white">
                 Executive Presidium
               </h2>
-              <p className="text-xs text-slate-500 mt-0.5">
-                The apex student executive officers directing the collegiate administration and college-level activities.
+              <p className="text-xs sm:text-sm text-emerald-200/70 mt-1 max-w-2xl">
+                The apex student executive officers directing collegiate administration, student welfare, and college-level initiatives.
               </p>
             </div>
             <div className="flex justify-center">
@@ -99,15 +99,15 @@ const Executives = () => {
           </div>
 
           {/* Cabinet Officers */}
-          <div className="pt-6 border-t border-slate-200/80">
-            <div className="mb-4">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-[#1a4480]">
+          <div className="pt-8 border-t border-emerald-900/50">
+            <div className="mb-5">
+              <span className="inline-block rounded-full bg-emerald-950/90 border border-emerald-500/40 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-emerald-300">
                 Cabinet Officers & Council Directors
               </span>
-              <h2 className="mt-1 font-display text-xl sm:text-2xl font-bold text-slate-900">
+              <h2 className="mt-2 font-display text-2xl sm:text-3xl font-extrabold text-white">
                 Council Secretariat & Portfolio Directors
               </h2>
-              <p className="text-xs text-slate-500 mt-0.5">
+              <p className="text-xs sm:text-sm text-emerald-200/70 mt-1 max-w-2xl">
                 Executive directors managing academic affairs, treasury, public relations, welfare, sports, and social programs.
               </p>
             </div>
@@ -121,16 +121,16 @@ const Executives = () => {
           {/* ======================================================== */}
           {/* SECTION 2: STUDENT REPRESENTATIVE COUNCIL (SRC)         */}
           {/* ======================================================== */}
-          <div className="pt-6 border-t-2 border-[#1a4480]/20">
-            <div className="mb-4">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-[#1a4480]">
+          <div className="pt-8 border-t-2 border-sky-900/50">
+            <div className="mb-5">
+              <span className="inline-block rounded-full bg-sky-950/90 border border-sky-400/40 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-sky-300">
                 Arm 2: Student Representative Council (SRC)
               </span>
-              <h2 className="mt-1 font-display text-xl sm:text-2xl font-bold text-slate-900">
+              <h2 className="mt-2 font-display text-2xl sm:text-3xl font-extrabold text-white">
                 Parliamentary Presiding Officers
               </h2>
-              <p className="text-xs text-slate-500 mt-0.5">
-                The presiding leadership of the legislative chamber overseeing constitutional governance and legislative records.
+              <p className="text-xs sm:text-sm text-sky-200/70 mt-1 max-w-2xl">
+                The presiding leadership of the legislative chamber overseeing constitutional governance, debates, and official records.
               </p>
             </div>
             <div className="flex justify-center">
@@ -143,16 +143,16 @@ const Executives = () => {
           </div>
 
           {/* Departmental Honorables */}
-          <div className="pt-6 border-t border-slate-200/80">
-            <div className="mb-4">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-[#1a4480]">
+          <div className="pt-8 border-t border-sky-900/30">
+            <div className="mb-5">
+              <span className="inline-block rounded-full bg-sky-950/90 border border-sky-400/40 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-sky-300">
                 Legislative Chamber
               </span>
-              <h2 className="mt-1 font-display text-xl sm:text-2xl font-bold text-slate-900">
+              <h2 className="mt-2 font-display text-2xl sm:text-3xl font-extrabold text-white">
                 Departmental Honorable Members
               </h2>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Elected representatives advocating student welfare and legislative motions across the 5 basic science departments.
+              <p className="text-xs sm:text-sm text-sky-200/70 mt-1 max-w-2xl">
+                Elected representatives advocating student welfare and legislative motions across the 5 constituent basic science departments.
               </p>
             </div>
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">

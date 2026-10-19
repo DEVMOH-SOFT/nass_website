@@ -521,23 +521,23 @@ const Index = () => {
         {/* ======================================================== */}
         {/* STUDENT EXECUTIVE COUNCIL PREVIEW */}
         {/* ======================================================== */}
-        <section className="py-8 md:py-12 bg-white border-b border-slate-200/80">
+        <section className="py-10 md:py-14 bg-gradient-to-b from-[#061d10] via-[#04170e] to-[#03130b] text-white border-b border-emerald-950">
           <div className="container">
-            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-5 sm:mb-6">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6 sm:mb-8">
               <div>
-                <span className="text-[11px] font-bold uppercase tracking-wider text-[#145a32]">
+                <span className="inline-block rounded-full bg-emerald-950/90 border border-emerald-500/40 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-emerald-300">
                   Collegiate Leadership
                 </span>
-                <h2 className="mt-1 font-display text-2xl sm:text-3xl font-bold text-slate-900">
+                <h2 className="mt-2 font-display text-2xl sm:text-3xl font-extrabold text-white">
                   NASS LASUSTECH Student Executive Council
                 </h2>
-                <p className="mt-1 text-xs sm:text-sm text-slate-600">
-                  Elected officers representing science students across all constituent departments.
+                <p className="mt-1 text-xs sm:text-sm text-emerald-200/70 max-w-2xl">
+                  Elected officers representing science students across all 5 constituent academic departments.
                 </p>
               </div>
               <Link to="/executives">
-                <Button variant="outline" className="h-9 gap-1.5 rounded-lg border-slate-300 text-xs font-semibold">
-                  <span>View All Council Members</span>
+                <Button variant="outline" className="h-9 gap-1.5 rounded-lg border-emerald-700/60 bg-emerald-950/80 text-emerald-200 hover:bg-emerald-800 hover:text-white text-xs font-semibold shadow-sm transition-colors">
+                  <span>View Full Leadership Directory</span>
                   <ArrowRight className="h-3.5 w-3.5" />
                 </Button>
               </Link>
