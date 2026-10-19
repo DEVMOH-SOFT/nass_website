@@ -704,7 +704,7 @@ const Index = () => {
                     setLoginOpen(true);
                   }
                 }}
-                className="h-10 rounded-lg border-emerald-600/40 text-emerald-200 hover:bg-white/10 hover:text-white px-5 text-xs font-semibold"
+                className="h-10 rounded-lg border-emerald-300/60 bg-transparent text-white hover:bg-white/10 hover:text-white px-5 text-xs font-semibold"
               >
                 <span>Access Student Portal</span>
               </Button>

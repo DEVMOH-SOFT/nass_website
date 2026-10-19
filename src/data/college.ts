@@ -95,7 +95,7 @@ export const departments: DepartmentInfo[] = [
     headOfDepartment: "Dr. Idris Aremu",
     hodImage: hodCscImg,
     description: "Pioneering computational theory, software engineering, intelligent systems, and cybersecurity to empower technological problem solvers.",
-    websiteUrl: "https://lasustech.edu.ng/department-of-computer-science",
+    websiteUrl: "https://nacoslasustech.org.ng",
     established: "2022",
     studentBodyCount: "1,200+ Scholars",
     degreesOffered: ["B.Sc. Computer Science", "B.Sc. Software Engineering", "B.Sc. Cyber Security"],
