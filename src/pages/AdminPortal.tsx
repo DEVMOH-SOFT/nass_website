@@ -680,20 +680,6 @@ Secretariat, NASS LASUSTECH`);
     }
   };
 
-  const handleClearAllTestPayments = () => {
-    localStorage.removeItem("nass_verified_payments");
-    Object.keys(localStorage).forEach(key => {
-      if (key.startsWith("nass_dues_")) {
-        localStorage.removeItem(key);
-      }
-    });
-    window.dispatchEvent(new Event("storage"));
-    toast({
-      title: "Ledger Cleared",
-      description: "All test payments have been wiped clean. Ready for new live test transactions.",
-    });
-  };
-
   const getAllStudentPayments = () => {
     const list: any[] = [];
 
@@ -1744,14 +1730,6 @@ Secretariat, NASS LASUSTECH`);
                     </div>
 
                     <div className="flex flex-wrap items-center gap-3">
-                      <Button
-                        onClick={handleClearAllTestPayments}
-                        variant="outline"
-                        className="rounded-xl border-red-200 text-red-600 hover:bg-red-50 font-semibold gap-2"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                        Clear Payment Ledger
-                      </Button>
                       <Button
                         onClick={() => window.print()}
                         variant="outline"
