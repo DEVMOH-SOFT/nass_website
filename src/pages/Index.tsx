@@ -109,15 +109,15 @@ const Index = () => {
             <img
               src={cbsFacultyBuilding}
               alt="College of Basic Sciences Complex, LASUSTECH Main Campus"
-              className="h-full w-full object-cover object-[80%_30%] sm:object-[78%_35%] md:object-[75%_35%] opacity-40 sm:opacity-55 md:opacity-70 filter brightness-[0.88] contrast-[1.08] saturate-[1.15]"
+              className="h-full w-full object-cover object-[80%_30%] sm:object-[78%_35%] md:object-[75%_35%] opacity-95 sm:opacity-55 md:opacity-70 filter brightness-[0.88] contrast-[1.08] saturate-[1.15]"
             />
           </div>
 
           {/* Directional Scrim Overlays: Deep dark institutional gradient protecting text readability on mobile and desktop */}
-          <div className="absolute inset-0 z-0 bg-gradient-to-b from-[#05180d]/95 via-[#061d10]/85 to-[#05180d]/90 sm:bg-gradient-to-r sm:from-[#05180d]/98 sm:via-[#061d10]/85 md:via-[#072414]/70 sm:to-transparent" />
+          <div className="absolute inset-0 z-0 bg-gradient-to-b from-[#05180d]/15 via-[#061d10]/60 to-[#05180d]/92 sm:bg-gradient-to-r sm:from-[#05180d]/98 sm:via-[#061d10]/85 md:via-[#072414]/70 sm:to-transparent" />
 
           {/* 2. Vertical vignette: Soft anchoring at top and bottom edges */}
-          <div className="absolute inset-0 z-0 bg-gradient-to-t from-[#05180d] via-transparent to-[#05180d]/40" />
+          <div className="absolute inset-0 z-0 bg-gradient-to-t from-[#05180d]/80 via-transparent to-transparent sm:from-[#05180d] sm:to-[#05180d]/40" />
 
           <div className="container relative z-10 w-full">
             <div className="max-w-2xl lg:max-w-3xl">
