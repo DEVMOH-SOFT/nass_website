@@ -88,17 +88,6 @@ const ExecutiveCard = ({
           </>
         )}
 
-        {/* Top Leadership Arm Pill */}
-        <div className="absolute top-2.5 left-2.5 z-10 flex items-center gap-1.5">
-          <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[9.5px] font-extrabold uppercase tracking-wider backdrop-blur-md shadow-md border ${
-            arm === "SRC"
-              ? "bg-[#071d33]/90 text-sky-300 border-sky-400/35"
-              : "bg-[#072414]/90 text-emerald-300 border-emerald-400/35"
-          }`}>
-            <span className={`h-1.5 w-1.5 rounded-full ${arm === "SRC" ? "bg-sky-400" : "bg-emerald-400"}`} />
-            <span>{arm === "SRC" ? "SRC Legislator" : "SEC Executive"}</span>
-          </span>
-        </div>
 
         {/* Executive Preferred Name Plaque */}
         {preferredName && (

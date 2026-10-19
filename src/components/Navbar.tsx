@@ -68,7 +68,7 @@ const Navbar = () => {
         {/* ======================================================== */}
         {/* TIER 1: SLIM INSTITUTIONAL IDENTITY MASTHEAD (WHITE)     */}
         {/* ======================================================== */}
-        <div className="bg-white/98 backdrop-blur-md border-b border-slate-200 select-none py-1.5 sm:py-2">
+        <div className="bg-white border-b border-slate-200 select-none py-1.5 sm:py-2">
           <div className="container flex items-center justify-between gap-4">
             {/* Left: Academic Collegiate Identity */}
             <Link
@@ -207,7 +207,10 @@ const Navbar = () => {
         {/* ======================================================== */}
         {/* TIER 2: CRISP COLLEGIATE FOREST NAVIGATION BAR           */}
         {/* ======================================================== */}
-        <div className="bg-[#061d10]/98 backdrop-blur-md text-slate-100 border-t-2 border-[#1a4480] shadow-xs">
+        <div
+          style={{ backgroundColor: "#061d10" }}
+          className="text-white border-t-2 border-[#1a4480] shadow-sm select-none"
+        >
           <div className="container">
           <div className="flex h-10 items-center justify-between">
             {/* Desktop Navigation Links */}
@@ -219,10 +222,10 @@ const Navbar = () => {
                   <Link
                     key={link.path}
                     to={link.path}
-                    className={`h-full text-[11px] uppercase font-bold tracking-wider px-3.5 transition-all flex items-center ${
+                    className={`h-full text-[11.5px] uppercase tracking-wider px-3.5 transition-all flex items-center font-bold ${
                       isActive
-                        ? "text-sky-300 bg-blue-950/50 border-b-2 border-blue-500 font-extrabold"
-                        : "text-slate-200/90 hover:text-white hover:bg-white/5"
+                        ? "text-sky-300 bg-[#0c2f1b] border-b-2 border-sky-400 font-extrabold"
+                        : "text-emerald-100/90 hover:text-white hover:bg-white/10"
                     }`}
                   >
                     <span>{link.label}</span>
@@ -232,7 +235,7 @@ const Navbar = () => {
             </nav>
 
             {/* Right: Quick Collegiate Status in Nav Bar */}
-            <div className="hidden lg:flex items-center gap-2 text-[10.5px] font-semibold text-emerald-300/80">
+            <div className="hidden lg:flex items-center gap-2 text-[10.5px] font-semibold text-emerald-300">
               <ShieldCheck className="h-3.5 w-3.5 text-sky-400" />
               <span>5 Accredited Science Departments</span>
             </div>
@@ -252,10 +255,14 @@ const Navbar = () => {
             </div>
           </div>
         </div>
+      </div>
 
         {/* Mobile Navigation Drawer */}
         {mobileOpen && (
-          <div className="border-t border-emerald-950 bg-[#072414] px-4 py-3 lg:hidden animate-reveal text-white">
+          <div
+            style={{ backgroundColor: "#072414" }}
+            className="border-t border-emerald-950 px-4 py-3 lg:hidden animate-reveal text-white"
+          >
             <div className="space-y-1">
               {navLinks.map((link) => {
                 const isActive = location.pathname === link.path;
@@ -302,7 +309,6 @@ const Navbar = () => {
             </div>
           </div>
         )}
-        </div>
       </header>
 
       <LoginModal open={loginOpen} onClose={() => setLoginOpen(false)} />
