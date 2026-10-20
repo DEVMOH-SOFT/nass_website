@@ -391,6 +391,10 @@ export const saveStudentSession = (student: StudentRecord) => {
   const cleanName = student.full_name ? student.full_name.trim().toUpperCase() : "";
   localStorage.removeItem("dashboard_data");
   localStorage.removeItem("token");
+  try {
+    sessionStorage.removeItem("nass_whatsapp_popup_dismissed");
+    sessionStorage.removeItem("nass_whatsapp_banner_dismissed");
+  } catch (e) {}
   localStorage.setItem("isLoggedIn", "true");
   localStorage.setItem("student_matric", student.matric_number);
   localStorage.setItem(
@@ -424,6 +428,10 @@ export const logoutStudent = () => {
   localStorage.removeItem("student_matric");
   localStorage.removeItem("dashboard_data");
   localStorage.removeItem("dashboard_active_tab");
+  try {
+    sessionStorage.removeItem("nass_whatsapp_popup_dismissed");
+    sessionStorage.removeItem("nass_whatsapp_banner_dismissed");
+  } catch (e) {}
 };
 
 /**

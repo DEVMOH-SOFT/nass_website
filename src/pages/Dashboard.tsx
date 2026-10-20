@@ -5,7 +5,7 @@ import {
   FileText, Download, Printer, QrCode, CheckCircle2, Search, Filter,
   GraduationCap, ArrowRight, ChevronRight, Award, Camera, Mail, Phone, Cake, Shield, Clock,
   ShoppingBag, Tag, Sparkles, Ticket, MapPin, Users, CheckSquare, PackageCheck,
-  Eye, X
+  Eye, X, MessageCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -44,6 +44,7 @@ import {
 } from "@/data/calendar";
 
 const ACCOUNT_NUMBER = "1234567890";
+const NASS_CBS_WHATSAPP_GROUP = "https://chat.whatsapp.com/FndqQxCWglc3izeuqTNcZr?s=cl&p=i&mlu=4&ilr=4&iam=0";
 
 const Dashboard = () => {
   const location = useLocation();
@@ -87,6 +88,38 @@ const Dashboard = () => {
   const [payments, setPayments] = useState<any[]>([]);
   const [adminNotice, setAdminNotice] = useState<any>(null);
   const [academicSettings, setAcademicSettings] = useState({ session: "", semester: "" });
+
+  const [showWhatsAppModal, setShowWhatsAppModal] = useState(() => {
+    try {
+      const dismissed = sessionStorage.getItem("nass_whatsapp_popup_dismissed");
+      return !dismissed;
+    } catch (e) {
+      return true;
+    }
+  });
+
+  const [showWhatsAppBanner, setShowWhatsAppBanner] = useState(() => {
+    try {
+      const dismissed = sessionStorage.getItem("nass_whatsapp_banner_dismissed");
+      return !dismissed;
+    } catch (e) {
+      return true;
+    }
+  });
+
+  const handleCloseWhatsAppModal = () => {
+    setShowWhatsAppModal(false);
+    try {
+      sessionStorage.setItem("nass_whatsapp_popup_dismissed", "true");
+    } catch (e) {}
+  };
+
+  const handleCloseWhatsAppBanner = () => {
+    setShowWhatsAppBanner(false);
+    try {
+      sessionStorage.setItem("nass_whatsapp_banner_dismissed", "true");
+    } catch (e) {}
+  };
   
   const mainScrollRef = useRef<HTMLDivElement>(null);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
@@ -1874,6 +1907,56 @@ const Dashboard = () => {
           <div className="absolute top-0 left-0 right-0 h-96 bg-[radial-gradient(ellipse_80%_60%_at_50%_-15%,rgba(16,185,129,0.12),transparent)] pointer-events-none" />
 
           <div className="max-w-7xl mx-auto w-full relative z-10">
+            {/* WhatsApp Information Group Pop-up Banner */}
+            {showWhatsAppBanner && (
+              <div className="mb-4 relative overflow-hidden rounded-2xl border border-emerald-600/30 bg-gradient-to-r from-[#062018] via-[#093525] to-[#125c40] p-4 text-white shadow-lg shadow-emerald-950/15">
+                {/* Cancel button on top right */}
+                <button
+                  type="button"
+                  onClick={handleCloseWhatsAppBanner}
+                  className="absolute right-3 top-3 rounded-full p-1.5 text-white/70 hover:text-white bg-black/25 hover:bg-black/50 transition-colors cursor-pointer z-10"
+                  aria-label="Close pop-up banner"
+                  title="Close banner"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3.5 pr-8 sm:pr-10">
+                  <div className="flex items-start sm:items-center gap-3">
+                    <div className="h-10 w-10 sm:h-11 sm:w-11 rounded-xl bg-[#25D366] text-white flex items-center justify-center shrink-0 shadow-md ring-2 ring-white/10">
+                      <MessageCircle className="h-5 w-5 sm:h-6 sm:w-6" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-[9.5px] font-black uppercase tracking-wider text-emerald-300 bg-emerald-900/70 px-2 py-0.5 rounded-full border border-emerald-400/30">
+                          Freshers & Scholars Alert
+                        </span>
+                        <h4 className="text-sm font-extrabold text-white">
+                          NASS CBS Information Group
+                        </h4>
+                      </div>
+                      <p className="mt-0.5 text-xs text-emerald-100/90 leading-snug">
+                        Join our official WhatsApp group for 100L freshers orientation, matriculation notices, and CBS academic updates.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
+                    <a
+                      href={NASS_CBS_WHATSAPP_GROUP}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 rounded-xl bg-[#25D366] hover:bg-[#20ba59] text-white font-extrabold px-4 py-2 text-xs shadow-md transition-all hover:scale-[1.02] active:scale-[0.98] uppercase tracking-wider"
+                    >
+                      <MessageCircle className="h-3.5 w-3.5" />
+                      <span>JOIN NOW</span>
+                      <ExternalLink className="h-3 w-3 opacity-90" />
+                    </a>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Admin Notice */}
           {adminNotice && (
             <div className="mb-4 flex flex-col gap-2 rounded-xl border border-red-200 bg-red-50/90 p-4 text-red-900 shadow-xs">
@@ -4970,6 +5053,86 @@ const Dashboard = () => {
             </div>
           </div>
         )}
+
+        {/* ─────────────────────────────────────────────────────────────
+            NASS CBS INFORMATION GROUP POPUP MODAL
+            ───────────────────────────────────────────────────────────── */}
+        <Dialog open={showWhatsAppModal} onOpenChange={(val) => {
+          if (!val) handleCloseWhatsAppModal();
+        }}>
+          <DialogContent className="max-w-md p-0 overflow-hidden rounded-2xl sm:rounded-3xl border border-emerald-900/20 shadow-2xl bg-white [&>button:last-child]:text-white [&>button:last-child]:bg-black/30 [&>button:last-child:hover]:bg-black/60 [&>button:last-child]:rounded-full [&>button:last-child]:p-1.5 [&>button:last-child]:z-30">
+            {/* Header Banner */}
+            <div className="relative bg-gradient-to-br from-[#062018] via-[#0a3827] to-[#125c40] p-6 text-white overflow-hidden">
+              <div className="absolute -right-8 -top-8 w-40 h-40 bg-emerald-400/20 rounded-full blur-2xl pointer-events-none" />
+              <div className="absolute -left-8 -bottom-8 w-40 h-40 bg-teal-400/15 rounded-full blur-2xl pointer-events-none" />
+
+              <div className="relative z-10 flex items-center gap-3.5 mb-2.5">
+                <div className="h-12 w-12 rounded-2xl bg-[#25D366] text-white flex items-center justify-center shadow-lg shadow-emerald-950/40 shrink-0 ring-4 ring-white/10">
+                  <MessageCircle className="h-7 w-7" />
+                </div>
+                <div>
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-400/20 text-emerald-200 border border-emerald-400/30">
+                    <span className="h-1.5 w-1.5 rounded-full bg-[#25D366] animate-pulse" />
+                    Official NASS Broadcast
+                  </span>
+                  <h3 className="text-lg font-display font-extrabold text-white mt-1 leading-tight">
+                    NASS CBS Information Group
+                  </h3>
+                </div>
+              </div>
+
+              <p className="text-xs sm:text-sm text-emerald-100/90 leading-relaxed relative z-10">
+                Welcome to the <strong>College of Basic Sciences</strong>, LASUSTECH! All freshers and students are required to join the official WhatsApp Information Group for verified announcements.
+              </p>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6 space-y-4 bg-slate-50/50">
+              <div className="rounded-xl bg-white border border-slate-200/80 p-4 space-y-2.5 shadow-xs">
+                <p className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                  Instant Updates & Support in this Group:
+                </p>
+                <ul className="text-xs text-slate-600 space-y-2">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                    <span><strong>100L Freshers Guidance:</strong> Matriculation dates, orientation schedules, course codes & lecture venues.</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                    <span><strong>Official Memos:</strong> Real-time alerts from the Dean's Office, HODs, and the NASS Secretariat.</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                    <span><strong>Student Welfare Desk:</strong> Direct peer assistance, dues clearance help, and exam past questions.</span>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Actions */}
+              <div className="pt-1 flex flex-col sm:flex-row items-center gap-2.5">
+                <a
+                  href={NASS_CBS_WHATSAPP_GROUP}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={handleCloseWhatsAppModal}
+                  className="w-full sm:flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-[#25D366] hover:bg-[#20ba59] text-white font-extrabold py-3 px-5 shadow-md shadow-emerald-600/30 transition-all hover:scale-[1.02] active:scale-[0.98] text-sm tracking-wide uppercase"
+                >
+                  <MessageCircle className="h-4.5 w-4.5" />
+                  <span>JOIN NOW</span>
+                  <ExternalLink className="h-3.5 w-3.5 ml-1 opacity-90" />
+                </a>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleCloseWhatsAppModal}
+                  className="w-full sm:w-auto rounded-xl border-slate-200 text-slate-600 hover:bg-slate-100 font-semibold text-xs py-3 px-4"
+                >
+                  Remind Me Later
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </Layout>
   );

@@ -119,7 +119,7 @@ export const departments: DepartmentInfo[] = [
     id: "chemical-sciences",
     name: "Department of Chemical Sciences",
     code: "CHS",
-    headOfDepartment: "Dr. Jimoh Mormoh",
+    headOfDepartment: "Dr. Momoh Johnson",
     description: "Investigating molecular synthesis, industrial formulation, cellular chemistry, enzymatic kinetics, and material sciences driving industrial transformations.",
     websiteUrl: "https://lasustech.edu.ng/department-of-chemistry",
     established: "2022",
