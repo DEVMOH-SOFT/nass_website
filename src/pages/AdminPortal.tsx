@@ -1828,7 +1828,7 @@ Secretariat, NASS LASUSTECH`);
                         <option value="Computer Science">Computer Science</option>
                         <option value="Software Engineering">Software Engineering</option>
                         <option value="Cyber Security">Cyber Security</option>
-                        <option value="Mathematics">Mathematics</option>
+                        <option value="Industrial Mathematics">Industrial Mathematics</option>
                         <option value="Statistics">Statistics</option>
                         <option value="Mathematical Sciences">Mathematical Sciences</option>
                         <option value="Biological Sciences">Biological Sciences</option>
@@ -2570,7 +2570,7 @@ Secretariat, NASS LASUSTECH`);
                           <option value="Computer Science">Computer Science</option>
                           <option value="Software Engineering">Software Engineering</option>
                           <option value="Cyber Security">Cyber Security</option>
-                          <option value="Mathematics">Mathematics</option>
+                          <option value="Industrial Mathematics">Industrial Mathematics</option>
                           <option value="Statistics">Statistics</option>
                           <option value="Mathematical Sciences">Mathematical Sciences</option>
                           <option value="Biological Sciences">Biological Sciences</option>
@@ -3098,7 +3098,7 @@ Secretariat, NASS LASUSTECH`);
                               <option value="Computer Science">Computer Science</option>
                               <option value="Software Engineering">Software Engineering</option>
                               <option value="Cyber Security">Cyber Security</option>
-                              <option value="Mathematics">Mathematics</option>
+                              <option value="Industrial Mathematics">Industrial Mathematics</option>
                               <option value="Statistics">Statistics</option>
                               <option value="Biochemistry">Biochemistry</option>
                               <option value="Microbiology">Microbiology</option>

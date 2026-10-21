@@ -25,7 +25,7 @@ export const COLLEGE_DEPARTMENTS = [
   "Computer Science",
   "Software Engineering",
   "Cyber Security",
-  "Mathematics",
+  "Industrial Mathematics",
   "Statistics",
   "Mathematical Sciences",
   "Physics with Electronics",

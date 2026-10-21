@@ -171,7 +171,7 @@ export const affiliatedAssociations: AffiliatedAssociation[] = [
     name: "National Association of Mathematical Science Students",
     acronym: "NAMSSN",
     description: "Uniting scholars across theoretical, applied, and quantitative disciplines to foster advanced mathematical modeling, statistical analysis, and algorithmic research.",
-    servedDepartments: ["Department of Mathematical Sciences", "Mathematics"],
+    servedDepartments: ["Department of Mathematical Sciences", "Industrial Mathematics"],
     studentCount: "1,000+ Members",
     established: "2022",
     badgeColor: "bg-emerald-50 text-[#145a32] border-emerald-200",
