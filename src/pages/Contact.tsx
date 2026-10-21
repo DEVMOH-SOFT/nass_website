@@ -15,7 +15,7 @@ const recipientUnits = [
   "Student Welfare Directorate (Welfare / Academic Support / Assistance)",
   "NASS Student Executive Council (SEC)",
   "Department of Computer Science",
-  "Department of Mathematics",
+  "Department of Industrial Mathematics",
   "Department of Statistics",
   "Department of Chemistry",
   "Department of Biochemistry",
