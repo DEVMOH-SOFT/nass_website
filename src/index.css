@@ -234,9 +234,11 @@
     padding: 0 !important;
   }
 
-  /* Make ONLY the printable receipt or pass visible */
+  /* Make ONLY the printable receipt, certificate or pass visible */
   #printable-receipt,
-  #printable-pass {
+  #printable-pass,
+  #nass-modal-printable-receipt,
+  #verified-receipt-certificate {
     display: block !important;
     visibility: visible !important;
     position: static !important;
@@ -253,7 +255,9 @@
   }
 
   #printable-receipt *,
-  #printable-pass * {
+  #printable-pass *,
+  #nass-modal-printable-receipt *,
+  #verified-receipt-certificate * {
     visibility: visible !important;
   }
 }

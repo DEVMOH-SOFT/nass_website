@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { useLocation, Link } from "react-router-dom";
-import { CheckCircle2, ShieldCheck, Printer, Download, ArrowLeft, Building2, Calendar, CreditCard, User, GraduationCap, AlertTriangle, FileCheck2, ExternalLink } from "lucide-react";
+import { CheckCircle2, ShieldCheck, Printer, Download, ArrowLeft, Building2, Calendar, CreditCard, User, GraduationCap, AlertTriangle, FileCheck2, ExternalLink, QrCode } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import nassLogo from "@/assets/nass_logo.png";
 import lasustechLogo from "@/assets/lasustech_logo.png";
 import Layout from "@/components/Layout";
 import { downloadElementAsPdf } from "@/lib/pdf-service";
+import { TreasurerESignature } from "@/components/TreasurerESignature";
 
 const VerifyReceipt = () => {
   const location = useLocation();
@@ -259,29 +260,32 @@ const VerifyReceipt = () => {
                   </div>
                 </div>
 
-                {/* Authorized Executive Signatures */}
+                {/* Authorized Executive Clearance & Verification: Large QR & Treasurer E-Signature */}
                 <div className="pt-4 border-t-2 border-[#145a32]/20">
-                  <div className="grid grid-cols-2 gap-6 text-center">
-                    {/* President */}
-                    <div className="flex flex-col items-center">
-                      <div className="h-9 w-full flex items-center justify-center font-serif italic text-xs text-slate-600">
-                        Comr. Adegoke Muhammed A.
+                  <div className="grid grid-cols-2 gap-4 sm:gap-8 items-center text-center">
+                    {/* Official Digital Verification QR Code (Enlarged for Instant Camera Scan) */}
+                    <div className="flex flex-col items-center justify-center">
+                      <div className="p-1.5 sm:p-2 bg-white border-2 border-dashed border-[#145a32] rounded-xl sm:rounded-2xl shadow-xs flex items-center justify-center">
+                        <img
+                          src={`https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=1&data=${encodeURIComponent(
+                            typeof window !== "undefined" ? window.location.href : `https://nasslasustech.com/verify-receipt?ref=${encodeURIComponent(params.ref)}&matric=${encodeURIComponent(params.matric)}&name=${encodeURIComponent(params.name)}&dept=${encodeURIComponent(params.dept)}&level=${encodeURIComponent(params.level)}&amount=${encodeURIComponent(params.amount)}&date=${encodeURIComponent(params.date)}`
+                          )}`}
+                          alt="Receipt Verification QR Code"
+                          className="w-20 h-20 sm:w-28 sm:h-28 object-contain"
+                        />
                       </div>
-                      <div className="border-t border-slate-700 pt-1 w-full max-w-[200px]">
-                        <p className="text-[11px] font-bold text-slate-900 leading-tight">Comr. Adegoke Muhammed A.</p>
-                        <p className="text-[8.5px] font-semibold text-slate-500 uppercase">Executive President, NASS</p>
-                      </div>
+                      <span className="mt-1 text-[7.5px] sm:text-[9.5px] font-black text-[#145a32] uppercase tracking-wider flex items-center gap-1">
+                        <QrCode className="h-3 w-3 text-[#145a32]" />
+                        Scan to Re-verify Slip
+                      </span>
+                      <span className="text-[6.5px] sm:text-[8px] text-slate-400 font-mono">
+                        Central Collegiate Registry
+                      </span>
                     </div>
 
-                    {/* Treasurer */}
-                    <div className="flex flex-col items-center">
-                      <div className="h-9 w-full flex items-center justify-center font-serif italic text-xs text-slate-600">
-                        Comr. Oladepo Damilare
-                      </div>
-                      <div className="border-t border-slate-700 pt-1 w-full max-w-[200px]">
-                        <p className="text-[11px] font-bold text-slate-900 leading-tight">Comr. Oladepo Damilare</p>
-                        <p className="text-[8.5px] font-semibold text-slate-500 uppercase">Executive Treasurer, NASS</p>
-                      </div>
+                    {/* Executive Treasurer Electronic Signature (E-Signed) */}
+                    <div className="flex flex-col items-center justify-center">
+                      <TreasurerESignature size="md" />
                     </div>
                   </div>
                 </div>

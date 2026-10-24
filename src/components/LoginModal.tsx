@@ -17,11 +17,13 @@ import {
   Check,
   Building,
   Zap,
+  QrCode,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import { TreasurerESignature } from "@/components/TreasurerESignature";
 import {
   Dialog,
   DialogContent,
@@ -1020,32 +1022,25 @@ const LoginModal = ({ open, onClose, redirectTab, initialMode }: LoginModalProps
                     </div>
 
                     {/* Signatures & Verification QR Code Block */}
-                    <div className="pt-2 border-t border-slate-200 flex items-center justify-between text-center gap-2">
-                      <div className="flex flex-col items-center min-w-[70px]">
-                        <div className="h-3 w-full" />
-                        <div className="border-t border-slate-600 pt-0.5 w-full">
-                          <p className="text-[7.5px] font-bold text-slate-900 leading-tight">Comr. Adegoke Muhammed A.</p>
-                          <p className="text-[6px] font-medium text-slate-500 uppercase">Executive President</p>
+                    <div className="pt-2.5 border-t border-slate-200 grid grid-cols-2 items-center text-center gap-2.5">
+                      <div className="flex flex-col items-center justify-center">
+                        <div className="p-1 bg-white border border-dashed border-[#145a32] rounded-lg shadow-xs flex items-center justify-center">
+                          <img
+                            src={`https://api.qrserver.com/v1/create-qr-code/?size=280x280&margin=1&data=${encodeURIComponent(
+                              `${typeof window !== "undefined" ? window.location.origin : "https://nasslasustech.com"}/verify-receipt?ref=${encodeURIComponent(issuedReceipt.reference)}&matric=${encodeURIComponent(issuedReceipt.matricNumber)}&name=${encodeURIComponent(issuedReceipt.studentName)}&dept=${encodeURIComponent(issuedReceipt.department)}&level=${encodeURIComponent(issuedReceipt.level)}&amount=${issuedReceipt.amount}&date=${encodeURIComponent(issuedReceipt.paidAt)}`
+                            )}`}
+                            alt="Verification QR Code"
+                            className="w-16 h-16 sm:w-20 sm:h-20 object-contain"
+                          />
                         </div>
+                        <span className="text-[6.5px] sm:text-[7.5px] font-bold text-[#145a32] uppercase tracking-wider mt-0.5 flex items-center gap-0.5">
+                          <QrCode className="h-2.5 w-2.5 text-[#145a32]" />
+                          Scan to Verify
+                        </span>
                       </div>
 
-                      <div className="flex flex-col items-center">
-                        <img
-                          src={`https://api.qrserver.com/v1/create-qr-code/?size=140x140&margin=1&data=${encodeURIComponent(
-                            `${typeof window !== "undefined" ? window.location.origin : "https://nasslasustech.com"}/verify-receipt?ref=${encodeURIComponent(issuedReceipt.reference)}&matric=${encodeURIComponent(issuedReceipt.matricNumber)}&name=${encodeURIComponent(issuedReceipt.studentName)}&dept=${encodeURIComponent(issuedReceipt.department)}&level=${encodeURIComponent(issuedReceipt.level)}&amount=${issuedReceipt.amount}&date=${encodeURIComponent(issuedReceipt.paidAt)}`
-                          )}`}
-                          alt="Verification QR Code"
-                          className="w-11 h-11 object-contain p-0.5 border border-dashed border-[#145a32] rounded bg-white"
-                        />
-                        <span className="text-[6px] font-bold text-[#145a32] uppercase tracking-wider mt-0.5">Scan to Verify</span>
-                      </div>
-
-                      <div className="flex flex-col items-center min-w-[70px]">
-                        <div className="h-3 w-full" />
-                        <div className="border-t border-slate-600 pt-0.5 w-full">
-                          <p className="text-[7.5px] font-bold text-slate-900 leading-tight">Comr. Oladepo Damilare</p>
-                          <p className="text-[6px] font-medium text-slate-500 uppercase">Executive Treasurer</p>
-                        </div>
+                      <div className="flex flex-col items-center justify-center">
+                        <TreasurerESignature size="sm" />
                       </div>
                     </div>
 

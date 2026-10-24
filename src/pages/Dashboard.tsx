@@ -27,6 +27,7 @@ import { triggerKorapayCheckout } from "@/lib/korapay";
 import { downloadFile, getDownloadUrl } from "@/lib/download";
 import { downloadElementAsPdf } from "@/lib/pdf-service";
 import { getStoreProducts, StoreProduct } from "@/lib/store-service";
+import { TreasurerESignature } from "@/components/TreasurerESignature";
 
 import nassLogo from "@/assets/nass_logo.png";
 import lasustechLogo from "@/assets/lasustech_logo.png";
@@ -4678,40 +4679,31 @@ const Dashboard = () => {
                         </div>
                       )}
 
-                      {/* Signatures & Seal Block: President & Treasurer */}
-                      <div className="pt-3 sm:pt-4 border-t-2 border-[#145a32]/30 grid grid-cols-3 items-end gap-1 sm:gap-4 text-center">
-                        {/* Executive President Manual Signature Space */}
-                        <div className="flex flex-col items-center">
-                          <div className="h-6 sm:h-10 w-full" aria-hidden="true" />
-                          <div className="border-t border-slate-700 pt-1 w-full">
-                            <p className="text-[8px] sm:text-[11px] font-bold text-slate-900 leading-tight">Comr. Adegoke Muhammed A.</p>
-                            <p className="text-[6.5px] sm:text-[8.5px] font-medium text-slate-500 uppercase">Executive President, NASS</p>
-                          </div>
-                        </div>
-
-                        {/* Official Digital Verification QR Code */}
+                      {/* Authorized Executive Clearance & Verification: Large QR & Treasurer E-Signature */}
+                      <div className="pt-3.5 sm:pt-5 border-t-2 border-[#145a32]/30 grid grid-cols-2 items-center gap-3 sm:gap-6 text-center">
+                        {/* Official Digital Verification QR Code (Enlarged for Fast Camera & Mobile Scan) */}
                         <div className="flex flex-col items-center justify-center">
-                          <div className="p-1 sm:p-1.5 bg-white border-2 border-dashed border-[#145a32] rounded-lg sm:rounded-xl shadow-xs flex items-center justify-center">
+                          <div className="p-1.5 sm:p-2 bg-white border-2 border-dashed border-[#145a32] rounded-xl sm:rounded-2xl shadow-xs flex items-center justify-center">
                             <img
-                              src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&margin=1&data=${encodeURIComponent(
+                              src={`https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=1&data=${encodeURIComponent(
                                 `${typeof window !== "undefined" ? window.location.origin : "https://nasslasustech.com"}/verify-receipt?ref=${encodeURIComponent(activeReceipt.reference || activeReceipt.transaction_reference || "NASS-DUES")}&matric=${encodeURIComponent(activeReceipt.matric_number || profile.matricNumber || "")}&name=${encodeURIComponent(activeReceipt.full_name || profile.fullName || "")}&dept=${encodeURIComponent(activeReceipt.department || profile.department || "")}&level=${encodeURIComponent(activeReceipt.level || profile.level || "")}&type=${encodeURIComponent(activeReceipt.payment_type || "2025/2026 SESSION DUES")}&amount=${encodeURIComponent(String(activeReceipt.amount || 3000))}&date=${encodeURIComponent(activeReceipt.paid_at || activeReceipt.created_at || new Date().toISOString())}`
                               )}`}
                               alt="Receipt Verification QR Code"
-                              className="w-11 h-11 sm:w-16 sm:h-16 object-contain"
+                              className="w-20 h-20 sm:w-28 sm:h-28 md:w-32 md:h-32 object-contain"
                             />
                           </div>
-                          <span className="mt-0.5 sm:mt-1 text-[6.5px] sm:text-[7.5px] font-extrabold text-[#145a32] uppercase tracking-wider">
+                          <span className="mt-1 text-[7.5px] sm:text-[9.5px] font-black text-[#145a32] uppercase tracking-wider flex items-center gap-1">
+                            <QrCode className="h-3 w-3 text-[#145a32]" />
                             Scan to Verify
+                          </span>
+                          <span className="text-[6.5px] sm:text-[8px] text-slate-400 font-mono">
+                            Collegiate Verification Registry
                           </span>
                         </div>
 
-                        {/* Executive Treasurer Manual Signature Space */}
-                        <div className="flex flex-col items-center">
-                          <div className="h-6 sm:h-10 w-full" aria-hidden="true" />
-                          <div className="border-t border-slate-700 pt-1 w-full">
-                            <p className="text-[8px] sm:text-[11px] font-bold text-slate-900 leading-tight">Comr. Oladepo Damilare</p>
-                            <p className="text-[6.5px] sm:text-[8.5px] font-medium text-slate-500 uppercase">Executive Treasurer, NASS</p>
-                          </div>
+                        {/* Executive Treasurer Electronic Signature (E-Signed) */}
+                        <div className="flex flex-col items-center justify-center">
+                          <TreasurerESignature size="md" />
                         </div>
                       </div>
 
