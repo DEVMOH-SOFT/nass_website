@@ -447,7 +447,7 @@ export const markDuesPaid = async (params: {
   amount?: number;
 }) => {
   const cleanMatric = normalizeMatric(params.matricNumber);
-  const duesAmount = params.amount || 2000;
+  const duesAmount = params.amount || 2500;
   const cleanFullName = (params.fullName || "SCIENCE SCHOLAR").trim().toUpperCase();
   const cleanEmail = params.email?.trim().toLowerCase() || "";
 

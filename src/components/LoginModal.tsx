@@ -57,7 +57,7 @@ const LoginModal = ({ open, onClose, redirectTab, initialMode }: LoginModalProps
 
   // Registration Multi-Phase:
   // Phase 1: Bio-Data & Classification
-  // Phase 2: Statutory Dues Payment (₦2,000)
+  // Phase 2: Statutory Dues Payment (₦2,500)
   // Phase 3: Official Electronic Receipt Issued & Access Granted
   const [phase, setPhase] = useState<1 | 2 | 3>(1);
 
@@ -194,7 +194,7 @@ const LoginModal = ({ open, onClose, redirectTab, initialMode }: LoginModalProps
 
       toast({
         title: "Bio-Data Saved",
-        description: "Please proceed to settle your statutory ₦2,000 session dues.",
+        description: "Please proceed to settle your statutory ₦2,500 session dues.",
       });
     } catch (err: any) {
       toast({
@@ -226,7 +226,7 @@ const LoginModal = ({ open, onClose, redirectTab, initialMode }: LoginModalProps
         email: registeredStudent.email,
         department: registeredStudent.department,
         level: registeredStudent.level,
-        amount: 2000,
+        amount: 2500,
       });
 
       // 2. Ensure active student session is set to this newly registered student
@@ -245,7 +245,7 @@ const LoginModal = ({ open, onClose, redirectTab, initialMode }: LoginModalProps
         to: registeredStudent.email,
         studentName: registeredStudent.fullName,
         matricNumber: registeredStudent.matricNumber,
-        amount: 2000,
+        amount: 2500,
         reference,
         department: registeredStudent.department,
         level: registeredStudent.level,
@@ -286,7 +286,7 @@ const LoginModal = ({ open, onClose, redirectTab, initialMode }: LoginModalProps
   };
 
   // ─────────────────────────────────────────────────────────────
-  // PHASE 2: Dues Payment (₦2,000 via Korapay or Transfer)
+  // PHASE 2: Dues Payment (₦2,500 via Korapay or Transfer)
   // ─────────────────────────────────────────────────────────────
   const handleInitiateDuesPayment = async () => {
     if (!registeredStudent) return;
@@ -294,13 +294,13 @@ const LoginModal = ({ open, onClose, redirectTab, initialMode }: LoginModalProps
     // Temporarily hide Radix dialog so pointer events and keyboard focus are 100% accessible to Korapay
     setIsKorapayActive(true);
     setSubmitting(true);
-    setLoadingStatus("Connecting to Korapay Secure Payment Gateway (₦2,000)...");
+    setLoadingStatus("Connecting to Korapay Secure Payment Gateway (₦2,500)...");
 
     const paymentRef = `NASS-DUES-${registeredStudent.matricNumber.replace(/[^A-Za-z0-9]/g, "")}-${Date.now().toString().slice(-4)}`;
 
     try {
       const opened = await triggerKorapayCheckout({
-        amount: 2000,
+        amount: 2500,
         email: registeredStudent.email,
         name: registeredStudent.fullName,
         reference: paymentRef,
@@ -555,7 +555,7 @@ const LoginModal = ({ open, onClose, redirectTab, initialMode }: LoginModalProps
                   : phase === 1
                   ? "Fresher Registration & Clearance"
                   : phase === 2
-                  ? "Session Dues Clearance (₦2,000)"
+                  ? "Session Dues Clearance (₦2,500)"
                   : "Official Payment Receipt"}
               </h2>
               <p className="text-[11px] text-slate-500 mt-0.5 font-medium">
@@ -716,7 +716,7 @@ const LoginModal = ({ open, onClose, redirectTab, initialMode }: LoginModalProps
                         </>
                       ) : (
                         <>
-                          <span>Continue to Dues Payment (₦2,000)</span>
+                          <span>Continue to Dues Payment (₦2,500)</span>
                           <ArrowRight className="h-4 w-4 ml-auto" />
                         </>
                       )}
@@ -781,7 +781,7 @@ const LoginModal = ({ open, onClose, redirectTab, initialMode }: LoginModalProps
                       <div className="text-right">
                         <p className="text-[9px] uppercase font-bold text-slate-500">Amount Due</p>
                         <p className="font-mono text-xl font-extrabold text-emerald-800 dark:text-emerald-400">
-                          ₦2,000
+                          ₦2,500
                         </p>
                       </div>
                     </div>
@@ -835,7 +835,7 @@ const LoginModal = ({ open, onClose, redirectTab, initialMode }: LoginModalProps
                           ) : (
                             <>
                               <CreditCard className="h-4 w-4" />
-                              <span>Pay ₦2,000 via Korapay</span>
+                              <span>Pay ₦2,500 via Korapay</span>
                               <ArrowRight className="h-4 w-4 ml-auto" />
                             </>
                           )}
@@ -905,7 +905,7 @@ const LoginModal = ({ open, onClose, redirectTab, initialMode }: LoginModalProps
 
                           <div className="text-[10.5px] text-slate-600 dark:text-slate-300">
                             <p><strong>Account Name:</strong> NASS LASUSTECH BASIC SCIENCES</p>
-                            <p className="mt-0.5"><strong>Amount:</strong> ₦2,000</p>
+                            <p className="mt-0.5"><strong>Amount:</strong> ₦2,500</p>
                           </div>
                         </div>
 
@@ -934,7 +934,7 @@ const LoginModal = ({ open, onClose, redirectTab, initialMode }: LoginModalProps
                           ) : (
                             <>
                               <CheckCircle2 className="h-4 w-4" />
-                              <span>I Have Paid ₦2,000 via Transfer (Verify & Activate)</span>
+                              <span>I Have Paid ₦2,500 via Transfer (Verify & Activate)</span>
                             </>
                           )}
                         </Button>

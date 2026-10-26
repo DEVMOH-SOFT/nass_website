@@ -9,11 +9,15 @@
  */
 
 export const KORAPAY_LIVE_PUBLIC_KEY = 
-  import.meta.env.VITE_KORAPAY_PUBLIC_KEY || "pk_live_Q8YucBLGXAKq3z23CBLa79Jv95brJLcwxvd9XUDM";
+  import.meta.env.VITE_KORAPAY_LIVE_PUBLIC_KEY || import.meta.env.VITE_KORAPAY_PUBLIC_KEY || "pk_live_Q8YucBLGXAKq3z23CBLa79Jv95brJLcwxvd9XUDM";
 
 export const KORAPAY_TEST_PUBLIC_KEY = 
   import.meta.env.VITE_KORAPAY_TEST_PUBLIC_KEY || "pk_test_xRzLDXmeuiQMaiyF5oXuvT4iSsXJN8friVqFkweh";
 
+/**
+ * Checks if test sandbox mode is active.
+ * Only returns true if explicitly set to test mode or configured with a pk_test_ key.
+ */
 export const isKorapayTestMode = () => {
   return (
     import.meta.env.VITE_KORAPAY_MODE === "test" ||
@@ -21,7 +25,7 @@ export const isKorapayTestMode = () => {
   );
 };
 
-// Determine active public key (live default, test if specified or flagged in env)
+// Determine active public key (Live production by default)
 export const getKorapayPublicKey = (isTest = false) => {
   return (isTest || isKorapayTestMode()) ? KORAPAY_TEST_PUBLIC_KEY : KORAPAY_LIVE_PUBLIC_KEY;
 };
@@ -118,6 +122,11 @@ export const triggerKorapayCheckout = async (options: {
 }): Promise<boolean> => {
   const loaded = await loadKorapayScript();
   const publicKey = getKorapayPublicKey(options.isTest);
+
+  console.info(
+    `[Korapay Gateway] Launching checkout in ${isKorapayTestMode() ? "TEST (Sandbox)" : "LIVE"} mode. ` +
+    `Key: ${publicKey ? publicKey.slice(0, 14) + "..." : "none"}`
+  );
 
   // Guarantee that every transaction reference contains "NASS"
   let ref = options.reference || `NASS-${Date.now()}-${Math.floor(Math.random() * 1000)}`;

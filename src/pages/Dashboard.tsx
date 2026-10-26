@@ -84,7 +84,7 @@ const Dashboard = () => {
   const [otpCode, setOtpCode] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [amountOwing, setAmountOwing] = useState(2000);
+  const [amountOwing, setAmountOwing] = useState(2500);
   const [activities, setActivities] = useState<any[]>([]);
   const [payments, setPayments] = useState<any[]>([]);
   const [adminNotice, setAdminNotice] = useState<any>(null);
@@ -730,7 +730,7 @@ const Dashboard = () => {
             department: studentDept,
             level: studentLevel,
             payment_type: "2025/2026 Session Dues",
-            amount: 2000,
+            amount: 2500,
             channel: "Korapay Online",
             status: "Paid",
             created_at: liveStudent?.dues_paid_at || new Date().toISOString(),
@@ -752,7 +752,7 @@ const Dashboard = () => {
         }));
 
         setPayments(studentPaymentsList);
-        setAmountOwing(isDuesPaid || studentPaymentsList.some((p: any) => String(p.payment_type || '').toLowerCase().includes("due") && p.status === "Paid") ? 0 : 2000);
+        setAmountOwing(isDuesPaid || studentPaymentsList.some((p: any) => String(p.payment_type || '').toLowerCase().includes("due") && p.status === "Paid") ? 0 : 2500);
         setAcademicSettings({ session: "2025/2026", semester: "First Semester" });
       } catch (error: any) {
         console.error("Dashboard Sync Error:", error);
@@ -976,7 +976,7 @@ const Dashboard = () => {
       department: profile.department || "Basic Sciences",
       level: profile.level || "100L",
       payment_type: "2025/2026 Session Dues",
-      amount: 2000,
+      amount: 2500,
       channel: channelName,
       status: "Paid",
       created_at: new Date().toISOString(),
@@ -995,7 +995,7 @@ const Dashboard = () => {
           email: studentEmail,
           department: profile.department || "Basic Sciences",
           level: profile.level || "100L",
-          amount: 2000,
+          amount: 2500,
         }).catch(console.warn);
       }
       const userStr = localStorage.getItem("user");
@@ -1013,7 +1013,7 @@ const Dashboard = () => {
 
     toast({
       title: "Payment Confirmed • Official Receipt Issued!",
-      description: "Your ₦2,000 collegiate session dues have been recorded and cleared.",
+      description: "Your ₦2,500 collegiate session dues have been recorded and cleared.",
     });
 
     setActiveReceipt(confirmedRecord);
@@ -1035,7 +1035,7 @@ const Dashboard = () => {
       department: profile.department || "Basic Sciences",
       level: profile.level || "100L",
       payment_type: "2025/2026 Session Dues",
-      amount: 2000,
+      amount: 2500,
       channel: "Korapay Online",
       status: "Initiated",
       created_at: new Date().toISOString(),
@@ -1054,7 +1054,7 @@ const Dashboard = () => {
 
     // Launch Korapay inline modal with Live Public Key
     const opened = await triggerKorapayCheckout({
-      amount: 2000,
+      amount: 2500,
       email: studentEmail,
       name: studentName,
       reference: ref,
@@ -1083,7 +1083,7 @@ const Dashboard = () => {
   const handleResumePayment = async (pay: any) => {
     const studentEmail = profile.email || `${profile.matricNumber || 'student'}@lasustech.edu.ng`;
     const studentName = profile.fullName || "NASS Student";
-    const rawAmt = pay.amount || 2000;
+    const rawAmt = pay.amount || 2500;
     const finalAmount = rawAmt > 10000 ? rawAmt / 100 : rawAmt;
     const ref = pay.reference || `NASS-PAY-${Date.now()}`;
 
@@ -1161,9 +1161,9 @@ const Dashboard = () => {
       window.dispatchEvent(new Event("storage"));
     } catch (e) {}
     setProfile(prev => ({ ...prev, duesStatus: "Pending", idCardStatus: "Not Registered" }));
-    setAmountOwing(2000);
+    setAmountOwing(2500);
     setPayments([]);
-    toast({ title: "Account Ready for Testing", description: "Dues status reset to Pending (₦2,000 owing). You can now test payment through Korapay." });
+    toast({ title: "Account Ready for Testing", description: "Dues status reset to Pending (₦2,500 owing). You can now test payment through Korapay." });
   };
 
   const handleIdCardRequest = async () => {
@@ -2085,7 +2085,7 @@ const Dashboard = () => {
                         </span>
                       )}
                       <span className="px-2.5 py-1 rounded-lg bg-emerald-400/20 text-emerald-200 font-bold border border-emerald-400/30">
-                        ✓ {profile.duesStatus === 'Paid' ? 'Dues Cleared (₦2,000)' : 'Dues Pending'}
+                        ✓ {profile.duesStatus === 'Paid' ? 'Dues Cleared (₦2,500)' : 'Dues Pending'}
                       </span>
                     </div>
                   </div>
@@ -2154,7 +2154,7 @@ const Dashboard = () => {
 
                     <div className="mt-5">
                       <h3 className="font-display text-base font-bold text-slate-900">Session Dues</h3>
-                      <p className="mt-1 font-mono text-xl font-black text-slate-900">₦2,000</p>
+                      <p className="mt-1 font-mono text-xl font-black text-slate-900">₦2,500</p>
                       <p className="mt-1 text-xs text-slate-500 leading-relaxed">
                         Official 2025/2026 collegiate contribution. Enables laboratory, exams, and chapter credentials.
                       </p>
@@ -2242,7 +2242,7 @@ const Dashboard = () => {
                 <div className="border-r border-slate-200/60 pr-3 last:border-0">
                   <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">Statutory Standing</span>
                   <p className={`text-sm font-black mt-1 ${profile.duesStatus === 'Paid' ? 'text-emerald-700' : 'text-amber-600'}`}>
-                    {profile.duesStatus === 'Paid' ? '✓ Cleared (₦2,000)' : '⏳ Pending (₦2,000)'}
+                    {profile.duesStatus === 'Paid' ? '✓ Cleared (₦2,500)' : '⏳ Pending (₦2,500)'}
                   </p>
                   <p className="text-[10px] text-slate-500 font-medium">2025/2026 Session</p>
                 </div>
@@ -2903,7 +2903,7 @@ const Dashboard = () => {
                     ) : (
                       <>
                         <Clock className="h-3.5 w-3.5 text-amber-600" />
-                        <span>Payment Due (₦2,000)</span>
+                        <span>Payment Due (₦2,500)</span>
                       </>
                     )}
                   </span>
@@ -2933,7 +2933,7 @@ const Dashboard = () => {
                         </p>
                         <div className="flex flex-wrap items-center gap-2 pt-1">
                           <span className="px-2.5 py-1 rounded-lg bg-white/10 text-white font-mono text-xs font-bold border border-white/15">
-                            Amount Paid: ₦2,000.00
+                            Amount Paid: ₦2,500.00
                           </span>
                           <span className="px-2.5 py-1 rounded-lg bg-emerald-400/20 text-emerald-300 font-mono text-xs font-bold border border-emerald-400/30">
                             Outstanding: ₦0.00
@@ -2954,7 +2954,7 @@ const Dashboard = () => {
                               department: profile.department || "Basic Sciences",
                               level: profile.level || "100L",
                               payment_type: "2025/2026 Session Dues",
-                              amount: 2000,
+                              amount: 2500,
                               channel: "Verified Official",
                               status: "Paid",
                               created_at: new Date().toISOString(),
@@ -3198,7 +3198,7 @@ const Dashboard = () => {
                           </div>
                           <div className="flex justify-between pt-2 border-t border-slate-200">
                             <span className="font-bold text-slate-900">Statutory Fee:</span>
-                            <span className="font-mono font-black text-emerald-800 text-sm">₦2,000.00</span>
+                            <span className="font-mono font-black text-emerald-800 text-sm">₦2,500.00</span>
                           </div>
                         </div>
                       </div>
@@ -3229,7 +3229,7 @@ const Dashboard = () => {
                         className="w-full rounded-xl text-sm font-bold py-3 bg-gradient-to-r from-emerald-600 via-emerald-500 to-[#145a32] hover:from-emerald-700 hover:to-[#0f4426] text-white shadow-md shadow-emerald-900/20 hover:scale-[1.01] transition-all flex items-center justify-center gap-2"
                       >
                         <CreditCard className="h-4 w-4" />
-                        <span>Pay ₦2,000 with Korapay</span>
+                        <span>Pay ₦2,500 with Korapay</span>
                       </Button>
 
                       <div className="flex items-center justify-center gap-1.5 text-[10.5px] text-slate-500 pt-2 border-t border-slate-100">
@@ -4686,7 +4686,7 @@ const Dashboard = () => {
                           <div className="p-1.5 sm:p-2 bg-white border-2 border-dashed border-[#145a32] rounded-xl sm:rounded-2xl shadow-xs flex items-center justify-center">
                             <img
                               src={`https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=1&data=${encodeURIComponent(
-                                `${typeof window !== "undefined" ? window.location.origin : "https://nasslasustech.com"}/verify-receipt?ref=${encodeURIComponent(activeReceipt.reference || activeReceipt.transaction_reference || "NASS-DUES")}&matric=${encodeURIComponent(activeReceipt.matric_number || profile.matricNumber || "")}&name=${encodeURIComponent(activeReceipt.full_name || profile.fullName || "")}&dept=${encodeURIComponent(activeReceipt.department || profile.department || "")}&level=${encodeURIComponent(activeReceipt.level || profile.level || "")}&type=${encodeURIComponent(activeReceipt.payment_type || "2025/2026 SESSION DUES")}&amount=${encodeURIComponent(String(activeReceipt.amount || 3000))}&date=${encodeURIComponent(activeReceipt.paid_at || activeReceipt.created_at || new Date().toISOString())}`
+                                `${typeof window !== "undefined" ? window.location.origin : "https://nasslasustech.com"}/verify-receipt?ref=${encodeURIComponent(activeReceipt.reference || activeReceipt.transaction_reference || "NASS-DUES")}&matric=${encodeURIComponent(activeReceipt.matric_number || profile.matricNumber || "")}&name=${encodeURIComponent(activeReceipt.full_name || profile.fullName || "")}&dept=${encodeURIComponent(activeReceipt.department || profile.department || "")}&level=${encodeURIComponent(activeReceipt.level || profile.level || "")}&type=${encodeURIComponent(activeReceipt.payment_type || "2025/2026 SESSION DUES")}&amount=${encodeURIComponent(String(activeReceipt.amount || 2500))}&date=${encodeURIComponent(activeReceipt.paid_at || activeReceipt.created_at || new Date().toISOString())}`
                               )}`}
                               alt="Receipt Verification QR Code"
                               className="w-20 h-20 sm:w-28 sm:h-28 md:w-32 md:h-32 object-contain"

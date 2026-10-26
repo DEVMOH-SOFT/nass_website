@@ -341,7 +341,7 @@ DEVMOH Led Administration`);
 
 This is an administrative notification from the College Secretariat regarding statutory session dues for the 2025/2026 academic session.
 
-Please ensure your ₦2,000 session dues are paid and your official electronic receipt is downloaded. Cleared dues are required for laboratory practical manual issuance, customized lab coats, and collegiate clearances.
+Please ensure your ₦2,500 session dues are paid and your official electronic receipt is downloaded. Cleared dues are required for laboratory practical manual issuance, customized lab coats, and collegiate clearances.
 
 Office of the Executive Treasurer,
 DEVMOH Led Administration, NASS LASUSTECH`);
@@ -714,7 +714,7 @@ Secretariat, NASS LASUSTECH`);
         department: dept,
         level: lvl,
         payment_type: "2025/2026 Sessional Dues",
-        amount: 2000,
+        amount: 2500,
         channel: "Korapay Online",
         status: isPaid ? "Paid" : "Pending",
         created_at: date,
@@ -1682,7 +1682,7 @@ Secretariat, NASS LASUSTECH`);
 
                             <div className="flex flex-wrap items-center gap-2 shrink-0">
                               <span className={`rounded-full px-2.5 py-0.5 text-xs font-bold border ${isPaid ? "bg-emerald-100 text-emerald-800 border-emerald-300" : "bg-amber-100 text-amber-800 border-amber-300"}`}>
-                                {isPaid ? "✓ Dues Cleared (₦2,000)" : "⏳ Dues Unpaid"}
+                                {isPaid ? "✓ Dues Cleared (₦2,500)" : "⏳ Dues Unpaid"}
                               </span>
 
                               <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${student.activeFlag ? "bg-red-100 text-red-700" : "bg-emerald-50 text-emerald-700"}`}>

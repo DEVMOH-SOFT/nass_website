@@ -17,7 +17,7 @@ const VerifyReceipt = () => {
     dept: "",
     level: "",
     type: "",
-    amount: "3,000",
+    amount: "2,500",
     date: "",
   });
   const [isValid, setIsValid] = useState<boolean | null>(null);
@@ -30,10 +30,10 @@ const VerifyReceipt = () => {
     const dept = searchParams.get("dept") || "";
     const level = searchParams.get("level") || "";
     const type = searchParams.get("type") || "2025/2026 Statutory Session Dues";
-    const rawAmount = searchParams.get("amount") || "3000";
+    const rawAmount = searchParams.get("amount") || "2500";
     const date = searchParams.get("date") || "";
 
-    const formattedAmount = Number(rawAmount.replace(/[^0-9]/g, "") || 3000).toLocaleString();
+    const formattedAmount = Number(rawAmount.replace(/[^0-9]/g, "") || 2500).toLocaleString();
 
     // Check if we have minimum valid receipt parameters
     if (ref || matric || name) {
@@ -61,7 +61,7 @@ const VerifyReceipt = () => {
             dept: parsed.department || "Basic Sciences",
             level: parsed.level || "300L",
             type: "2025/2026 Statutory Session Dues",
-            amount: "3,000",
+            amount: "2,500",
             date: new Date().toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" }),
           });
           setIsValid(true);

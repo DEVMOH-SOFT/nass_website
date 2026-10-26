@@ -60,7 +60,7 @@ This document outlines the required API endpoints and data payloads for the stud
     "dues_status": "Paid",
     "wallet_balance": 500.00,
     "recent_activities": [
-      { "type": "payment", "amount": 2000, "date": "2026-04-10" }
+      { "type": "payment", "amount": 2500, "date": "2026-04-10" }
     ]
   }
 }
