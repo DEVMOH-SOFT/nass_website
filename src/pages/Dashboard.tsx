@@ -22,7 +22,7 @@ import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { fetchApi, API_BASE_URL } from "@/lib/api";
 import { events as staticEvents } from "@/data/events";
-import { fetchStudentProfile, updateStudentProfile, logoutStudent, markDuesPaid } from "@/lib/student-auth";
+import { fetchStudentProfile, updateStudentProfile, logoutStudent, markDuesPaid, resolveStudentDuesPaidAmount } from "@/lib/student-auth";
 import { triggerKorapayCheckout } from "@/lib/korapay";
 import { downloadFile, getDownloadUrl } from "@/lib/download";
 import { downloadElementAsPdf } from "@/lib/pdf-service";
@@ -722,6 +722,7 @@ const Dashboard = () => {
         );
 
         if (isDuesPaid && !studentPaymentsList.some((p: any) => String(p.payment_type || '').toLowerCase().includes("due") && p.status === "Paid")) {
+          const duesAmt = resolveStudentDuesPaidAmount(studentMatric, studentEmail, liveStudent || localUser);
           studentPaymentsList.unshift({
             id: `pay-dues-${studentMatric}`,
             reference: `NASS-DUES-${studentMatric}`,
@@ -730,7 +731,7 @@ const Dashboard = () => {
             department: studentDept,
             level: studentLevel,
             payment_type: "2025/2026 Session Dues",
-            amount: 2500,
+            amount: duesAmt,
             channel: "Korapay Online",
             status: "Paid",
             created_at: liveStudent?.dues_paid_at || new Date().toISOString(),
@@ -763,6 +764,18 @@ const Dashboard = () => {
 
     fetchDashboardData();
   }, [navigate]);
+
+  const duesPaidAmount = (() => {
+    const duesPay = payments.find((p: any) =>
+      String(p.payment_type || '').toLowerCase().includes("due") &&
+      (p.status === "Paid" || String(p.status).toLowerCase() === "paid")
+    );
+    if (duesPay && typeof duesPay.amount === "number") {
+      const amt = duesPay.amount > 10000 ? duesPay.amount / 100 : duesPay.amount;
+      if (amt === 2000 || amt === 2500) return amt;
+    }
+    return resolveStudentDuesPaidAmount(profile.matricNumber, profile.email);
+  })();
 
   const isProfileIncomplete = !profile.fullName || !profile.matricNumber || !profile.level || !profile.birthday;
 
@@ -2085,7 +2098,7 @@ const Dashboard = () => {
                         </span>
                       )}
                       <span className="px-2.5 py-1 rounded-lg bg-emerald-400/20 text-emerald-200 font-bold border border-emerald-400/30">
-                        ✓ {profile.duesStatus === 'Paid' ? 'Dues Cleared (₦2,500)' : 'Dues Pending'}
+                        ✓ {profile.duesStatus === 'Paid' ? `Dues Cleared (₦${duesPaidAmount.toLocaleString()})` : 'Dues Pending'}
                       </span>
                     </div>
                   </div>
@@ -2154,7 +2167,9 @@ const Dashboard = () => {
 
                     <div className="mt-5">
                       <h3 className="font-display text-base font-bold text-slate-900">Session Dues</h3>
-                      <p className="mt-1 font-mono text-xl font-black text-slate-900">₦2,500</p>
+                      <p className="mt-1 font-mono text-xl font-black text-slate-900">
+                        {profile.duesStatus === 'Paid' ? `₦${duesPaidAmount.toLocaleString()}` : '₦2,500'}
+                      </p>
                       <p className="mt-1 text-xs text-slate-500 leading-relaxed">
                         Official 2025/2026 collegiate contribution. Enables laboratory, exams, and chapter credentials.
                       </p>
@@ -2242,7 +2257,7 @@ const Dashboard = () => {
                 <div className="border-r border-slate-200/60 pr-3 last:border-0">
                   <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">Statutory Standing</span>
                   <p className={`text-sm font-black mt-1 ${profile.duesStatus === 'Paid' ? 'text-emerald-700' : 'text-amber-600'}`}>
-                    {profile.duesStatus === 'Paid' ? '✓ Cleared (₦2,500)' : '⏳ Pending (₦2,500)'}
+                    {profile.duesStatus === 'Paid' ? `✓ Cleared (₦${duesPaidAmount.toLocaleString()})` : '⏳ Pending (₦2,500)'}
                   </p>
                   <p className="text-[10px] text-slate-500 font-medium">2025/2026 Session</p>
                 </div>
@@ -2898,7 +2913,7 @@ const Dashboard = () => {
                     {profile.duesStatus === 'Paid' ? (
                       <>
                         <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
-                        <span>Dues Cleared</span>
+                        <span>Dues Cleared (₦{duesPaidAmount.toLocaleString()})</span>
                       </>
                     ) : (
                       <>
@@ -2933,7 +2948,7 @@ const Dashboard = () => {
                         </p>
                         <div className="flex flex-wrap items-center gap-2 pt-1">
                           <span className="px-2.5 py-1 rounded-lg bg-white/10 text-white font-mono text-xs font-bold border border-white/15">
-                            Amount Paid: ₦2,500.00
+                            Amount Paid: ₦{duesPaidAmount.toLocaleString()}.00
                           </span>
                           <span className="px-2.5 py-1 rounded-lg bg-emerald-400/20 text-emerald-300 font-mono text-xs font-bold border border-emerald-400/30">
                             Outstanding: ₦0.00
@@ -2947,14 +2962,15 @@ const Dashboard = () => {
                       <div className="flex flex-col sm:flex-row md:flex-col gap-2 shrink-0">
                         <Button
                           onClick={() => {
-                            const found = payments.find(p => p.status === 'Paid') || {
+                            const duesPay = payments.find(p => String(p.payment_type || '').toLowerCase().includes("due") && p.status === 'Paid') || payments.find(p => p.status === 'Paid');
+                            const found = duesPay || {
                               reference: `NASS-DUES-${profile.matricNumber || 'PAID'}`,
                               student_name: profile.fullName || "Student Scholar",
                               matric_number: profile.matricNumber || "",
                               department: profile.department || "Basic Sciences",
                               level: profile.level || "100L",
                               payment_type: "2025/2026 Session Dues",
-                              amount: 2500,
+                              amount: duesPaidAmount,
                               channel: "Verified Official",
                               status: "Paid",
                               created_at: new Date().toISOString(),
@@ -4686,7 +4702,7 @@ const Dashboard = () => {
                           <div className="p-1.5 sm:p-2 bg-white border-2 border-dashed border-[#145a32] rounded-xl sm:rounded-2xl shadow-xs flex items-center justify-center">
                             <img
                               src={`https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=1&data=${encodeURIComponent(
-                                `${typeof window !== "undefined" ? window.location.origin : "https://nasslasustech.com"}/verify-receipt?ref=${encodeURIComponent(activeReceipt.reference || activeReceipt.transaction_reference || "NASS-DUES")}&matric=${encodeURIComponent(activeReceipt.matric_number || profile.matricNumber || "")}&name=${encodeURIComponent(activeReceipt.full_name || profile.fullName || "")}&dept=${encodeURIComponent(activeReceipt.department || profile.department || "")}&level=${encodeURIComponent(activeReceipt.level || profile.level || "")}&type=${encodeURIComponent(activeReceipt.payment_type || "2025/2026 SESSION DUES")}&amount=${encodeURIComponent(String(activeReceipt.amount || 2500))}&date=${encodeURIComponent(activeReceipt.paid_at || activeReceipt.created_at || new Date().toISOString())}`
+                                `${typeof window !== "undefined" ? window.location.origin : "https://nasslasustech.com"}/verify-receipt?ref=${encodeURIComponent(activeReceipt.reference || activeReceipt.transaction_reference || "NASS-DUES")}&matric=${encodeURIComponent(activeReceipt.matric_number || profile.matricNumber || "")}&name=${encodeURIComponent(activeReceipt.full_name || profile.fullName || "")}&dept=${encodeURIComponent(activeReceipt.department || profile.department || "")}&level=${encodeURIComponent(activeReceipt.level || profile.level || "")}&type=${encodeURIComponent(activeReceipt.payment_type || "2025/2026 SESSION DUES")}&amount=${encodeURIComponent(String(activeReceipt.amount || duesPaidAmount || 2500))}&date=${encodeURIComponent(activeReceipt.paid_at || activeReceipt.created_at || new Date().toISOString())}`
                               )}`}
                               alt="Receipt Verification QR Code"
                               className="w-20 h-20 sm:w-28 sm:h-28 md:w-32 md:h-32 object-contain"

@@ -7,6 +7,7 @@ import lasustechLogo from "@/assets/lasustech_logo.png";
 import Layout from "@/components/Layout";
 import { downloadElementAsPdf } from "@/lib/pdf-service";
 import { TreasurerESignature } from "@/components/TreasurerESignature";
+import { resolveStudentDuesPaidAmount } from "@/lib/student-auth";
 
 const VerifyReceipt = () => {
   const location = useLocation();
@@ -30,10 +31,13 @@ const VerifyReceipt = () => {
     const dept = searchParams.get("dept") || "";
     const level = searchParams.get("level") || "";
     const type = searchParams.get("type") || "2025/2026 Statutory Session Dues";
-    const rawAmount = searchParams.get("amount") || "2500";
+    const rawAmount = searchParams.get("amount");
     const date = searchParams.get("date") || "";
 
-    const formattedAmount = Number(rawAmount.replace(/[^0-9]/g, "") || 2500).toLocaleString();
+    const resolvedAmount = rawAmount
+      ? (Number(rawAmount.replace(/[^0-9]/g, "")) || 2500)
+      : resolveStudentDuesPaidAmount(matric, null, { dues_paid_at: date });
+    const formattedAmount = resolvedAmount.toLocaleString();
 
     // Check if we have minimum valid receipt parameters
     if (ref || matric || name) {
@@ -54,6 +58,7 @@ const VerifyReceipt = () => {
         const session = localStorage.getItem("nass_student_session");
         if (session) {
           const parsed = JSON.parse(session);
+          const fallbackAmt = resolveStudentDuesPaidAmount(parsed.matric_number, parsed.email, parsed);
           setParams({
             ref: `NASS-VERIFIED-${parsed.matric_number?.slice(-4) || "2026"}`,
             matric: parsed.matric_number || "230303010052",
@@ -61,7 +66,7 @@ const VerifyReceipt = () => {
             dept: parsed.department || "Basic Sciences",
             level: parsed.level || "300L",
             type: "2025/2026 Statutory Session Dues",
-            amount: "2,500",
+            amount: fallbackAmt.toLocaleString(),
             date: new Date().toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" }),
           });
           setIsValid(true);

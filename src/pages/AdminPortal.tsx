@@ -9,6 +9,7 @@ import { BarChart3, Calendar, FileText, Flag, Image, LogOut, Settings, ShieldChe
 import { sendCollegiateEmail, getDispatchedEmails, DispatchedMailLog, getMailerConfigApi, saveMailerConfigApi, sendTestEmailApi, MailerConfigStatus, EmailAttachment } from "@/lib/mailer";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { getStoreProducts, addStoreProduct, updateStoreProduct, deleteStoreProduct, resetStoreProducts, StoreProduct } from "@/lib/store-service";
+import { resolveStudentDuesPaidAmount } from "@/lib/student-auth";
 
 type TabKey = "overview" | "students" | "payments" | "store" | "pastQuestions" | "mailer" | "academics" | "executives" | "events" | "voting";
 
@@ -705,6 +706,7 @@ Secretariat, NASS LASUSTECH`);
       const dept = st.department || "Basic Sciences";
       const lvl = st.level || "100L";
       const date = st.dues_paid_at || st.created_at || new Date().toISOString();
+      const actualDuesAmount = resolveStudentDuesPaidAmount(matric, st.email, st);
 
       list.push({
         id: `pay-dues-${matric}`,
@@ -714,7 +716,7 @@ Secretariat, NASS LASUSTECH`);
         department: dept,
         level: lvl,
         payment_type: "2025/2026 Sessional Dues",
-        amount: 2500,
+        amount: isPaid ? actualDuesAmount : 2500,
         channel: "Korapay Online",
         status: isPaid ? "Paid" : "Pending",
         created_at: date,
@@ -1059,6 +1061,7 @@ Secretariat, NASS LASUSTECH`);
       if (Array.isArray(verifiedList)) {
         verifiedList.forEach((p: any) => {
           const key = (p.email || p.matric_number || "").toLowerCase().trim();
+          const pAmount = typeof p.amount === "number" ? (p.amount > 10000 ? p.amount / 100 : p.amount) : 2500;
           if (key && !studentMap.has(key)) {
             studentMap.set(key, {
               matric_number: p.matric_number,
@@ -1067,8 +1070,16 @@ Secretariat, NASS LASUSTECH`);
               level: p.level,
               email: p.email,
               dues_status: p.status === "Paid" ? "Paid" : "Unpaid",
+              dues_amount: pAmount,
+              amount: pAmount,
               created_at: p.created_at,
             });
+          } else if (key && studentMap.has(key)) {
+            const existing = studentMap.get(key);
+            if (!existing.dues_amount && p.amount) {
+              existing.dues_amount = pAmount;
+              existing.amount = pAmount;
+            }
           }
         });
       }
@@ -1647,6 +1658,7 @@ Secretariat, NASS LASUSTECH`);
                       const matric = student.matric_number || student.matric_no || student.matric || `student-${index}`;
                       const isFresher = student.level === "100L" || matric.startsWith("FSH");
                       const isPaid = student.dues_status?.toLowerCase() === "paid" || localStorage.getItem(`nass_dues_${matric}`) === "Paid";
+                      const paidDuesAmount = resolveStudentDuesPaidAmount(matric, student.email, student);
 
                       return (
                         <div key={matric} className="rounded-2xl border border-border p-4 bg-slate-50/50 hover:bg-slate-50 transition-all">
@@ -1682,7 +1694,7 @@ Secretariat, NASS LASUSTECH`);
 
                             <div className="flex flex-wrap items-center gap-2 shrink-0">
                               <span className={`rounded-full px-2.5 py-0.5 text-xs font-bold border ${isPaid ? "bg-emerald-100 text-emerald-800 border-emerald-300" : "bg-amber-100 text-amber-800 border-amber-300"}`}>
-                                {isPaid ? "✓ Dues Cleared (₦2,500)" : "⏳ Dues Unpaid"}
+                                {isPaid ? `✓ Dues Cleared (₦${paidDuesAmount.toLocaleString()})` : "⏳ Dues Unpaid (₦2,500)"}
                               </span>
 
                               <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${student.activeFlag ? "bg-red-100 text-red-700" : "bg-emerald-50 text-emerald-700"}`}>

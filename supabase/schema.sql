@@ -46,6 +46,7 @@ CREATE TABLE IF NOT EXISTS public.students (
   emergency_contact TEXT,
   dues_status TEXT NOT NULL DEFAULT 'Unpaid', -- 'Paid', 'Unpaid'
   dues_paid_at TIMESTAMPTZ,
+  dues_amount INTEGER DEFAULT 2500,
   id_card_status TEXT NOT NULL DEFAULT 'Not Requested', -- 'Not Requested', 'Pending', 'Issued'
   id_card_issued_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now()),

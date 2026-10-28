@@ -15,6 +15,8 @@ export interface StudentRecord {
   birthday?: string | null;
   dues_status: string; // 'Paid' | 'Unpaid'
   dues_paid_at?: string | null;
+  dues_amount?: number | null;
+  amount?: number | null;
   id_card_status: string; // 'Not Requested' | 'Pending' | 'Issued'
   id_card_issued_at?: string | null;
   created_at?: string;
@@ -117,6 +119,7 @@ export const loginStudent = async (identifier: string, password?: string) => {
           (p.matric_number && normalizeMatric(p.matric_number) === cleanMatric)
         );
         if (found) {
+          const resolvedAmt = (found.amount === 2000 || found.amount === 2500) ? found.amount : (found.dues_amount || 2500);
           student = {
             matric_number: found.matric_number || cleanMatric,
             full_name: (found.student_name || "Science Scholar").trim().toUpperCase(),
@@ -124,6 +127,8 @@ export const loginStudent = async (identifier: string, password?: string) => {
             level: found.level || (isEmail ? "100L" : "200L"),
             email: found.email || cleanEmail,
             dues_status: "Paid",
+            dues_amount: resolvedAmt,
+            amount: resolvedAmt,
             id_card_status: "Issued",
           };
         }
@@ -385,10 +390,107 @@ export const updateStudentProfile = async (
 };
 
 /**
+ * Timestamp when collegiate dues was updated from 2000 to 2500:
+ * Mon Oct 26 21:49:17 2026 +01:00 (1793047757000 ms)
+ */
+export const DUES_PRICE_UPDATE_TIMESTAMP = new Date("2026-10-26T20:49:17.000Z").getTime();
+
+/**
+ * Resolves whether a student paid 2000 or 2500 for collegiate dues.
+ * For students who already paid 2000, it reflects 2000.
+ * For students who paid 2500, it reflects 2500.
+ * For unpaid students or new sessions, the current dues rate is 2500.
+ */
+export const resolveStudentDuesPaidAmount = (
+  matric?: string | null,
+  email?: string | null,
+  fallbackRecord?: any
+): number => {
+  const cleanMatric = matric ? normalizeMatric(matric) : "";
+  const cleanEmail = email ? email.trim().toLowerCase() : "";
+
+  // 1. Direct explicit amount or dues_amount on fallback record
+  if (fallbackRecord) {
+    if (typeof fallbackRecord.dues_amount === "number" && (fallbackRecord.dues_amount === 2000 || fallbackRecord.dues_amount === 2500)) {
+      return fallbackRecord.dues_amount;
+    }
+    if (typeof fallbackRecord.amount === "number") {
+      const amt = fallbackRecord.amount > 10000 ? fallbackRecord.amount / 100 : fallbackRecord.amount;
+      if (amt === 2000 || amt === 2500) {
+        return amt;
+      }
+    }
+  }
+
+  // 2. Specific dues amount saved in localStorage
+  if (cleanMatric) {
+    try {
+      const storedAmt = localStorage.getItem(`nass_dues_amount_${cleanMatric}`);
+      if (storedAmt) {
+        const parsed = Number(storedAmt);
+        if (parsed === 2000 || parsed === 2500) return parsed;
+      }
+    } catch {}
+  }
+
+  // 3. Search verified payments ledger in localStorage
+  try {
+    const listStr = localStorage.getItem("nass_verified_payments");
+    if (listStr) {
+      const list = JSON.parse(listStr);
+      if (Array.isArray(list)) {
+        const found = list.find((p: any) => {
+          const isDues = String(p.payment_type || "").toLowerCase().includes("due");
+          const isPaid = String(p.status || "").toLowerCase() === "paid" || String(p.status || "").toLowerCase() === "success";
+          const matchMatric = cleanMatric && (normalizeMatric(p.matric_number || "") === cleanMatric || String(p.reference || "").includes(cleanMatric));
+          const matchEmail = cleanEmail && p.email && p.email.toLowerCase() === cleanEmail;
+          return isDues && isPaid && (matchMatric || matchEmail);
+        });
+        if (found && typeof found.amount === "number") {
+          const amt = found.amount > 10000 ? found.amount / 100 : found.amount;
+          if (amt === 2000 || amt === 2500) return amt;
+        }
+      }
+    }
+  } catch {}
+
+  // 4. Check active 'user' session in localStorage
+  try {
+    const userStr = localStorage.getItem("user");
+    if (userStr) {
+      const u = JSON.parse(userStr);
+      const isSameUser =
+        (cleanMatric && normalizeMatric(u.matric_no || u.matric_number || "") === cleanMatric) ||
+        (cleanEmail && u.email && u.email.toLowerCase() === cleanEmail);
+      if (isSameUser) {
+        if (u.dues_amount === 2000 || u.dues_amount === 2500) return u.dues_amount;
+        if (u.amount === 2000 || u.amount === 2500) return u.amount;
+      }
+    }
+  } catch {}
+
+  // 5. Check payment timestamp: payments made before Oct 26, 2026 price update are 2000
+  const dateStr = fallbackRecord?.dues_paid_at || fallbackRecord?.paid_at || fallbackRecord?.created_at;
+  if (dateStr) {
+    const t = new Date(dateStr).getTime();
+    if (!isNaN(t) && t < DUES_PRICE_UPDATE_TIMESTAMP) {
+      return 2000;
+    }
+  }
+
+  return 2500;
+};
+
+/**
  * Helper to sync session into localStorage for Navbar & global state
  */
 export const saveStudentSession = (student: StudentRecord) => {
   const cleanName = student.full_name ? student.full_name.trim().toUpperCase() : "";
+  const isPaid = String(student.dues_status || "").toLowerCase() === "paid";
+  const resolvedAmount = isPaid
+    ? resolveStudentDuesPaidAmount(student.matric_number, student.email, student)
+    : 2500;
+
   localStorage.removeItem("dashboard_data");
   localStorage.removeItem("token");
   try {
@@ -397,6 +499,10 @@ export const saveStudentSession = (student: StudentRecord) => {
   } catch (e) {}
   localStorage.setItem("isLoggedIn", "true");
   localStorage.setItem("student_matric", student.matric_number);
+  if (isPaid) {
+    localStorage.setItem(`nass_dues_${student.matric_number}`, "Paid");
+    localStorage.setItem(`nass_dues_amount_${student.matric_number}`, String(resolvedAmount));
+  }
   localStorage.setItem(
     "user",
     JSON.stringify({
@@ -409,6 +515,7 @@ export const saveStudentSession = (student: StudentRecord) => {
       email: student.email || "",
       phone: student.phone || "",
       dues_status: student.dues_status || "Unpaid",
+      dues_amount: resolvedAmount,
       id_card_status: student.id_card_status || "Not Requested",
       role: "student",
       post: student.department ? `${student.department} Scholar` : "Science Student",
@@ -457,6 +564,7 @@ export const markDuesPaid = async (params: {
   localStorage.setItem("isLoggedIn", "true");
   localStorage.setItem("student_matric", cleanMatric);
   localStorage.setItem(`nass_dues_${cleanMatric}`, "Paid");
+  localStorage.setItem(`nass_dues_amount_${cleanMatric}`, String(duesAmount));
 
   // 2. Add confirmed payment record to verified list
   try {
@@ -506,6 +614,7 @@ export const markDuesPaid = async (params: {
       if (cleanEmail) u.email = cleanEmail;
     }
     u.dues_status = "Paid";
+    u.dues_amount = duesAmount;
     u.id_card_status = "Ready";
     localStorage.setItem("user", JSON.stringify(u));
     window.dispatchEvent(new Event("storage"));
@@ -519,10 +628,21 @@ export const markDuesPaid = async (params: {
         .update({
           dues_status: "Paid",
           dues_paid_at: new Date().toISOString(),
+          dues_amount: duesAmount,
         })
         .ilike("matric_number", cleanMatric);
     } catch (e) {
-      console.warn("Supabase dues status update error:", e);
+      try {
+        await supabase
+          .from("students")
+          .update({
+            dues_status: "Paid",
+            dues_paid_at: new Date().toISOString(),
+          })
+          .ilike("matric_number", cleanMatric);
+      } catch (fallbackErr) {
+        console.warn("Supabase dues status update error:", fallbackErr);
+      }
     }
   }
 };
