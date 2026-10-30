@@ -35,7 +35,7 @@ import {
   saveStudentSession,
   COLLEGE_DEPARTMENTS,
 } from "@/lib/student-auth";
-import { triggerKorapayCheckout, isKorapayTestMode } from "@/lib/korapay";
+import { triggerKorapayCheckout, isKorapayTestMode, NASS_PRESIDENT_WHATSAPP_URL } from "@/lib/korapay";
 import { downloadElementAsPdf } from "@/lib/pdf-service";
 import { sendDuesReceiptEmail } from "@/lib/mailer";
 import nassLogo from "@/assets/nass_logo.png";
@@ -322,7 +322,21 @@ const LoginModal = ({ open, onClose, redirectTab, initialMode }: LoginModalProps
           setIsKorapayActive(false);
           toast({
             title: "Payment Incomplete",
-            description: err?.message || "Payment attempt was unsuccessful.",
+            description: (
+              <div className="space-y-2">
+                <p>{err?.message || "Payment attempt was unsuccessful."}</p>
+                {err?.whatsappUrl && (
+                  <a
+                    href={err.whatsappUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-white px-3 py-1.5 text-xs font-bold text-emerald-700 shadow-xs hover:bg-emerald-50"
+                  >
+                    Chat NASS President on WhatsApp (08102306949)
+                  </a>
+                )}
+              </div>
+            ),
             variant: "destructive",
           });
         },

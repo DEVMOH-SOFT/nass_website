@@ -44,11 +44,19 @@ const BLOCKED_KORAPAY_KEYS = new Set<string>([
 const isUsableKorapayKey = (key: string) =>
   !!key && !BLOCKED_KORAPAY_KEYS.has(key) && !key.toUpperCase().includes("REPLACE") && !key.includes("your_");
 
+export const NASS_PRESIDENT_WHATSAPP_URL =
+  "https://wa.me/2348102306949?text=Hello%20NASS%20President%2C%20I%20would%20like%20assistance%20with%20my%20NASS%20payment.";
+
+export const KORAPAY_UNAVAILABLE_MESSAGE =
+  "Online payment is temporarily unavailable. Please contact the NASS President on WhatsApp (08102306949): https://wa.me/2348102306949";
+
 // Determine active public key (Live production by default). Returns "" when no valid NASS key is configured.
 export const getKorapayPublicKey = (isTest = false) => {
   const key = (isTest || isKorapayTestMode()) ? KORAPAY_TEST_PUBLIC_KEY : KORAPAY_LIVE_PUBLIC_KEY;
   return isUsableKorapayKey(key) ? key : "";
 };
+
+export const isKorapayConfigured = (isTest = false) => Boolean(getKorapayPublicKey(isTest));
 
 declare global {
   interface Window {
@@ -146,7 +154,10 @@ export const triggerKorapayCheckout = async (options: {
       "[Korapay Gateway] No NASS Korapay public key configured. Set VITE_KORAPAY_PUBLIC_KEY to the NASS LASUSTECH merchant key."
     );
     if (options.onFailed) {
-      options.onFailed({ message: "Online payment is temporarily unavailable. Please contact the NASS Treasurer." });
+      options.onFailed({
+        message: KORAPAY_UNAVAILABLE_MESSAGE,
+        whatsappUrl: NASS_PRESIDENT_WHATSAPP_URL,
+      });
     }
     return true; // handled: onFailed already informed the user
   }

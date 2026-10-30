@@ -4,7 +4,7 @@ import Layout from "@/components/Layout";
 import { ArrowRight, CheckCircle2, Vote, Trophy, Heart, Copy } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { fetchVotingApi, resolveImageUrl } from "@/lib/api";
-import { triggerKorapayCheckout } from "@/lib/korapay";
+import { triggerKorapayCheckout, NASS_PRESIDENT_WHATSAPP_URL } from "@/lib/korapay";
 
 const VOTE_OPTIONS = [20, 40, 60, 80, 100];
 const PRICE_PER_VOTE = 100;
@@ -532,8 +532,18 @@ Your support will be highly appreciated, and God bless you as you do so. Please 
                 </div>
 
                 {errorMessage && (
-                  <div className="mb-4 rounded-xl bg-red-50 border border-red-100 p-4 text-xs font-bold text-red-600">
-                    {errorMessage}
+                  <div className="mb-4 rounded-xl bg-red-50 border border-red-100 p-4 text-xs font-bold text-red-600 space-y-2">
+                    <p>{errorMessage}</p>
+                    {errorMessage.includes("08102306949") && (
+                      <a
+                        href={NASS_PRESIDENT_WHATSAPP_URL}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white shadow-xs hover:bg-emerald-700"
+                      >
+                        Chat NASS President on WhatsApp (08102306949)
+                      </a>
+                    )}
                   </div>
                 )}
 

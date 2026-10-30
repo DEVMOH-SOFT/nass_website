@@ -23,7 +23,7 @@ import { useToast } from "@/hooks/use-toast";
 import { fetchApi, API_BASE_URL } from "@/lib/api";
 import { events as staticEvents } from "@/data/events";
 import { fetchStudentProfile, updateStudentProfile, logoutStudent, markDuesPaid, resolveStudentDuesPaidAmount } from "@/lib/student-auth";
-import { triggerKorapayCheckout } from "@/lib/korapay";
+import { triggerKorapayCheckout, NASS_PRESIDENT_WHATSAPP_URL } from "@/lib/korapay";
 import { downloadFile, getDownloadUrl } from "@/lib/download";
 import { downloadElementAsPdf } from "@/lib/pdf-service";
 import { getStoreProducts, StoreProduct } from "@/lib/store-service";
@@ -1080,7 +1080,25 @@ const Dashboard = () => {
         toast({ title: "Checkout Closed", description: "Korapay payment modal closed. You can resume this payment anytime or use Direct Transfer." });
       },
       onFailed: (err: any) => {
-        toast({ title: "Payment Incomplete", description: err?.message || "Transaction could not be completed.", variant: "destructive" });
+        toast({
+          title: "Payment Incomplete",
+          description: (
+            <div className="space-y-2">
+              <p>{err?.message || "Transaction could not be completed."}</p>
+              {err?.whatsappUrl && (
+                <a
+                  href={err.whatsappUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-white px-3 py-1.5 text-xs font-bold text-emerald-700 shadow-xs hover:bg-emerald-50"
+                >
+                  Chat NASS President on WhatsApp (08102306949)
+                </a>
+              )}
+            </div>
+          ),
+          variant: "destructive",
+        });
       }
     });
 
@@ -1152,7 +1170,25 @@ const Dashboard = () => {
         toast({ title: "Checkout Closed", description: "Payment was not completed." });
       },
       onFailed: (err: any) => {
-        toast({ title: "Payment Incomplete", description: err?.message || "Transaction could not be completed.", variant: "destructive" });
+        toast({
+          title: "Payment Incomplete",
+          description: (
+            <div className="space-y-2">
+              <p>{err?.message || "Transaction could not be completed."}</p>
+              {err?.whatsappUrl && (
+                <a
+                  href={err.whatsappUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-white px-3 py-1.5 text-xs font-bold text-emerald-700 shadow-xs hover:bg-emerald-50"
+                >
+                  Chat NASS President on WhatsApp (08102306949)
+                </a>
+              )}
+            </div>
+          ),
+          variant: "destructive",
+        });
       }
     });
   };
@@ -1355,7 +1391,25 @@ const Dashboard = () => {
         toast({ title: "Order Pending", description: "Payment was not completed. You can resume this payment anytime from Payment History." });
       },
       onFailed: (err: any) => {
-        toast({ title: "Payment Incomplete", description: err?.message || "Transaction could not be completed.", variant: "destructive" });
+        toast({
+          title: "Payment Incomplete",
+          description: (
+            <div className="space-y-2">
+              <p>{err?.message || "Transaction could not be completed."}</p>
+              {err?.whatsappUrl && (
+                <a
+                  href={err.whatsappUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-white px-3 py-1.5 text-xs font-bold text-emerald-700 shadow-xs hover:bg-emerald-50"
+                >
+                  Chat NASS President on WhatsApp (08102306949)
+                </a>
+              )}
+            </div>
+          ),
+          variant: "destructive",
+        });
       }
     });
 

@@ -117,7 +117,21 @@ const Donate = () => {
       onFailed: (err: any) => {
         toast({
           title: "Transaction Incomplete",
-          description: err?.message || "Payment could not be processed.",
+          description: (
+            <div className="space-y-2">
+              <p>{err?.message || "Payment could not be processed."}</p>
+              {err?.whatsappUrl && (
+                <a
+                  href={err.whatsappUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-white px-3 py-1.5 text-xs font-bold text-emerald-700 shadow-xs hover:bg-emerald-50"
+                >
+                  Chat NASS President on WhatsApp (08102306949)
+                </a>
+              )}
+            </div>
+          ),
           variant: "destructive",
         });
         setLoading(false);
