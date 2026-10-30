@@ -103,11 +103,8 @@ const LoginModal = ({ open, onClose, redirectTab, initialMode }: LoginModalProps
   const [showPassword, setShowPassword] = useState(false);
   const [loginLoading, setLoginLoading] = useState(false);
 
-  // Phase 2 Payment Method & Korapay Pointer-Lock Management
+  // Phase 2 Korapay Pointer-Lock Management
   const [isKorapayActive, setIsKorapayActive] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState<"korapay" | "transfer">("korapay");
-  const [copiedAccount, setCopiedAccount] = useState(false);
-  const [transferRefInput, setTransferRefInput] = useState("");
 
   useEffect(() => {
     if (initialMode) {
@@ -361,19 +358,6 @@ const LoginModal = ({ open, onClose, redirectTab, initialMode }: LoginModalProps
       setSubmitting(false);
       setLoadingStatus("");
     }
-  };
-
-  const handleCopyAccount = (acc: string) => {
-    navigator.clipboard.writeText(acc);
-    setCopiedAccount(true);
-    toast({ title: "Account Copied", description: "Wema Bank account number copied to clipboard." });
-    setTimeout(() => setCopiedAccount(false), 2000);
-  };
-
-  const handleConfirmDirectTransfer = async () => {
-    if (!registeredStudent) return;
-    const ref = transferRefInput.trim() || `NASS-TRF-${Date.now().toString().slice(-6)}`;
-    await completeSuccessfulPayment(ref);
   };
 
   // ─────────────────────────────────────────────────────────────
@@ -800,160 +784,59 @@ const LoginModal = ({ open, onClose, redirectTab, initialMode }: LoginModalProps
                       </div>
                     </div>
 
-                    {/* Method Selector Tabs */}
-                    <div className="grid grid-cols-2 p-1 bg-slate-200/70 dark:bg-slate-800/80 rounded-xl text-xs font-bold gap-1">
-                      <button
-                        type="button"
-                        onClick={() => setPaymentMethod("korapay")}
-                        className={`py-1.5 px-2 rounded-lg transition-all flex items-center justify-center gap-1.5 ${
-                          paymentMethod === "korapay"
-                            ? "bg-emerald-700 text-white shadow-xs"
-                            : "text-slate-600 dark:text-slate-300 hover:text-slate-900"
-                        }`}
+                    {/* Korapay Online Checkout */}
+                    <div className="space-y-3">
+                      <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                        Pay securely via Debit Card, Bank Transfer, or USSD through Korapay Gateway. Your student portal activates immediately upon completion.
+                      </p>
+
+                      <Button
+                        onClick={handleInitiateDuesPayment}
+                        disabled={submitting}
+                        className="w-full h-11 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-md transition-all active:scale-[0.98] flex items-center justify-center gap-2"
                       >
-                        <CreditCard className="h-3.5 w-3.5" />
-                        <span>Online Gateway (Korapay)</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => setPaymentMethod("transfer")}
-                        className={`py-1.5 px-2 rounded-lg transition-all flex items-center justify-center gap-1.5 ${
-                          paymentMethod === "transfer"
-                            ? "bg-emerald-700 text-white shadow-xs"
-                            : "text-slate-600 dark:text-slate-300 hover:text-slate-900"
-                        }`}
-                      >
-                        <Building className="h-3.5 w-3.5" />
-                        <span>Bank Transfer</span>
-                      </button>
-                    </div>
-
-                    {/* METHOD 1: Korapay Online */}
-                    {paymentMethod === "korapay" && (
-                      <div className="space-y-3">
-                        <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                          Pay securely via Debit Card, Bank Transfer, or USSD through Korapay Gateway. Your student portal activates immediately upon completion.
-                        </p>
-
-                        <Button
-                          onClick={handleInitiateDuesPayment}
-                          disabled={submitting}
-                          className="w-full h-11 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-md transition-all active:scale-[0.98] flex items-center justify-center gap-2"
-                        >
-                          {submitting ? (
-                            <>
-                              <Loader2 className="h-4 w-4 animate-spin" />
-                              <span>{loadingStatus || "Connecting to Payment Gateway..."}</span>
-                            </>
-                          ) : (
-                            <>
-                              <CreditCard className="h-4 w-4" />
-                              <span>Pay ₦2,500 via Korapay</span>
-                              <ArrowRight className="h-4 w-4 ml-auto" />
-                            </>
-                          )}
-                        </Button>
-
-                        {/* Korapay Sandbox Test Mode Helper & Simulator */}
-                        {isKorapayTestMode() && (
-                          <div className="rounded-xl border border-dashed border-amber-500/60 bg-amber-50/80 dark:bg-amber-950/30 p-2.5 space-y-2 text-left">
-                            <div className="flex items-center justify-between">
-                              <span className="text-[10px] font-black uppercase tracking-wider text-amber-900 dark:text-amber-300 flex items-center gap-1.5">
-                                <span className="h-2 w-2 rounded-full bg-amber-500 animate-ping" />
-                                Korapay Sandbox Test Environment
-                              </span>
-                              <span className="text-[9px] font-mono text-amber-800 bg-amber-200/70 dark:bg-amber-900/60 px-2 py-0.5 rounded font-black">
-                                ACTIVE
-                              </span>
-                            </div>
-                            <p className="text-[10px] text-amber-950 dark:text-amber-200 leading-snug">
-                              <strong>Card:</strong> <span className="font-mono font-bold bg-white dark:bg-slate-800 px-1 py-0.5 rounded">4084 0841 1111 1111</span> • <strong>Exp:</strong> 12/30 • <strong>CVV:</strong> 123 • <strong>PIN:</strong> 1111
-                            </p>
-                            <Button
-                              type="button"
-                              variant="outline"
-                              onClick={() => completeSuccessfulPayment(`KORA-SANDBOX-${Date.now().toString().slice(-6)}`)}
-                              disabled={submitting}
-                              className="w-full h-8 text-[10.5px] font-bold border-amber-600/40 text-amber-950 dark:text-amber-200 hover:bg-amber-100/70 rounded-lg gap-1.5"
-                            >
-                              <Zap className="h-3.5 w-3.5 text-amber-600" />
-                              <span>⚡ Instant Sandbox Test Clearance</span>
-                            </Button>
-                          </div>
+                        {submitting ? (
+                          <>
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            <span>{loadingStatus || "Connecting to Payment Gateway..."}</span>
+                          </>
+                        ) : (
+                          <>
+                            <CreditCard className="h-4 w-4" />
+                            <span>Pay ₦2,500 via Korapay</span>
+                            <ArrowRight className="h-4 w-4 ml-auto" />
+                          </>
                         )}
-                      </div>
-                    )}
+                      </Button>
 
-                    {/* METHOD 2: Direct Bank Transfer */}
-                    {paymentMethod === "transfer" && (
-                      <div className="space-y-3 text-left">
-                        <div className="rounded-xl bg-white dark:bg-slate-900 border border-emerald-200/80 dark:border-slate-700 p-3 space-y-2 text-xs">
+                      {/* Korapay Sandbox Test Mode Helper & Simulator */}
+                      {isKorapayTestMode() && (
+                        <div className="rounded-xl border border-dashed border-amber-500/60 bg-amber-50/80 dark:bg-amber-950/30 p-2.5 space-y-2 text-left">
                           <div className="flex items-center justify-between">
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
-                              Official Association Bank
+                            <span className="text-[10px] font-black uppercase tracking-wider text-amber-900 dark:text-amber-300 flex items-center gap-1.5">
+                              <span className="h-2 w-2 rounded-full bg-amber-500 animate-ping" />
+                              Korapay Sandbox Test Environment
                             </span>
-                            <span className="text-[10px] font-bold uppercase text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">
-                              Wema Bank
+                            <span className="text-[9px] font-mono text-amber-800 bg-amber-200/70 dark:bg-amber-900/60 px-2 py-0.5 rounded font-black">
+                              ACTIVE
                             </span>
                           </div>
-
-                          <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-800/60 p-2 rounded-lg border border-slate-200/60 dark:border-slate-700">
-                            <div>
-                              <p className="text-[9px] uppercase font-bold text-slate-500">Account Number</p>
-                              <p className="font-mono text-base font-extrabold text-slate-900 dark:text-white tracking-wider">
-                                0124967382
-                              </p>
-                            </div>
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleCopyAccount("0124967382")}
-                              className="h-8 gap-1.5 text-xs font-bold"
-                            >
-                              {copiedAccount ? <Check className="h-3.5 w-3.5 text-emerald-600" /> : <Copy className="h-3.5 w-3.5" />}
-                              <span>{copiedAccount ? "Copied" : "Copy"}</span>
-                            </Button>
-                          </div>
-
-                          <div className="text-[10.5px] text-slate-600 dark:text-slate-300">
-                            <p><strong>Account Name:</strong> NASS LASUSTECH BASIC SCIENCES</p>
-                            <p className="mt-0.5"><strong>Amount:</strong> ₦2,500</p>
-                          </div>
+                          <p className="text-[10px] text-amber-950 dark:text-amber-200 leading-snug">
+                            <strong>Card:</strong> <span className="font-mono font-bold bg-white dark:bg-slate-800 px-1 py-0.5 rounded">4084 0841 1111 1111</span> • <strong>Exp:</strong> 12/30 • <strong>CVV:</strong> 123 • <strong>PIN:</strong> 1111
+                          </p>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => completeSuccessfulPayment(`KORA-SANDBOX-${Date.now().toString().slice(-6)}`)}
+                            disabled={submitting}
+                            className="w-full h-8 text-[10.5px] font-bold border-amber-600/40 text-amber-950 dark:text-amber-200 hover:bg-amber-100/70 rounded-lg gap-1.5"
+                          >
+                            <Zap className="h-3.5 w-3.5 text-amber-600" />
+                            <span>⚡ Instant Sandbox Test Clearance</span>
+                          </Button>
                         </div>
-
-                        <div className="space-y-1.5">
-                          <label className="text-[10.5px] font-bold text-slate-700 dark:text-slate-300">
-                            Transfer Reference / Depositor Name (Optional)
-                          </label>
-                          <Input
-                            placeholder="e.g. Sender Name or Ref"
-                            value={transferRefInput}
-                            onChange={(e) => setTransferRefInput(e.target.value)}
-                            className="h-9 text-xs rounded-xl"
-                          />
-                        </div>
-
-                        <Button
-                          onClick={handleConfirmDirectTransfer}
-                          disabled={submitting}
-                          className="w-full h-11 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-md gap-2"
-                        >
-                          {submitting ? (
-                            <>
-                              <Loader2 className="h-4 w-4 animate-spin" />
-                              <span>Confirming Clearance...</span>
-                            </>
-                          ) : (
-                            <>
-                              <CheckCircle2 className="h-4 w-4" />
-                              <span>I Have Paid ₦2,500 via Transfer (Verify & Activate)</span>
-                            </>
-                          )}
-                        </Button>
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </div>
 
                   <div className="flex items-center justify-between pt-0.5">

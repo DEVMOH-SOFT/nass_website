@@ -1077,7 +1077,7 @@ const Dashboard = () => {
         handleDirectDuesClearance("Korapay Online");
       },
       onClose: () => {
-        toast({ title: "Checkout Closed", description: "Korapay payment modal closed. You can resume this payment anytime or use Direct Transfer." });
+        toast({ title: "Checkout Closed", description: "Korapay payment modal closed. You can resume this payment anytime." });
       },
       onFailed: (err: any) => {
         toast({
@@ -1105,7 +1105,7 @@ const Dashboard = () => {
     if (!opened) {
       toast({ 
         title: "Gateway Inline Blocked", 
-        description: "Browser blocked the payment popup. You can click 'Direct Bank Transfer / Instant Receipt Verification' to complete clearance.", 
+        description: "Browser blocked the payment popup. Please enable popups or contact the NASS President on WhatsApp (08102306949).",  
         variant: "destructive" 
       });
     }
