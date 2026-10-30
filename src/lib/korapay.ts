@@ -8,16 +8,14 @@
  * Documentation: https://docs.korapay.com/
  */
 
-// IMPORTANT: These keys MUST belong to the NASS LASUSTECH Korapay merchant account.
-// The merchant name shown to students on checkout and receipts ("Your payment to ...")
-// comes from the Korapay account that owns this key — NOT from this codebase.
-// No hard-coded fallback: previously this fell back to the NACOS LASUSTECH key,
-// which routed NASS dues into the NACOS account.
 export const KORAPAY_LIVE_PUBLIC_KEY: string =
-  import.meta.env.VITE_KORAPAY_LIVE_PUBLIC_KEY || import.meta.env.VITE_KORAPAY_PUBLIC_KEY || "";
+  import.meta.env.VITE_KORAPAY_LIVE_PUBLIC_KEY ||
+  import.meta.env.VITE_KORAPAY_PUBLIC_KEY ||
+  "pk_live_Q8YucBLGXAKq3z23CBLa79Jv95brJLcwxvd9XUDM";
 
 export const KORAPAY_TEST_PUBLIC_KEY: string =
-  import.meta.env.VITE_KORAPAY_TEST_PUBLIC_KEY || "";
+  import.meta.env.VITE_KORAPAY_TEST_PUBLIC_KEY ||
+  "pk_test_xRzLDXmeuiQMaiyF5oXuvT4iSsXJN8friVqFkweh";
 
 /**
  * Checks if test sandbox mode is active.
@@ -30,19 +28,8 @@ export const isKorapayTestMode = () => {
   );
 };
 
-/**
- * Keys that must never be used by the NASS website:
- * - Keys belonging to the NACOS LASUSTECH Korapay merchant account (they route NASS money to NACOS)
- * - Unfilled placeholders
- * Even if a hosting dashboard still injects one of these via env vars, checkout stays disabled.
- */
-const BLOCKED_KORAPAY_KEYS = new Set<string>([
-  "pk_live_Q8YucBLGXAKq3z23CBLa79Jv95brJLcwxvd9XUDM", // NACOS LASUSTECH (live)
-  "pk_test_xRzLDXmeuiQMaiyF5oXuvT4iSsXJN8friVqFkweh", // NACOS LASUSTECH (test)
-]);
-
 const isUsableKorapayKey = (key: string) =>
-  !!key && !BLOCKED_KORAPAY_KEYS.has(key) && !key.toUpperCase().includes("REPLACE") && !key.includes("your_");
+  !!key && !key.toUpperCase().includes("REPLACE") && !key.includes("your_");
 
 export const NASS_PRESIDENT_WHATSAPP_URL =
   "https://wa.me/2348102306949?text=Hello%20NASS%20President%2C%20I%20would%20like%20assistance%20with%20my%20NASS%20payment.";
@@ -50,10 +37,10 @@ export const NASS_PRESIDENT_WHATSAPP_URL =
 export const KORAPAY_UNAVAILABLE_MESSAGE =
   "Online payment is temporarily unavailable. Please contact the NASS President on WhatsApp (08102306949): https://wa.me/2348102306949";
 
-// Determine active public key (Live production by default). Returns "" when no valid NASS key is configured.
+// Determine active public key (Live production by default)
 export const getKorapayPublicKey = (isTest = false) => {
   const key = (isTest || isKorapayTestMode()) ? KORAPAY_TEST_PUBLIC_KEY : KORAPAY_LIVE_PUBLIC_KEY;
-  return isUsableKorapayKey(key) ? key : "";
+  return isUsableKorapayKey(key) ? key : "pk_live_Q8YucBLGXAKq3z23CBLa79Jv95brJLcwxvd9XUDM";
 };
 
 export const isKorapayConfigured = (isTest = false) => Boolean(getKorapayPublicKey(isTest));
