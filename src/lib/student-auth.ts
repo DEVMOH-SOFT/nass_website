@@ -620,30 +620,33 @@ export const markDuesPaid = async (params: {
     window.dispatchEvent(new Event("storage"));
   } catch (e) {}
 
-  // 4. Update Supabase record
-  if (isSupabaseConfigured && cleanMatric) {
-    try {
-      await supabase
-        .from("students")
-        .update({
-          dues_status: "Paid",
-          dues_paid_at: new Date().toISOString(),
-          dues_amount: duesAmount,
-        })
-        .ilike("matric_number", cleanMatric);
-    } catch (e) {
-      try {
-        await supabase
-          .from("students")
-          .update({
-            dues_status: "Paid",
-            dues_paid_at: new Date().toISOString(),
-          })
-          .ilike("matric_number", cleanMatric);
-      } catch (fallbackErr) {
-        console.warn("Supabase dues status update error:", fallbackErr);
-      }
-    }
+  // 4. Update Supabase record.
+  // supabase-js reports failures through `error` and does not throw, so each attempt is checked.
+  // The second attempt omits dues_amount for databases that have not added that column yet.
+  if (!isSupabaseConfigured || !cleanMatric) return false;
+
+  const paidAt = new Date().toISOString();
+  const attempts = [
+    { dues_status: "Paid", dues_paid_at: paidAt, dues_amount: duesAmount },
+    { dues_status: "Paid", dues_paid_at: paidAt },
+  ];
+
+  for (const changes of attempts) {
+    const { data, error } = await supabase
+      .from("students")
+      .update(changes)
+      .ilike("matric_number", cleanMatric)
+      .select("matric_number");
+
+    if (!error && data && data.length > 0) return true;
+
+    console.error(
+      error
+        ? `Supabase dues update failed: ${error.message}`
+        : `Supabase dues update matched no student for ${cleanMatric}`
+    );
   }
+
+  return false;
 };
 
