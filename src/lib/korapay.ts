@@ -8,11 +8,16 @@
  * Documentation: https://docs.korapay.com/
  */
 
-export const KORAPAY_LIVE_PUBLIC_KEY = 
-  import.meta.env.VITE_KORAPAY_LIVE_PUBLIC_KEY || import.meta.env.VITE_KORAPAY_PUBLIC_KEY || "pk_live_Q8YucBLGXAKq3z23CBLa79Jv95brJLcwxvd9XUDM";
+// IMPORTANT: These keys MUST belong to the NASS LASUSTECH Korapay merchant account.
+// The merchant name shown to students on checkout and receipts ("Your payment to ...")
+// comes from the Korapay account that owns this key — NOT from this codebase.
+// No hard-coded fallback: previously this fell back to the NACOS LASUSTECH key,
+// which routed NASS dues into the NACOS account.
+export const KORAPAY_LIVE_PUBLIC_KEY: string =
+  import.meta.env.VITE_KORAPAY_LIVE_PUBLIC_KEY || import.meta.env.VITE_KORAPAY_PUBLIC_KEY || "";
 
-export const KORAPAY_TEST_PUBLIC_KEY = 
-  import.meta.env.VITE_KORAPAY_TEST_PUBLIC_KEY || "pk_test_xRzLDXmeuiQMaiyF5oXuvT4iSsXJN8friVqFkweh";
+export const KORAPAY_TEST_PUBLIC_KEY: string =
+  import.meta.env.VITE_KORAPAY_TEST_PUBLIC_KEY || "";
 
 /**
  * Checks if test sandbox mode is active.
@@ -25,9 +30,24 @@ export const isKorapayTestMode = () => {
   );
 };
 
-// Determine active public key (Live production by default)
+/**
+ * Keys that must never be used by the NASS website:
+ * - Keys belonging to the NACOS LASUSTECH Korapay merchant account (they route NASS money to NACOS)
+ * - Unfilled placeholders
+ * Even if a hosting dashboard still injects one of these via env vars, checkout stays disabled.
+ */
+const BLOCKED_KORAPAY_KEYS = new Set<string>([
+  "pk_live_Q8YucBLGXAKq3z23CBLa79Jv95brJLcwxvd9XUDM", // NACOS LASUSTECH (live)
+  "pk_test_xRzLDXmeuiQMaiyF5oXuvT4iSsXJN8friVqFkweh", // NACOS LASUSTECH (test)
+]);
+
+const isUsableKorapayKey = (key: string) =>
+  !!key && !BLOCKED_KORAPAY_KEYS.has(key) && !key.toUpperCase().includes("REPLACE") && !key.includes("your_");
+
+// Determine active public key (Live production by default). Returns "" when no valid NASS key is configured.
 export const getKorapayPublicKey = (isTest = false) => {
-  return (isTest || isKorapayTestMode()) ? KORAPAY_TEST_PUBLIC_KEY : KORAPAY_LIVE_PUBLIC_KEY;
+  const key = (isTest || isKorapayTestMode()) ? KORAPAY_TEST_PUBLIC_KEY : KORAPAY_LIVE_PUBLIC_KEY;
+  return isUsableKorapayKey(key) ? key : "";
 };
 
 declare global {
@@ -120,8 +140,18 @@ export const triggerKorapayCheckout = async (options: {
   onClose?: () => void;
   onFailed?: (res: any) => void;
 }): Promise<boolean> => {
-  const loaded = await loadKorapayScript();
   const publicKey = getKorapayPublicKey(options.isTest);
+  if (!publicKey) {
+    console.error(
+      "[Korapay Gateway] No NASS Korapay public key configured. Set VITE_KORAPAY_PUBLIC_KEY to the NASS LASUSTECH merchant key."
+    );
+    if (options.onFailed) {
+      options.onFailed({ message: "Online payment is temporarily unavailable. Please contact the NASS Treasurer." });
+    }
+    return true; // handled: onFailed already informed the user
+  }
+
+  const loaded = await loadKorapayScript();
 
   console.info(
     `[Korapay Gateway] Launching checkout in ${isKorapayTestMode() ? "TEST (Sandbox)" : "LIVE"} mode. ` +
