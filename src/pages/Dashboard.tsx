@@ -721,8 +721,17 @@ const Dashboard = () => {
           try {
             const list = JSON.parse(localStorage.getItem("nass_verified_payments") || "[]");
             if (!Array.isArray(list)) return [];
-            const onlyPaid = list.filter((p: any) => String(p?.status || "").toLowerCase() === "paid");
-            if (onlyPaid.length !== list.length) {
+            let changed = false;
+            const onlyPaid = list
+              .filter((p: any) => String(p?.status || "").toLowerCase() === "paid")
+              .map((p: any) => {
+                if (typeof p?.payment_type === "string" && p.payment_type.includes("2025/2026")) {
+                  changed = true;
+                  return { ...p, payment_type: p.payment_type.replace(/2025\/2026/g, "2026/2027") };
+                }
+                return p;
+              });
+            if (onlyPaid.length !== list.length || changed) {
               localStorage.setItem("nass_verified_payments", JSON.stringify(onlyPaid));
             }
             return onlyPaid;
@@ -4691,7 +4700,7 @@ const Dashboard = () => {
                           OFFICIAL PURPOSE OF PAYMENT
                         </p>
                         <h1 className="text-base sm:text-2xl md:text-3xl font-serif font-black uppercase tracking-tight text-white mt-1 leading-snug break-words">
-                          {activeReceipt.payment_type ? activeReceipt.payment_type.replace(/_/g, ' ') : "COLLEGE OF BASIC SCIENCES ANNUAL DUES"}
+                          {activeReceipt.payment_type ? activeReceipt.payment_type.replace(/_/g, ' ').replace(/2025\/2026/g, '2026/2027') : "COLLEGE OF BASIC SCIENCES ANNUAL DUES"}
                         </h1>
                         <div className="mt-1.5 sm:mt-2 inline-flex items-center gap-1.5 sm:gap-2 bg-white/10 px-2.5 sm:px-3.5 py-0.5 sm:py-1 rounded-full border border-white/20">
                           <span className="text-[9px] sm:text-[10px] uppercase tracking-wider text-emerald-200 font-bold">TOTAL VERIFIED:</span>
@@ -4747,7 +4756,7 @@ const Dashboard = () => {
                         <div className="grid grid-cols-[100px_1fr] sm:grid-cols-[135px_1fr] p-2.5 sm:p-3 bg-amber-50/60 border-y border-amber-200 items-center">
                           <span className="font-black text-amber-950 uppercase text-[8.5px] sm:text-[9.5px]">Item / Purpose:</span>
                           <span className="font-black text-xs sm:text-base text-slate-900 uppercase font-serif break-words">
-                            {activeReceipt.payment_type || "2026/2027 SESSION DUES"}
+                            {(activeReceipt.payment_type || "2026/2027 SESSION DUES").replace(/2025\/2026/g, "2026/2027")}
                           </span>
                         </div>
 

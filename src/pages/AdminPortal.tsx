@@ -688,7 +688,13 @@ Secretariat, NASS LASUSTECH`);
     try {
       const verified = JSON.parse(localStorage.getItem("nass_verified_payments") || "[]");
       if (Array.isArray(verified)) {
-        const onlyPaid = verified.filter((p) => String(p?.status || "").toLowerCase() === "paid");
+        const onlyPaid = verified
+          .filter((p) => String(p?.status || "").toLowerCase() === "paid")
+          .map((p) =>
+            typeof p?.payment_type === "string" && p.payment_type.includes("2025/2026")
+              ? { ...p, payment_type: p.payment_type.replace(/2025\/2026/g, "2026/2027") }
+              : p
+          );
         if (onlyPaid.length !== verified.length) {
           localStorage.setItem("nass_verified_payments", JSON.stringify(onlyPaid));
         }

@@ -30,7 +30,7 @@ const VerifyReceipt = () => {
     const name = searchParams.get("name") || "";
     const dept = searchParams.get("dept") || "";
     const level = searchParams.get("level") || "";
-    const type = searchParams.get("type") || "2026/2027 Statutory Session Dues";
+    const type = (searchParams.get("type") || "2026/2027 Statutory Session Dues").replace(/2025\/2026/g, "2026/2027");
     const rawAmount = searchParams.get("amount");
     const date = searchParams.get("date") || "";
 
