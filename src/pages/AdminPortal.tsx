@@ -9,7 +9,7 @@ import { BarChart3, Calendar, FileText, Flag, Image, LogOut, Settings, ShieldChe
 import { sendCollegiateEmail, getDispatchedEmails, DispatchedMailLog, getMailerConfigApi, saveMailerConfigApi, sendTestEmailApi, MailerConfigStatus, EmailAttachment } from "@/lib/mailer";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { getStoreProducts, addStoreProduct, updateStoreProduct, deleteStoreProduct, resetStoreProducts, StoreProduct } from "@/lib/store-service";
-import { resolveStudentDuesPaidAmount, markDuesPaid } from "@/lib/student-auth";
+import { resolveStudentDuesPaidAmount } from "@/lib/student-auth";
 
 type TabKey = "overview" | "students" | "payments" | "store" | "pastQuestions" | "mailer" | "academics" | "executives" | "events" | "voting";
 
@@ -1210,42 +1210,6 @@ Secretariat, NASS LASUSTECH`);
     toast({ title: "Signed out", description: "Admin session cleared." });
   };
 
-  const handleConfirmStudentDues = async (studentOrRecord: any) => {
-    const matric = studentOrRecord.matric_number || studentOrRecord.matric_no || studentOrRecord.matric || "";
-    const email = studentOrRecord.email || "";
-    const name = studentOrRecord.full_name || studentOrRecord.student_name || studentOrRecord.name || "Student Scholar";
-    const dept = studentOrRecord.department || "Basic Sciences";
-    const level = studentOrRecord.level || "100L";
-    const amount = studentOrRecord.amount === 2000 || studentOrRecord.dues_amount === 2000 ? 2000 : 2500;
-    const ref = studentOrRecord.reference || `NASS-DUES-${(matric || "VERIFY").slice(-6)}-${Date.now().toString().slice(-4)}`;
-
-    setSubmitting(true);
-    try {
-      await markDuesPaid({
-        matricNumber: matric,
-        reference: ref,
-        fullName: name,
-        email,
-        department: dept,
-        level,
-        amount,
-      });
-      await loadAll();
-      toast({
-        title: "Dues Clearance Confirmed!",
-        description: `${name} (${matric || email}) is now marked Paid in Supabase. Their dashboard will immediately reflect Paid.`,
-      });
-    } catch (err: any) {
-      toast({
-        title: "Clearance Error",
-        description: err?.message || "Failed to confirm student dues.",
-        variant: "destructive",
-      });
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
   const withSubmit = async (task: () => Promise<void>, successMessage: string) => {
     setSubmitting(true);
     try {
@@ -1741,18 +1705,6 @@ Secretariat, NASS LASUSTECH`);
                                 {isPaid ? `✓ Dues Cleared (₦${paidDuesAmount.toLocaleString()})` : "⏳ Dues Unpaid (₦2,500)"}
                               </span>
 
-                              {!isPaid && (
-                                <Button
-                                  size="sm"
-                                  disabled={submitting}
-                                  onClick={() => handleConfirmStudentDues(student)}
-                                  className="h-7 rounded-full px-3 text-xs font-bold bg-emerald-700 hover:bg-emerald-800 text-white gap-1"
-                                >
-                                  <CheckCircle2 className="h-3 w-3" />
-                                  Mark as Paid
-                                </Button>
-                              )}
-
                               <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${student.activeFlag ? "bg-red-100 text-red-700" : "bg-emerald-50 text-emerald-700"}`}>
                                 {student.activeFlag ? "Flagged" : "Active"}
                               </span>
@@ -1992,8 +1944,7 @@ Secretariat, NASS LASUSTECH`);
                                 </div>
                               </td>
                               <td className="py-3 px-4 text-center">
-                                <div className="flex flex-col items-center gap-1.5">
-                                  <span
+                                <span
                                     className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold ${
                                       record.status.toLowerCase() === "paid"
                                         ? "bg-emerald-100 text-emerald-800"
@@ -2007,18 +1958,6 @@ Secretariat, NASS LASUSTECH`);
                                     )}
                                     {record.status}
                                   </span>
-                                  {record.status.toLowerCase() !== "paid" && String(record.payment_type || "").toLowerCase().includes("due") && (
-                                    <button
-                                      type="button"
-                                      disabled={submitting}
-                                      onClick={() => handleConfirmStudentDues(record)}
-                                      className="inline-flex items-center gap-1 rounded-lg bg-emerald-700 hover:bg-emerald-800 px-2.5 py-1 text-[10px] font-bold text-white shadow-xs transition"
-                                    >
-                                      <CheckCircle2 className="h-3 w-3" />
-                                      Confirm Paid
-                                    </button>
-                                  )}
-                                </div>
                               </td>
                             </tr>
                           ))
