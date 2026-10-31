@@ -9,7 +9,7 @@ import { BarChart3, Calendar, FileText, Flag, Image, LogOut, Settings, ShieldChe
 import { sendCollegiateEmail, getDispatchedEmails, DispatchedMailLog, getMailerConfigApi, saveMailerConfigApi, sendTestEmailApi, MailerConfigStatus, EmailAttachment } from "@/lib/mailer";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { getStoreProducts, addStoreProduct, updateStoreProduct, deleteStoreProduct, resetStoreProducts, StoreProduct } from "@/lib/store-service";
-import { resolveStudentDuesPaidAmount } from "@/lib/student-auth";
+import { resolveStudentDuesPaidAmount, parseStudentStoreOrders } from "@/lib/student-auth";
 
 type TabKey = "overview" | "students" | "payments" | "store" | "pastQuestions" | "mailer" | "academics" | "executives" | "events" | "voting";
 
@@ -696,14 +696,24 @@ Secretariat, NASS LASUSTECH`);
       }
     } catch (e) {}
 
-    // 2. Real student roster dues status (only real students from central DB/API)
+    // 2. Real student roster dues status AND confirmed CBS Lab Coat / Store orders from Supabase
     (students || []).forEach((st, idx) => {
       const isPaid = String(st.dues_status || st.status || "").toLowerCase() === "paid";
       const matric = st.matric_number || st.matric_no || st.matric;
       if (!matric) return;
+
+      // 2a. Include any confirmed CBS Lab Coat / Store orders stored on the student's Supabase record
+      const storeOrders = parseStudentStoreOrders(st);
+      for (const order of storeOrders) {
+        if (!list.some((p) => p.reference === order.reference)) {
+          list.push(order);
+        }
+      }
       
-      // Avoid duplicating if already present in verified payments
-      const alreadyListed = list.some(p => p.matric_number === matric);
+      // 2b. Avoid duplicating sessional dues if already present in verified payments
+      const alreadyListed = list.some(
+        (p) => p.matric_number === matric && String(p.payment_type || "").toLowerCase().includes("due")
+      );
       if (alreadyListed) return;
 
       const name = st.full_name || st.name || "Student";

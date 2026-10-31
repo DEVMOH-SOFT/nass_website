@@ -698,3 +698,154 @@ export const markDuesPaid = async (params: {
   return false;
 };
 
+/**
+ * Parses confirmed store / CBS Lab Coat orders persisted on a student record
+ * (stored as JSON in `emergency_contact` on `public.students`).
+ */
+export const parseStudentStoreOrders = (student?: Partial<StudentRecord> | any | null): any[] => {
+  if (!student || !student.emergency_contact) return [];
+  const raw = String(student.emergency_contact).trim();
+  if (!raw.startsWith("[") && !raw.startsWith("{")) return [];
+
+  try {
+    const parsed = JSON.parse(raw);
+    const arr = Array.isArray(parsed)
+      ? parsed
+      : Array.isArray(parsed?.store_orders)
+        ? parsed.store_orders
+        : [];
+    const cleanMatric = student.matric_number || student.matric_no || student.matric || "";
+    const cleanName = String(student.full_name || student.name || "Science Scholar").trim().toUpperCase();
+    const cleanDept = student.department || "Basic Sciences";
+    const cleanLevel = student.level || "100L";
+    const cleanEmail = (student.email || "").trim().toLowerCase();
+
+    return arr
+      .filter((o: any) => o && typeof o === "object" && o.reference)
+      .map((o: any, idx: number) => ({
+        id: o.id || `pay-store-${o.reference}-${idx}`,
+        reference: String(o.reference),
+        student_name: String(o.student_name || cleanName).trim().toUpperCase(),
+        matric_number: cleanMatric || o.matric_number || "",
+        email: cleanEmail || o.email || "",
+        department: o.department || cleanDept,
+        level: o.level || cleanLevel,
+        payment_type: o.payment_type || "Official CBS Lab Coat",
+        amount: Number(o.amount || 6500),
+        whatsapp_number: o.whatsapp_number || student.phone || "",
+        size: o.size,
+        labcoat_name: o.labcoat_name,
+        jersey_name: o.jersey_name,
+        jersey_number: o.jersey_number,
+        channel: o.channel || "Korapay Online",
+        status: "Paid",
+        created_at: o.created_at || student.updated_at || new Date().toISOString(),
+      }));
+  } catch {
+    return [];
+  }
+};
+
+/**
+ * Persists a confirmed CBS Lab Coat / Collegiate Store order to both localStorage
+ * and the student's live record in Supabase (`students.emergency_contact` + `phone`).
+ */
+export const recordStudentStoreOrder = async (orderRecord: {
+  id?: string;
+  reference: string;
+  student_name: string;
+  matric_number: string;
+  email?: string;
+  department?: string;
+  level?: string;
+  payment_type: string;
+  amount: number;
+  whatsapp_number?: string;
+  size?: string;
+  labcoat_name?: string;
+  jersey_name?: string;
+  jersey_number?: string;
+  channel?: string;
+  status?: string;
+  created_at?: string;
+}): Promise<boolean> => {
+  const cleanMatric = normalizeMatric(orderRecord.matric_number || "");
+  const cleanEmail = (orderRecord.email || "").trim().toLowerCase();
+  const cleanWa = (orderRecord.whatsapp_number || "").trim();
+
+  const confirmedOrder = {
+    ...orderRecord,
+    id: orderRecord.id || `pay-store-${orderRecord.reference}`,
+    matric_number: cleanMatric || orderRecord.matric_number,
+    email: cleanEmail,
+    student_name: (orderRecord.student_name || "SCIENCE SCHOLAR").trim().toUpperCase(),
+    channel: orderRecord.channel || "Korapay Online",
+    status: "Paid",
+    created_at: orderRecord.created_at || new Date().toISOString(),
+  };
+
+  // 1. Save to localStorage verified payments
+  try {
+    const list = JSON.parse(localStorage.getItem("nass_verified_payments") || "[]");
+    const safeList = Array.isArray(list) ? list : [];
+    const updated = [
+      confirmedOrder,
+      ...safeList.filter(
+        (p: any) =>
+          p?.reference !== confirmedOrder.reference &&
+          String(p?.status || "").toLowerCase() === "paid"
+      ),
+    ];
+    localStorage.setItem("nass_verified_payments", JSON.stringify(updated));
+    if (cleanWa) localStorage.setItem("student_whatsapp", cleanWa);
+    window.dispatchEvent(new Event("storage"));
+  } catch (e) {
+    console.error("Local store order save error:", e);
+  }
+
+  // 2. Persist to Supabase `students` table
+  if (!isSupabaseConfigured || (!cleanMatric && !cleanEmail)) return false;
+
+  try {
+    const existingStudent = await fetchStudentProfile(cleanMatric, cleanEmail);
+    const prevOrders = parseStudentStoreOrders(existingStudent);
+    const mergedOrders = [
+      confirmedOrder,
+      ...prevOrders.filter((o: any) => o.reference !== confirmedOrder.reference),
+    ];
+
+    const updatePayload: Record<string, any> = {
+      emergency_contact: JSON.stringify(mergedOrders),
+      updated_at: new Date().toISOString(),
+    };
+    if (cleanWa) {
+      updatePayload.phone = cleanWa;
+    }
+
+    if (cleanMatric) {
+      const { data, error } = await supabase
+        .from("students")
+        .update(updatePayload)
+        .ilike("matric_number", cleanMatric)
+        .select("matric_number");
+
+      if (!error && data && data.length > 0) return true;
+    }
+
+    if (cleanEmail) {
+      const { data, error } = await supabase
+        .from("students")
+        .update(updatePayload)
+        .ilike("email", cleanEmail)
+        .select("matric_number");
+
+      if (!error && data && data.length > 0) return true;
+    }
+  } catch (err) {
+    console.error("Supabase store order sync error:", err);
+  }
+
+  return false;
+};
+
+

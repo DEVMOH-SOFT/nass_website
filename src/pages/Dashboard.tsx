@@ -22,7 +22,7 @@ import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { fetchApi, API_BASE_URL } from "@/lib/api";
 import { events as staticEvents } from "@/data/events";
-import { fetchStudentProfile, updateStudentProfile, logoutStudent, markDuesPaid, resolveStudentDuesPaidAmount } from "@/lib/student-auth";
+import { fetchStudentProfile, updateStudentProfile, logoutStudent, markDuesPaid, resolveStudentDuesPaidAmount, parseStudentStoreOrders, recordStudentStoreOrder } from "@/lib/student-auth";
 import { triggerKorapayCheckout, NASS_PRESIDENT_WHATSAPP_URL } from "@/lib/korapay";
 import { downloadFile, getDownloadUrl } from "@/lib/download";
 import { downloadElementAsPdf } from "@/lib/pdf-service";
@@ -736,6 +736,27 @@ const Dashboard = () => {
           (studentEmail && p.email === studentEmail)
         );
 
+        // Merge any confirmed CBS Lab Coat / Store orders stored on the student's Supabase record
+        const supaStoreOrders = parseStudentStoreOrders(liveStudent);
+        if (supaStoreOrders.length > 0) {
+          let updatedLocal = [...storedVerifiedPayments];
+          let localChanged = false;
+          for (const order of supaStoreOrders) {
+            if (!studentPaymentsList.some((p: any) => p.reference === order.reference)) {
+              studentPaymentsList.unshift(order);
+            }
+            if (!updatedLocal.some((p: any) => p.reference === order.reference)) {
+              updatedLocal.unshift(order);
+              localChanged = true;
+            }
+          }
+          if (localChanged) {
+            try {
+              localStorage.setItem("nass_verified_payments", JSON.stringify(updatedLocal));
+            } catch {}
+          }
+        }
+
         if (isDuesPaid && !studentPaymentsList.some((p: any) => String(p.payment_type || '').toLowerCase().includes("due") && p.status === "Paid")) {
           const duesAmt = resolveStudentDuesPaidAmount(studentMatric, studentEmail, liveStudent || localUser);
           studentPaymentsList.unshift({
@@ -1318,7 +1339,8 @@ const Dashboard = () => {
 
     const studentEmail = profile.email || `${profile.matricNumber || 'student'}@lasustech.edu.ng`;
     const studentName = profile.fullName || "NASS Student";
-    const ref = `NASS-${selectedStoreItem.category.toUpperCase()}-${Date.now().toString().slice(-6)}`;
+    const cleanRefMatric = (profile.matricNumber || "SCHOLAR").replace(/[^A-Za-z0-9]/g, "").toUpperCase();
+    const ref = `NASS-${selectedStoreItem.category.toUpperCase()}-${cleanRefMatric}-${Date.now().toString().slice(-4)}`;
 
     // Record initiated transaction
     const initiatedRecord = {
@@ -1326,6 +1348,7 @@ const Dashboard = () => {
       reference: ref,
       student_name: studentName,
       matric_number: profile.matricNumber || "",
+      email: studentEmail,
       department: profile.department || "Basic Sciences",
       level: profile.level || "100L",
       payment_type: finalTitle,
@@ -1354,26 +1377,24 @@ const Dashboard = () => {
       reference: ref,
       merchant_bears_cost: false,
       narration: `NASS LASUSTECH: ${finalTitle} (WA: ${cleanWa})`,
-      onSuccess: () => {
+      onSuccess: async () => {
         const confirmedRecord = {
           ...initiatedRecord,
           status: "Paid",
           created_at: new Date().toISOString(),
         };
 
-        try {
-          const list = JSON.parse(localStorage.getItem("nass_verified_payments") || "[]");
-          const updated = [confirmedRecord, ...list.filter((p: any) => p.reference !== ref)];
-          localStorage.setItem("nass_verified_payments", JSON.stringify(updated));
-          localStorage.setItem("student_whatsapp", cleanWa);
-          window.dispatchEvent(new Event("storage"));
-        } catch (e) {}
+        await recordStudentStoreOrder(confirmedRecord);
 
+        setProfile(prev => ({
+          ...prev,
+          whatsappNumber: cleanWa || prev.whatsappNumber,
+        }));
         setPayments(prev => [confirmedRecord, ...prev.filter(p => p.reference !== ref)]);
 
         toast({
           title: "Payment Confirmed!",
-          description: `Your order for ${finalTitle} has been verified! Your official payment receipt is ready.`,
+          description: `Your order for ${finalTitle} has been verified and saved! Your official payment receipt is ready.`,
         });
 
         // Immediately issue the receipt
@@ -3766,14 +3787,62 @@ const Dashboard = () => {
                             </div>
 
                             {/* Action */}
-                            <div className="pt-4 border-t border-slate-100">
-                              <Button
-                                onClick={() => handleInitiateStorePayment(labcoatItem)}
-                                className="w-full sm:w-auto px-8 rounded-xl py-3.5 bg-[#145a32] hover:bg-[#0f4426] text-white font-bold text-sm shadow-md flex items-center justify-center gap-2 hover:scale-[1.01] transition-all"
-                              >
-                                <ShoppingBag className="h-4 w-4" />
-                                <span>Order Customised Lab Coat • ₦6,500</span>
-                              </Button>
+                            <div className="pt-4 border-t border-slate-100 space-y-3">
+                              {(() => {
+                                const paidLabcoatOrders = payments.filter(
+                                  (p) =>
+                                    String(p.status || "").toLowerCase() === "paid" &&
+                                    (String(p.payment_type || "").toLowerCase().includes("lab coat") ||
+                                      String(p.reference || "").toUpperCase().includes("LABCOAT"))
+                                );
+                                const latestLabcoat = paidLabcoatOrders[0];
+
+                                return (
+                                  <>
+                                    {latestLabcoat && (
+                                      <div className="rounded-2xl border-2 border-emerald-600/30 bg-emerald-50/80 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                        <div className="space-y-1">
+                                          <div className="flex items-center gap-1.5 text-emerald-900 font-black text-xs uppercase tracking-wider">
+                                            <CheckCircle2 className="h-4 w-4 text-emerald-700 shrink-0" />
+                                            <span>Lab Coat Ordered & Paid (₦{Number(latestLabcoat.amount || 6500).toLocaleString()})</span>
+                                          </div>
+                                          <p className="text-xs font-semibold text-slate-800">
+                                            {latestLabcoat.payment_type}
+                                          </p>
+                                          <p className="text-[11px] font-mono text-slate-500">
+                                            Ref: {latestLabcoat.reference} • {paidLabcoatOrders.length > 1 ? `${paidLabcoatOrders.length} Paid Orders` : "Verified"}
+                                          </p>
+                                        </div>
+                                        <Button
+                                          size="sm"
+                                          onClick={() => {
+                                            setActiveReceipt(latestLabcoat);
+                                            setReceiptModalOpen(true);
+                                          }}
+                                          className="bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs rounded-xl gap-1.5 shrink-0"
+                                        >
+                                          <FileText className="h-3.5 w-3.5" />
+                                          <span>View Lab Coat Receipt</span>
+                                        </Button>
+                                      </div>
+                                    )}
+
+                                    <div className="flex flex-wrap items-center gap-3">
+                                      <Button
+                                        onClick={() => handleInitiateStorePayment(labcoatItem)}
+                                        className="w-full sm:w-auto px-8 rounded-xl py-3.5 bg-[#145a32] hover:bg-[#0f4426] text-white font-bold text-sm shadow-md flex items-center justify-center gap-2 hover:scale-[1.01] transition-all"
+                                      >
+                                        <ShoppingBag className="h-4 w-4" />
+                                        <span>
+                                          {latestLabcoat
+                                            ? "Order Additional Lab Coat • ₦6,500"
+                                            : "Order Customised Lab Coat • ₦6,500"}
+                                        </span>
+                                      </Button>
+                                    </div>
+                                  </>
+                                );
+                              })()}
                               <p className="text-[11px] text-slate-400 mt-2 flex items-center gap-1.5">
                                 <MapPin className="h-3.5 w-3.5 text-emerald-700 shrink-0" />
                                 <span>Collection at College of Basic Science Ground Floor upon completion of custom embroidery.</span>
@@ -4199,6 +4268,7 @@ const Dashboard = () => {
                           { size: "Medium (M)" as const, chest: "Chest: 38 - 40 in", note: "Standard" },
                           { size: "Large (L)" as const, chest: "Chest: 40 - 42 in", note: "Popular", badge: "Recommended" },
                           { size: "Extra Large (XL)" as const, chest: "Chest: 44 - 46 in", note: "Relaxed" },
+                          { size: "2X Large (XXL)" as const, chest: "Chest: 46 - 48 in", note: "Extra Roomy" },
                         ].map((s) => (
                           <button
                             key={s.size}
@@ -4750,7 +4820,7 @@ const Dashboard = () => {
                           <div className="p-1.5 sm:p-2 bg-white border-2 border-dashed border-[#145a32] rounded-xl sm:rounded-2xl shadow-xs flex items-center justify-center">
                             <img
                               src={`https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=1&data=${encodeURIComponent(
-                                `${typeof window !== "undefined" ? window.location.origin : "https://nasslasustech.com"}/verify-receipt?ref=${encodeURIComponent(activeReceipt.reference || activeReceipt.transaction_reference || "NASS-DUES")}&matric=${encodeURIComponent(activeReceipt.matric_number || profile.matricNumber || "")}&name=${encodeURIComponent(activeReceipt.full_name || profile.fullName || "")}&dept=${encodeURIComponent(activeReceipt.department || profile.department || "")}&level=${encodeURIComponent(activeReceipt.level || profile.level || "")}&type=${encodeURIComponent(activeReceipt.payment_type || "2025/2026 SESSION DUES")}&amount=${encodeURIComponent(String(activeReceipt.amount || duesPaidAmount || 2500))}&date=${encodeURIComponent(activeReceipt.paid_at || activeReceipt.created_at || new Date().toISOString())}`
+                                `${typeof window !== "undefined" ? window.location.origin : "https://nasslasustech.com"}/verify-receipt?ref=${encodeURIComponent(activeReceipt.reference || activeReceipt.transaction_reference || "NASS-DUES")}&matric=${encodeURIComponent(activeReceipt.matric_number || profile.matricNumber || "")}&name=${encodeURIComponent(activeReceipt.student_name || activeReceipt.full_name || profile.fullName || "")}&dept=${encodeURIComponent(activeReceipt.department || profile.department || "")}&level=${encodeURIComponent(activeReceipt.level || profile.level || "")}&type=${encodeURIComponent(activeReceipt.payment_type || "2025/2026 SESSION DUES")}&amount=${encodeURIComponent(String(activeReceipt.amount || duesPaidAmount || 2500))}&date=${encodeURIComponent(activeReceipt.paid_at || activeReceipt.created_at || new Date().toISOString())}`
                               )}`}
                               alt="Receipt Verification QR Code"
                               className="w-20 h-20 sm:w-28 sm:h-28 md:w-32 md:h-32 object-contain"
