@@ -1781,7 +1781,13 @@ Secretariat, NASS LASUSTECH`);
                   {/* Summary Metric Cards */}
                   <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
                     <div className="rounded-2xl bg-emerald-50/70 p-4 border border-emerald-100">
-                      <p className="text-xs font-bold uppercase tracking-wider text-emerald-800">Total Dues Collected</p>
+                      <p className="text-xs font-bold uppercase tracking-wider text-emerald-800">
+                        {paymentTypeFilter === "labcoat"
+                          ? "Lab Coat Revenue"
+                          : paymentTypeFilter === "dues"
+                            ? "Total Dues Collected"
+                            : "Total Revenue Collected"}
+                      </p>
                       <p className="mt-2 text-2xl font-bold text-emerald-950">
                         {formatCurrency(
                           filteredStudentPayments
@@ -1793,17 +1799,21 @@ Secretariat, NASS LASUSTECH`);
                     </div>
 
                     <div className="rounded-2xl bg-blue-50/70 p-4 border border-blue-100">
-                      <p className="text-xs font-bold uppercase tracking-wider text-blue-800">Cleared Students</p>
-                      <p className="mt-2 text-2xl font-bold text-blue-950">
-                        {filteredStudentPayments.filter(p => p.status.toLowerCase() === "paid" && p.payment_type.includes("Dues")).length}
+                      <p className="text-xs font-bold uppercase tracking-wider text-blue-800">
+                        {paymentTypeFilter === "labcoat" ? "Paid Lab Coats" : "Cleared Students"}
                       </p>
-                      <p className="mt-1 text-[11px] text-blue-700/80 font-medium">Session dues validated</p>
+                      <p className="mt-2 text-2xl font-bold text-blue-950">
+                        {filteredStudentPayments.filter(p => p.status.toLowerCase() === "paid").length}
+                      </p>
+                      <p className="mt-1 text-[11px] text-blue-700/80 font-medium">
+                        {paymentTypeFilter === "labcoat" ? "Confirmed lab coat orders" : "Confirmed payments validated"}
+                      </p>
                     </div>
 
                     <div className="rounded-2xl bg-amber-50/70 p-4 border border-amber-100">
                       <p className="text-xs font-bold uppercase tracking-wider text-amber-800">Pending Dues</p>
                       <p className="mt-2 text-2xl font-bold text-amber-950">
-                        {filteredStudentPayments.filter(p => p.status.toLowerCase() !== "paid" && p.payment_type.includes("Dues")).length}
+                        {filteredStudentPayments.filter(p => p.status.toLowerCase() !== "paid").length}
                       </p>
                       <p className="mt-1 text-[11px] text-amber-700/80 font-medium">Awaiting collegiate confirmation</p>
                     </div>

@@ -709,11 +709,12 @@ export const parseStudentStoreOrders = (student?: Partial<StudentRecord> | any |
 
   try {
     const parsed = JSON.parse(raw);
-    const arr = Array.isArray(parsed)
+    const rawArr = Array.isArray(parsed)
       ? parsed
       : Array.isArray(parsed?.store_orders)
         ? parsed.store_orders
         : [];
+    const arr = rawArr.flatMap((item: any) => (Array.isArray(item) ? item : [item]));
     const cleanMatric = student.matric_number || student.matric_no || student.matric || "";
     const cleanName = String(student.full_name || student.name || "Science Scholar").trim().toUpperCase();
     const cleanDept = student.department || "Basic Sciences";
