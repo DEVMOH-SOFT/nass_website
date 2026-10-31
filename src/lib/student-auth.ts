@@ -301,20 +301,43 @@ export const registerStudent = async (params: {
 /**
  * Fetches the live student profile from Supabase
  */
-export const fetchStudentProfile = async (matricNumber: string): Promise<StudentRecord | null> => {
-  const cleanMatric = normalizeMatric(matricNumber);
-  if (!cleanMatric || !isSupabaseConfigured) return null;
+export const fetchStudentProfile = async (
+  matricNumber: string,
+  email?: string | null
+): Promise<StudentRecord | null> => {
+  const cleanMatric = normalizeMatric(matricNumber || "");
+  const cleanEmail = (email || "").trim().toLowerCase();
+  if ((!cleanMatric && !cleanEmail) || !isSupabaseConfigured) return null;
 
-  const { data, error } = await supabase
-    .from("students")
-    .select("*")
-    .ilike("matric_number", cleanMatric)
-    .maybeSingle();
+  if (cleanMatric) {
+    const { data, error } = await supabase
+      .from("students")
+      .select("*")
+      .ilike("matric_number", cleanMatric)
+      .maybeSingle();
 
-  if (error || !data) return null;
-  const student = data as StudentRecord;
-  if (student.full_name) student.full_name = student.full_name.trim().toUpperCase();
-  return student;
+    if (!error && data) {
+      const student = data as StudentRecord;
+      if (student.full_name) student.full_name = student.full_name.trim().toUpperCase();
+      return student;
+    }
+  }
+
+  if (cleanEmail) {
+    const { data, error } = await supabase
+      .from("students")
+      .select("*")
+      .ilike("email", cleanEmail)
+      .maybeSingle();
+
+    if (!error && data) {
+      const student = data as StudentRecord;
+      if (student.full_name) student.full_name = student.full_name.trim().toUpperCase();
+      return student;
+    }
+  }
+
+  return null;
 };
 
 /**
@@ -620,31 +643,56 @@ export const markDuesPaid = async (params: {
     window.dispatchEvent(new Event("storage"));
   } catch (e) {}
 
-  // 4. Update Supabase record.
-  // supabase-js reports failures through `error` and does not throw, so each attempt is checked.
-  // The second attempt omits dues_amount for databases that have not added that column yet.
-  if (!isSupabaseConfigured || !cleanMatric) return false;
+  // 4. Update Supabase record (match by matric_number, fallback to email, fallback to insert).
+  if (!isSupabaseConfigured || (!cleanMatric && !cleanEmail)) return false;
 
   const paidAt = new Date().toISOString();
   const attempts = [
-    { dues_status: "Paid", dues_paid_at: paidAt, dues_amount: duesAmount },
+    { dues_status: "Paid", dues_paid_at: paidAt, dues_amount: duesAmount, id_card_status: "Ready" },
     { dues_status: "Paid", dues_paid_at: paidAt },
   ];
 
-  for (const changes of attempts) {
-    const { data, error } = await supabase
-      .from("students")
-      .update(changes)
-      .ilike("matric_number", cleanMatric)
-      .select("matric_number");
+  // 4a. Try updating by matric_number
+  if (cleanMatric) {
+    for (const changes of attempts) {
+      const { data, error } = await supabase
+        .from("students")
+        .update(changes)
+        .ilike("matric_number", cleanMatric)
+        .select("matric_number");
 
-    if (!error && data && data.length > 0) return true;
+      if (!error && data && data.length > 0) return true;
+    }
+  }
 
-    console.error(
-      error
-        ? `Supabase dues update failed: ${error.message}`
-        : `Supabase dues update matched no student for ${cleanMatric}`
-    );
+  // 4b. Fallback: try updating by email (critical for freshers or students whose provisional ID shifted)
+  if (cleanEmail) {
+    for (const changes of attempts) {
+      const { data, error } = await supabase
+        .from("students")
+        .update(changes)
+        .ilike("email", cleanEmail)
+        .select("matric_number");
+
+      if (!error && data && data.length > 0) return true;
+    }
+  }
+
+  // 4c. Final fallback: if the student record wasn't in Supabase yet, insert it as Paid
+  if (cleanMatric) {
+    const { error: insertErr } = await supabase.from("students").insert({
+      matric_number: cleanMatric,
+      full_name: cleanFullName,
+      department: params.department || "Basic Sciences",
+      level: params.level || (cleanMatric.startsWith("FSH") ? "100L" : "200L"),
+      email: cleanEmail || null,
+      dues_status: "Paid",
+      dues_paid_at: paidAt,
+      dues_amount: duesAmount,
+      id_card_status: "Ready",
+    });
+    if (!insertErr) return true;
+    console.error("Supabase dues fallback insert failed:", insertErr.message);
   }
 
   return false;

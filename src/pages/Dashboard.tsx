@@ -686,9 +686,9 @@ const Dashboard = () => {
 
         // 1. Fetch live Supabase profile
         let liveStudent = null;
-        if (currentMatric) {
+        if (currentMatric || localUser?.email) {
           try {
-            liveStudent = await fetchStudentProfile(currentMatric);
+            liveStudent = await fetchStudentProfile(currentMatric, localUser?.email);
           } catch (supaErr) {
             console.warn("Supabase profile load notice:", supaErr);
           }
@@ -705,6 +705,16 @@ const Dashboard = () => {
           localUser?.dues_status?.toLowerCase() === "paid" ||
           (studentMatric && localStorage.getItem(`nass_dues_${studentMatric}`) === "Paid")
         );
+
+        // If Supabase confirms Paid, sync localStorage user cache immediately so reload/tabs never show Pending
+        if (isDuesPaid && localUser && localUser.dues_status !== "Paid") {
+          try {
+            localUser.dues_status = "Paid";
+            localUser.id_card_status = "Ready";
+            localStorage.setItem("user", JSON.stringify(localUser));
+            if (studentMatric) localStorage.setItem(`nass_dues_${studentMatric}`, "Paid");
+          } catch {}
+        }
 
         // Load student's verified payments
         const storedVerifiedPayments = (() => {
@@ -999,9 +1009,9 @@ const Dashboard = () => {
       const list = JSON.parse(localStorage.getItem("nass_verified_payments") || "[]");
       const updated = [confirmedRecord, ...list.filter((p: any) => p.reference !== ref)];
       localStorage.setItem("nass_verified_payments", JSON.stringify(updated));
-      if (profile.matricNumber) {
-        localStorage.setItem(`nass_dues_${profile.matricNumber}`, "Paid");
-        markDuesPaid({
+      if (profile.matricNumber || studentEmail) {
+        if (profile.matricNumber) localStorage.setItem(`nass_dues_${profile.matricNumber}`, "Paid");
+        await markDuesPaid({
           matricNumber: profile.matricNumber,
           reference: ref,
           fullName: profile.fullName || "Student Scholar",
@@ -1140,8 +1150,17 @@ const Dashboard = () => {
           const updated = [confirmedRecord, ...list.filter((p: any) => p.reference !== pay.reference && p.reference !== ref)];
           localStorage.setItem("nass_verified_payments", JSON.stringify(updated));
           if (String(pay.payment_type).toLowerCase().includes("due")) {
-            if (profile.matricNumber) {
+            if (profile.matricNumber || profile.email) {
               localStorage.setItem(`nass_dues_${profile.matricNumber}`, "Paid");
+              markDuesPaid({
+                matricNumber: profile.matricNumber,
+                reference: ref,
+                fullName: profile.fullName || "Student Scholar",
+                email: studentEmail,
+                department: profile.department || "Basic Sciences",
+                level: profile.level || "100L",
+                amount: finalAmount,
+              }).catch(console.warn);
             }
             const userStr = localStorage.getItem("user");
             if (userStr) {
