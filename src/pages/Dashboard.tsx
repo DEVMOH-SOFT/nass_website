@@ -720,7 +720,12 @@ const Dashboard = () => {
         const storedVerifiedPayments = (() => {
           try {
             const list = JSON.parse(localStorage.getItem("nass_verified_payments") || "[]");
-            return Array.isArray(list) ? list : [];
+            if (!Array.isArray(list)) return [];
+            const onlyPaid = list.filter((p: any) => String(p?.status || "").toLowerCase() === "paid");
+            if (onlyPaid.length !== list.length) {
+              localStorage.setItem("nass_verified_payments", JSON.stringify(onlyPaid));
+            }
+            return onlyPaid;
           } catch (e) {
             return [];
           }
@@ -1049,30 +1054,6 @@ const Dashboard = () => {
     const cleanMatric = (profile.matricNumber || "SCHOLAR").replace(/[^A-Za-z0-9]/g, "");
     const ref = `NASS-DUES-${cleanMatric}-${Date.now().toString().slice(-4)}`;
 
-    // Record initiated transaction in state and storage
-    const initiatedRecord = {
-      id: `pay-dues-${profile.matricNumber || Date.now()}`,
-      reference: ref,
-      student_name: profile.fullName || "Student Scholar",
-      matric_number: profile.matricNumber || "",
-      department: profile.department || "Basic Sciences",
-      level: profile.level || "100L",
-      payment_type: "2025/2026 Session Dues",
-      amount: 2500,
-      channel: "Korapay Online",
-      status: "Initiated",
-      created_at: new Date().toISOString(),
-    };
-
-    try {
-      const list = JSON.parse(localStorage.getItem("nass_verified_payments") || "[]");
-      const filtered = list.filter((p: any) => p.reference !== ref);
-      localStorage.setItem("nass_verified_payments", JSON.stringify([initiatedRecord, ...filtered]));
-      window.dispatchEvent(new Event("storage"));
-    } catch (e) {}
-
-    setPayments(prev => [initiatedRecord, ...prev.filter(p => p.reference !== ref)]);
-
     toast({ title: "Opening Gateway...", description: "Connecting to Korapay checkout." });
 
     // Launch Korapay inline modal with Live Public Key
@@ -1360,14 +1341,8 @@ const Dashboard = () => {
     };
 
     try {
-      const list = JSON.parse(localStorage.getItem("nass_verified_payments") || "[]");
-      const filtered = list.filter((p: any) => p.reference !== ref);
-      localStorage.setItem("nass_verified_payments", JSON.stringify([initiatedRecord, ...filtered]));
       localStorage.setItem("student_whatsapp", cleanWa);
-      window.dispatchEvent(new Event("storage"));
     } catch (e) {}
-
-    setPayments(prev => [initiatedRecord, ...prev.filter(p => p.reference !== ref)]);
 
     setStoreModalOpen(false);
     toast({ title: "Opening Gateway...", description: `Connecting to Korapay checkout for ${finalTitle}.` });

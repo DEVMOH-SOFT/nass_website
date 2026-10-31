@@ -684,11 +684,15 @@ Secretariat, NASS LASUSTECH`);
   const getAllStudentPayments = () => {
     const list: any[] = [];
 
-    // 1. Live verified payments from actual transactions in localStorage
+    // 1. Live verified payments from actual transactions in localStorage (only confirmed Paid records; purge abandoned Initiated junk)
     try {
       const verified = JSON.parse(localStorage.getItem("nass_verified_payments") || "[]");
       if (Array.isArray(verified)) {
-        list.push(...verified);
+        const onlyPaid = verified.filter((p) => String(p?.status || "").toLowerCase() === "paid");
+        if (onlyPaid.length !== verified.length) {
+          localStorage.setItem("nass_verified_payments", JSON.stringify(onlyPaid));
+        }
+        list.push(...onlyPaid);
       }
     } catch (e) {}
 
@@ -1057,8 +1061,12 @@ Secretariat, NASS LASUSTECH`);
 
     // Third: Local verified payments ledger
     try {
-      const verifiedList = JSON.parse(localStorage.getItem("nass_verified_payments") || "[]");
-      if (Array.isArray(verifiedList)) {
+      const rawVerifiedList = JSON.parse(localStorage.getItem("nass_verified_payments") || "[]");
+      if (Array.isArray(rawVerifiedList)) {
+        const verifiedList = rawVerifiedList.filter((p: any) => String(p?.status || "").toLowerCase() === "paid");
+        if (verifiedList.length !== rawVerifiedList.length) {
+          localStorage.setItem("nass_verified_payments", JSON.stringify(verifiedList));
+        }
         verifiedList.forEach((p: any) => {
           const key = (p.email || p.matric_number || "").toLowerCase().trim();
           const pAmount = typeof p.amount === "number" ? (p.amount > 10000 ? p.amount / 100 : p.amount) : 2500;
