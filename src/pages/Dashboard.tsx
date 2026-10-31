@@ -1341,6 +1341,8 @@ const Dashboard = () => {
     const studentName = profile.fullName || "NASS Student";
     const cleanRefMatric = (profile.matricNumber || "SCHOLAR").replace(/[^A-Za-z0-9]/g, "").toUpperCase();
     const ref = `NASS-${selectedStoreItem.category.toUpperCase()}-${cleanRefMatric}-${Date.now().toString().slice(-4)}`;
+    // Use an internal no-reply gateway email for Korapay so students do not receive Korapay's automated email after paying for a lab coat
+    const korapayCheckoutEmail = `store.${cleanRefMatric.toLowerCase()}@nasslasustech.org.ng`;
 
     // Record initiated transaction
     const initiatedRecord = {
@@ -1372,7 +1374,7 @@ const Dashboard = () => {
 
     const opened = await triggerKorapayCheckout({
       amount: finalPrice,
-      email: studentEmail,
+      email: korapayCheckoutEmail,
       name: studentName,
       reference: ref,
       merchant_bears_cost: false,
