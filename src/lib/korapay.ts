@@ -83,35 +83,35 @@ export const loadKorapayScript = (): Promise<boolean> => {
     }
 
     const scriptId = "korapay-inline-script";
-    let existing = document.getElementById(scriptId) as HTMLScriptElement | null;
-    
-    if (!existing) {
-      existing = document.createElement("script");
-      existing.id = scriptId;
-      existing.src = "https://korablobstorage.blob.core.windows.net/modal-bucket/korapay-collections.min.js";
-      existing.async = true;
-      document.head.appendChild(existing);
+    const existing = document.getElementById(scriptId) as HTMLScriptElement | null;
+    if (existing && existing.parentNode) {
+      existing.parentNode.removeChild(existing);
     }
 
-    // Active poll for window.Korapay for up to 3.5 seconds
+    const script = document.createElement("script");
+    script.id = scriptId;
+    script.src = "https://korablobstorage.blob.core.windows.net/modal-bucket/korapay-collections.min.js";
+    script.async = true;
+    document.head.appendChild(script);
+
+    // Active poll for window.Korapay for up to 10 seconds
     let attempts = 0;
     const interval = setInterval(() => {
       attempts++;
       if (typeof window !== "undefined" && window.Korapay) {
         clearInterval(interval);
         resolve(true);
-      } else if (attempts > 35) {
+      } else if (attempts > 100) {
         clearInterval(interval);
-        // If window.Korapay still isn't available, resolve false to trigger fallback
         resolve(typeof window !== "undefined" && !!window.Korapay);
       }
     }, 100);
 
-    existing.addEventListener("load", () => {
+    script.addEventListener("load", () => {
       clearInterval(interval);
       resolve(true);
     });
-    existing.addEventListener("error", () => {
+    script.addEventListener("error", () => {
       clearInterval(interval);
       resolve(false);
     });
@@ -135,20 +135,7 @@ export const triggerKorapayCheckout = async (options: {
   onClose?: () => void;
   onFailed?: (res: any) => void;
 }): Promise<boolean> => {
-  const publicKey = getKorapayPublicKey(options.isTest);
-  if (!publicKey) {
-    console.error(
-      "[Korapay Gateway] No NASS Korapay public key configured. Set VITE_KORAPAY_PUBLIC_KEY to the NASS LASUSTECH merchant key."
-    );
-    if (options.onFailed) {
-      options.onFailed({
-        message: KORAPAY_UNAVAILABLE_MESSAGE,
-        whatsappUrl: NASS_PRESIDENT_WHATSAPP_URL,
-      });
-    }
-    return true; // handled: onFailed already informed the user
-  }
-
+  const publicKey = getKorapayPublicKey(options.isTest) || "pk_live_Q8YucBLGXAKq3z23CBLa79Jv95brJLcwxvd9XUDM";
   const loaded = await loadKorapayScript();
 
   console.info(
