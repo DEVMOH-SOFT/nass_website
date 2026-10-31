@@ -30,7 +30,7 @@ const VerifyReceipt = () => {
     const name = searchParams.get("name") || "";
     const dept = searchParams.get("dept") || "";
     const level = searchParams.get("level") || "";
-    const type = searchParams.get("type") || "2025/2026 Statutory Session Dues";
+    const type = searchParams.get("type") || "2026/2027 Statutory Session Dues";
     const rawAmount = searchParams.get("amount");
     const date = searchParams.get("date") || "";
 
@@ -47,7 +47,7 @@ const VerifyReceipt = () => {
         name: name || "Basic Science Undergraduate",
         dept: dept || "College of Basic Sciences",
         level: level || "Undergraduate",
-        type: type || "2025/2026 Session Dues",
+        type: type || "2026/2027 Session Dues",
         amount: formattedAmount,
         date: date ? new Date(date).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" }) : new Date().toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" }),
       });
@@ -65,7 +65,7 @@ const VerifyReceipt = () => {
             name: parsed.full_name || "Science Scholar",
             dept: parsed.department || "Basic Sciences",
             level: parsed.level || "300L",
-            type: "2025/2026 Statutory Session Dues",
+            type: "2026/2027 Statutory Session Dues",
             amount: fallbackAmt.toLocaleString(),
             date: new Date().toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" }),
           });

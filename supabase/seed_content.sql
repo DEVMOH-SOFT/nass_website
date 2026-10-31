@@ -62,7 +62,7 @@ VALUES
   (
     'deans-welcome-dispatch',
     'Dean & Secretariat Dispatch: The Renaissance of Basic Sciences at LASUSTECH',
-    'An inspiring collegiate address to all scholars of the College of Basic Sciences detailing research expectations, leadership excellence, and collaborative innovation in the 2025/2026 session.',
+    'An inspiring collegiate address to all scholars of the College of Basic Sciences detailing research expectations, leadership excellence, and collaborative innovation in the 2026/2027 session.',
     'Welcome to an era of groundbreaking discovery at the College of Basic Sciences. As science scholars, our role in national development and technological progress has never been more pivotal. Under the leadership of NASS LASUSTECH, we are uniting all 5 departments toward research innovation and academic excellence.',
     'NASS Executive Council',
     'Dean''s Corner',

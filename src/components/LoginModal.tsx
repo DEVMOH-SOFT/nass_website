@@ -770,7 +770,7 @@ const LoginModal = ({ open, onClose, redirectTab, initialMode }: LoginModalProps
                     <div className="flex items-center justify-between pb-2.5 border-b border-emerald-200/60 dark:border-emerald-800/60">
                       <div>
                         <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-800 dark:text-emerald-400">
-                          2025/2026 Sessional Dues
+                          2026/2027 Sessional Dues
                         </p>
                         <h4 className="text-sm font-bold text-slate-900 dark:text-white mt-0.5">
                           Collegiate Clearance
@@ -870,7 +870,7 @@ const LoginModal = ({ open, onClose, redirectTab, initialMode }: LoginModalProps
                       Payment Verified • Official Receipt Issued
                     </h3>
                     <p className="text-[10px] sm:text-[10.5px] text-emerald-800/90 dark:text-emerald-300">
-                      Your NASS 2025/2026 session dues are fully settled. Download or print your verified clearance receipt below.
+                      Your NASS 2026/2027 session dues are fully settled. Download or print your verified clearance receipt below.
                     </p>
                   </div>
 
@@ -910,7 +910,7 @@ const LoginModal = ({ open, onClose, redirectTab, initialMode }: LoginModalProps
                       </div>
                       <div className="py-1 flex justify-between">
                         <span className="font-bold text-slate-500 uppercase">Item:</span>
-                        <span className="font-bold text-emerald-900 uppercase">2025/2026 Session Dues</span>
+                        <span className="font-bold text-emerald-900 uppercase">2026/2027 Session Dues</span>
                       </div>
                       <div className="py-1 flex justify-between bg-emerald-50/70 px-2 rounded font-bold">
                         <span className="text-emerald-950 uppercase text-[9px] sm:text-[9.5px]">Amount Cleared:</span>

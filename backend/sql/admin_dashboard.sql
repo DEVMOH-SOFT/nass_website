@@ -77,7 +77,7 @@ CREATE TABLE IF NOT EXISTS blogs (
 
 INSERT INTO site_settings (setting_key, setting_value, setting_group)
 VALUES
-  ('current_session', '2025/2026', 'academic'),
+  ('current_session', '2026/2027', 'academic'),
   ('current_semester', 'First Semester', 'academic')
 ON DUPLICATE KEY UPDATE
   setting_value = VALUES(setting_value),

@@ -57,7 +57,7 @@ export const DEFAULT_STORE_PRODUCTS: StoreProduct[] = [
     category: "manual",
     price: 2500,
     priceConfirmed: false,
-    badge: "2025/2026 Approved Editions",
+    badge: "2026/2027 Approved Editions",
     description: "Official laboratory practical manuals approved by the CBS Deanery. Includes pre-lab safety protocols, qualitative and volumetric schemes, observation logsheets, and experiment report formats.",
     manualOptions: [
       { name: "Chemistry Practical Manual (CHM 107/108)" },

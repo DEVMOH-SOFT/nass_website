@@ -80,7 +80,7 @@ export const TreasurerESignature: React.FC<TreasurerESignatureProps> = ({
           Executive Treasurer, NASS
         </p>
         <p className={`text-slate-400 font-mono tracking-tight ${isSm ? "text-[5.5px]" : "text-[6px] sm:text-[7px]"}`}>
-          Secretariat Treasury • 2025/2026 Session
+          Secretariat Treasury • 2026/2027 Session
         </p>
       </div>
     </div>

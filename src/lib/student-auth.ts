@@ -600,7 +600,7 @@ export const markDuesPaid = async (params: {
       email: cleanEmail,
       department: params.department || "Basic Sciences",
       level: params.level || "100L",
-      payment_type: "2025/2026 Session Dues",
+      payment_type: "2026/2027 Session Dues",
       amount: duesAmount,
       channel: "Korapay Online",
       status: "Paid",

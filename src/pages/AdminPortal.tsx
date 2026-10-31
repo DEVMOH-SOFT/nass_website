@@ -337,10 +337,10 @@ Best regards,
 Secretariat, NASS LASUSTECH
 DEVMOH Led Administration`);
     } else if (type === "dues_clearance") {
-      setMailSubject("Notice: 2025/2026 Statutory Session Dues Clearance & Verified Receipts");
+      setMailSubject("Notice: 2026/2027 Statutory Session Dues Clearance & Verified Receipts");
       setMailBody(`Dear Science Scholar,
 
-This is an administrative notification from the College Secretariat regarding statutory session dues for the 2025/2026 academic session.
+This is an administrative notification from the College Secretariat regarding statutory session dues for the 2026/2027 academic session.
 
 Please ensure your ₦2,500 session dues are paid and your official electronic receipt is downloaded. Cleared dues are required for laboratory practical manual issuance, customized lab coats, and collegiate clearances.
 
@@ -729,7 +729,7 @@ Secretariat, NASS LASUSTECH`);
         matric_number: matric,
         department: dept,
         level: lvl,
-        payment_type: "2025/2026 Sessional Dues",
+        payment_type: "2026/2027 Sessional Dues",
         amount: isPaid ? actualDuesAmount : 2500,
         channel: "Korapay Online",
         status: isPaid ? "Paid" : "Pending",
@@ -1049,7 +1049,7 @@ Secretariat, NASS LASUSTECH`);
     let mainDashboard: any = null;
     try {
       mainDashboard = await adminFetch("/admin/dashboard");
-      setAcademicForm(mainDashboard?.academicSettings || { session: "2025/2026", semester: "First Semester" });
+      setAcademicForm(mainDashboard?.academicSettings || { session: "2026/2027", semester: "First Semester" });
       mainConnected = true;
       setMainOnline(true);
     } catch (err: any) {
@@ -2418,7 +2418,7 @@ Secretariat, NASS LASUSTECH`);
                         <div>
                           <label className="text-xs font-bold text-slate-700 uppercase">Badge / Tagline</label>
                           <Input
-                            placeholder="e.g. 2025/2026 Edition or Official CBS Merchandise"
+                            placeholder="e.g. 2026/2027 Edition or Official CBS Merchandise"
                             value={productForm.badge}
                             onChange={(e) => setProductForm({ ...productForm, badge: e.target.value })}
                             className="mt-1 rounded-xl"
@@ -3368,7 +3368,7 @@ Secretariat, NASS LASUSTECH`);
               <div className="rounded-[2rem] bg-white p-6 shadow-sm">
                 <h3 className="font-display text-xl font-bold">Current Academic Session</h3>
                 <div className="mt-6 grid gap-4 md:grid-cols-2">
-                  <Input placeholder="2025/2026 Session" value={academicForm.session} onChange={(e) => setAcademicForm({ ...academicForm, session: e.target.value })} />
+                  <Input placeholder="2026/2027 Session" value={academicForm.session} onChange={(e) => setAcademicForm({ ...academicForm, session: e.target.value })} />
                   <select className="flex h-10 w-full rounded-xl border border-border bg-background px-3 text-sm" value={academicForm.semester} onChange={(e) => setAcademicForm({ ...academicForm, semester: e.target.value })}>
                     <option>First Semester</option>
                     <option>Second Semester</option>

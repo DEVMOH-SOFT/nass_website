@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS public.site_settings (
 -- Seed Academic Calendar Settings
 INSERT INTO public.site_settings (setting_key, setting_value, setting_group)
 VALUES
-  ('current_session', '2025/2026', 'academic'),
+  ('current_session', '2026/2027', 'academic'),
   ('current_semester', 'First Semester', 'academic'),
   ('college_name', 'College of Basic Sciences', 'institutional'),
   ('association_name', 'National Association of Science Students (NASS)', 'institutional'),

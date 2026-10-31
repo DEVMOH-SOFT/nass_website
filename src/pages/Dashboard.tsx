@@ -766,7 +766,7 @@ const Dashboard = () => {
             matric_number: studentMatric,
             department: studentDept,
             level: studentLevel,
-            payment_type: "2025/2026 Session Dues",
+            payment_type: "2026/2027 Session Dues",
             amount: duesAmt,
             channel: "Korapay Online",
             status: "Paid",
@@ -790,7 +790,7 @@ const Dashboard = () => {
 
         setPayments(studentPaymentsList);
         setAmountOwing(isDuesPaid || studentPaymentsList.some((p: any) => String(p.payment_type || '').toLowerCase().includes("due") && p.status === "Paid") ? 0 : 2500);
-        setAcademicSettings({ session: "2025/2026", semester: "First Semester" });
+        setAcademicSettings({ session: "2026/2027", semester: "First Semester" });
       } catch (error: any) {
         console.error("Dashboard Sync Error:", error);
       } finally {
@@ -1024,7 +1024,7 @@ const Dashboard = () => {
       matric_number: profile.matricNumber || "",
       department: profile.department || "Basic Sciences",
       level: profile.level || "100L",
-      payment_type: "2025/2026 Session Dues",
+      payment_type: "2026/2027 Session Dues",
       amount: 2500,
       channel: channelName,
       status: "Paid",
@@ -2007,7 +2007,7 @@ const Dashboard = () => {
                   Active
                 </span>
                 <span className="text-xs font-extrabold text-slate-800">
-                  {academicSettings.session || "2025/2026 Session"} {academicSettings.semester ? `• ${academicSettings.semester}` : "• First Semester"}
+                  {academicSettings.session || "2026/2027 Session"} {academicSettings.semester ? `• ${academicSettings.semester}` : "• First Semester"}
                 </span>
               </div>
             </div>
@@ -2146,7 +2146,7 @@ const Dashboard = () => {
                       Welcome back, <span className="text-emerald-300 uppercase">{String(profile.fullName || "Scholar").split(' ')[0].toUpperCase()}</span> 👋
                     </h1>
                     <p className="mt-2 text-xs sm:text-sm text-emerald-100/90 leading-relaxed">
-                      You are in good financial and academic standing for the 2025/2026 academic session. Access your official payment receipts, order your custom embroidered lab coat and practical manuals, or explore the science resource library.
+                      You are in good financial and academic standing for the 2026/2027 academic session. Access your official payment receipts, order your custom embroidered lab coat and practical manuals, or explore the science resource library.
                     </p>
 
                     {/* Quick Identity Tags */}
@@ -2242,7 +2242,7 @@ const Dashboard = () => {
                         {profile.duesStatus === 'Paid' ? `₦${duesPaidAmount.toLocaleString()}` : '₦2,500'}
                       </p>
                       <p className="mt-1 text-xs text-slate-500 leading-relaxed">
-                        Official 2025/2026 collegiate contribution. Enables laboratory, exams, and chapter credentials.
+                        Official 2026/2027 collegiate contribution. Enables laboratory, exams, and chapter credentials.
                       </p>
                     </div>
                   </div>
@@ -2330,7 +2330,7 @@ const Dashboard = () => {
                   <p className={`text-sm font-black mt-1 ${profile.duesStatus === 'Paid' ? 'text-emerald-700' : 'text-amber-600'}`}>
                     {profile.duesStatus === 'Paid' ? `✓ Cleared (₦${duesPaidAmount.toLocaleString()})` : '⏳ Pending (₦2,500)'}
                   </p>
-                  <p className="text-[10px] text-slate-500 font-medium">2025/2026 Session</p>
+                  <p className="text-[10px] text-slate-500 font-medium">2026/2027 Session</p>
                 </div>
                 <div className="border-r border-slate-200/60 pr-3 last:border-0">
                   <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">Payment Receipts</span>
@@ -2470,7 +2470,7 @@ const Dashboard = () => {
                               <div className="flex items-center gap-2.5">
                                 <div className="h-2 w-2 rounded-full bg-emerald-500" />
                                 <div>
-                                  <p className="text-xs font-semibold text-slate-800">2025/2026 Sessional Dues Receipt</p>
+                                  <p className="text-xs font-semibold text-slate-800">2026/2027 Sessional Dues Receipt</p>
                                   <p className="text-[10px] text-slate-400">Current Session • Verified by Deanery</p>
                                 </div>
                               </div>
@@ -2515,7 +2515,7 @@ const Dashboard = () => {
                         </div>
                       </div>
                       <span className="px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase bg-amber-400 text-slate-950">
-                        2025/2026
+                        2026/2027
                       </span>
                     </div>
 
@@ -2972,7 +2972,7 @@ const Dashboard = () => {
                     <span>Payment History & Official Receipts</span>
                   </h2>
                   <p className="mt-0.5 text-xs text-slate-500">
-                    Statutory 2025/2026 collegiate session dues standing, verified transaction ledger, and official downloadable receipts.
+                    Statutory 2026/2027 collegiate session dues standing, verified transaction ledger, and official downloadable receipts.
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
@@ -3008,7 +3008,7 @@ const Dashboard = () => {
                           <span>Official Academic Standing • Cleared</span>
                         </div>
                         <h3 className="font-display text-xl sm:text-2xl font-black text-white leading-snug">
-                          2025/2026 Statutory Session Dues
+                          2026/2027 Statutory Session Dues
                         </h3>
                         <p className="text-xs text-emerald-100/80 max-w-2xl leading-relaxed">
                           Scholar: <strong className="text-white">{profile.fullName || "Student Scholar"}</strong> • {isFresherScholar ? (
@@ -3040,7 +3040,7 @@ const Dashboard = () => {
                               matric_number: profile.matricNumber || "",
                               department: profile.department || "Basic Sciences",
                               level: profile.level || "100L",
-                              payment_type: "2025/2026 Session Dues",
+                              payment_type: "2026/2027 Session Dues",
                               amount: duesPaidAmount,
                               channel: "Verified Official",
                               status: "Paid",
@@ -3264,7 +3264,7 @@ const Dashboard = () => {
                           <span>Statutory Collegiate Dues</span>
                         </div>
                         <h3 className="font-display text-xl font-black text-slate-900 mt-2">
-                          2025/2026 Academic Session
+                          2026/2027 Academic Session
                         </h3>
                         <p className="text-xs text-slate-600 mt-1 leading-relaxed">
                           All enrolled College of Basic Sciences undergraduates are required to clear statutory session dues to validate departmental membership and official exam clearance.
@@ -4747,7 +4747,7 @@ const Dashboard = () => {
                         <div className="grid grid-cols-[100px_1fr] sm:grid-cols-[135px_1fr] p-2.5 sm:p-3 bg-amber-50/60 border-y border-amber-200 items-center">
                           <span className="font-black text-amber-950 uppercase text-[8.5px] sm:text-[9.5px]">Item / Purpose:</span>
                           <span className="font-black text-xs sm:text-base text-slate-900 uppercase font-serif break-words">
-                            {activeReceipt.payment_type || "2025/2026 SESSION DUES"}
+                            {activeReceipt.payment_type || "2026/2027 SESSION DUES"}
                           </span>
                         </div>
 
@@ -4811,7 +4811,7 @@ const Dashboard = () => {
                         </div>
                       ) : (
                         <div className="rounded-xl bg-emerald-50 border border-emerald-200 p-2.5 sm:p-3 text-[9.5px] sm:text-[10.5px] text-emerald-950 mb-3.5 sm:mb-5 leading-relaxed">
-                          <strong>Academic Standing:</strong> This confirms statutory 2025/2026 collegiate dues payment. Valid for presentation during course registration, laboratory practical clearance, and semester examinations.
+                          <strong>Academic Standing:</strong> This confirms statutory 2026/2027 collegiate dues payment. Valid for presentation during course registration, laboratory practical clearance, and semester examinations.
                         </div>
                       )}
 
@@ -4822,7 +4822,7 @@ const Dashboard = () => {
                           <div className="p-1.5 sm:p-2 bg-white border-2 border-dashed border-[#145a32] rounded-xl sm:rounded-2xl shadow-xs flex items-center justify-center">
                             <img
                               src={`https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=1&data=${encodeURIComponent(
-                                `${typeof window !== "undefined" ? window.location.origin : "https://nasslasustech.com"}/verify-receipt?ref=${encodeURIComponent(activeReceipt.reference || activeReceipt.transaction_reference || "NASS-DUES")}&matric=${encodeURIComponent(activeReceipt.matric_number || profile.matricNumber || "")}&name=${encodeURIComponent(activeReceipt.student_name || activeReceipt.full_name || profile.fullName || "")}&dept=${encodeURIComponent(activeReceipt.department || profile.department || "")}&level=${encodeURIComponent(activeReceipt.level || profile.level || "")}&type=${encodeURIComponent(activeReceipt.payment_type || "2025/2026 SESSION DUES")}&amount=${encodeURIComponent(String(activeReceipt.amount || duesPaidAmount || 2500))}&date=${encodeURIComponent(activeReceipt.paid_at || activeReceipt.created_at || new Date().toISOString())}`
+                                `${typeof window !== "undefined" ? window.location.origin : "https://nasslasustech.com"}/verify-receipt?ref=${encodeURIComponent(activeReceipt.reference || activeReceipt.transaction_reference || "NASS-DUES")}&matric=${encodeURIComponent(activeReceipt.matric_number || profile.matricNumber || "")}&name=${encodeURIComponent(activeReceipt.student_name || activeReceipt.full_name || profile.fullName || "")}&dept=${encodeURIComponent(activeReceipt.department || profile.department || "")}&level=${encodeURIComponent(activeReceipt.level || profile.level || "")}&type=${encodeURIComponent(activeReceipt.payment_type || "2026/2027 SESSION DUES")}&amount=${encodeURIComponent(String(activeReceipt.amount || duesPaidAmount || 2500))}&date=${encodeURIComponent(activeReceipt.paid_at || activeReceipt.created_at || new Date().toISOString())}`
                               )}`}
                               alt="Receipt Verification QR Code"
                               className="w-20 h-20 sm:w-28 sm:h-28 md:w-32 md:h-32 object-contain"

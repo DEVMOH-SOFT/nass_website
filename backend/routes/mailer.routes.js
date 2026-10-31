@@ -128,7 +128,7 @@ const preparePublicMail = (reqBody, config) => {
 
 This is your official payment confirmation from the Nigerian Association of Science Students (NASS), College of Basic Sciences, LASUSTECH.
 
-We confirm receipt of ₦${amount.toLocaleString()} for your 2025/2026 Statutory Session Dues.
+We confirm receipt of ₦${amount.toLocaleString()} for your 2026/2027 Statutory Session Dues.
 
 Transaction Details:
 • Student Name: ${name}

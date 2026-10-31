@@ -400,7 +400,7 @@ const defaultEvents = [
   },
   {
     id: "hod-cup",
-    title: "HOD'S CUP 2025/2026",
+    title: "HOD'S CUP 2026/2027",
     event_status: "past",
     start_date: "2026-04-22T08:00",
     end_date: "2026-05-07T18:00",
@@ -434,7 +434,7 @@ const getStore = () => {
   if (!fs.existsSync(STORE_FILE)) {
     const initialStore = {
       academicSettings: {
-        session: '2025/2026',
+        session: '2026/2027',
         semester: 'First Semester',
       },
       executives: defaultExecutives,
@@ -452,7 +452,7 @@ const getStore = () => {
   } catch (err) {
     console.error('⚠️ local JSON store parsing failed:', err.message);
     return {
-      academicSettings: { session: '2025/2026', semester: 'First Semester' },
+      academicSettings: { session: '2026/2027', semester: 'First Semester' },
       executives: defaultExecutives,
       events: defaultEvents,
       blogs: [],
@@ -815,7 +815,7 @@ export const getAdminSummary = async ({ totalStudents = 0 } = {}) => {
     listExecutives().catch(() => []),
     listEvents().catch(() => []),
     listBlogs().catch(() => []),
-    getAcademicSettings().catch(() => ({ session: '2025/2026', semester: 'First Semester' })),
+    getAcademicSettings().catch(() => ({ session: '2026/2027', semester: 'First Semester' })),
   ]);
 
   return {
@@ -824,7 +824,7 @@ export const getAdminSummary = async ({ totalStudents = 0 } = {}) => {
     executives: Array.isArray(executives) ? executives.length : 0,
     activeEvents: Array.isArray(events) ? events.length : 0,
     publishedBlogs: Array.isArray(blogs) ? blogs.length : 0,
-    currentSession: settings.session || '2025/2026',
+    currentSession: settings.session || '2026/2027',
     currentSemester: settings.semester || 'First Semester',
   };
 };
