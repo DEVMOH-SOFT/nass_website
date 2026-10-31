@@ -4,6 +4,7 @@ import gensecImg from "@/assets/executives/gensec_likinyo.jpg";
 import assGensecImg from "@/assets/executives/ass_gensec_quadri.jpg";
 import treasurerImg from "@/assets/executives/treasurer_oladepo.jpg";
 import proImg from "@/assets/executives/pro_fregene.jpg";
+import pro2Img from "@/assets/executives/pro2_denedo.jpg";
 import socialDirectorImg from "@/assets/executives/social_adetunji.jpg";
 import sportsMichaelImg from "@/assets/executives/sports_michael.jpg";
 import sportsAkinsanyaImg from "@/assets/executives/sports1_akinsanya.jpg";
@@ -129,6 +130,16 @@ export const executives: Executive[] = [
     email: "chukwudie771@gmail.com",
     phone: "08076696462",
     whatsapp: "08076696462",
+    arm: "SEC",
+    objectPosition: "object-top",
+  },
+  {
+    name: "Denedo Emmanuel Oghenekparobo",
+    post: "PRO II",
+    department: "Mathematical Sciences (Mathematics)",
+    level: "300 Level",
+    description: "Co-directs collegiate public relations, official announcements, student information dissemination, and media outreach across the College of Basic Sciences.",
+    image: pro2Img,
     arm: "SEC",
     objectPosition: "object-top",
   },
