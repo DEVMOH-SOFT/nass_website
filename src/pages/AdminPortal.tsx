@@ -1035,6 +1035,11 @@ Secretariat, NASS LASUSTECH`);
     let mainConnected = false;
     let votingConnected = false;
 
+    // ── 0. Automatically reconcile any background Korapay Bank Transfer payments (Dues & Lab Coats)
+    try {
+      await fetch("/api/reconcile-korapay", { cache: "no-store" });
+    } catch {}
+
     // ── 1. Load live registered students from Supabase (Collegiate Source of Truth)
     let supaStudents: any[] = [];
     if (isSupabaseConfigured) {

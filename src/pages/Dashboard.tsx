@@ -684,6 +684,11 @@ const Dashboard = () => {
           return;
         }
 
+        // 0. Automatically reconcile any background Korapay Bank Transfer payments (Dues & Lab Coats)
+        try {
+          await fetch("/api/reconcile-korapay", { cache: "no-store" });
+        } catch {}
+
         // 1. Fetch live Supabase profile
         let liveStudent = null;
         if (currentMatric || localUser?.email) {
