@@ -45,7 +45,7 @@ import {
 } from "@/data/calendar";
 
 const ACCOUNT_NUMBER = "1234567890";
-const NASS_CBS_WHATSAPP_GROUP = "https://chat.whatsapp.com/FndqQxCWglc3izeuqTNcZr?s=cl&p=i&mlu=4&ilr=4&iam=0";
+const NASS_CBS_WHATSAPP_GROUP = "https://chat.whatsapp.com/BW1JNBTTnT8FwWVePrHgGB?s=cl&p=i&mlu=4&ilr=4";
 
 const Dashboard = () => {
   const location = useLocation();
@@ -2037,15 +2037,15 @@ const Dashboard = () => {
             </div>
           </div>
 
-          {/* Tiny Slim WhatsApp Information Group Strip (Below the Active Session Bar) */}
-          {showWhatsAppBanner && (
+          {/* Tiny Slim WhatsApp Information Group Strip (Below the Active Session Bar - Freshers Only) */}
+          {showWhatsAppBanner && isFresherScholar && (
             <div className="mb-4 flex items-center justify-between gap-3 px-3.5 py-2 rounded-xl bg-gradient-to-r from-[#062018] via-[#093525] to-[#125c40] text-white shadow-xs border border-emerald-700/40">
               <div className="flex items-center gap-2.5 min-w-0">
                 <div className="h-6 w-6 rounded-lg bg-[#25D366] text-white flex items-center justify-center shrink-0">
                   <MessageCircle className="h-3.5 w-3.5" />
                 </div>
                 <div className="flex items-center gap-2 truncate text-xs">
-                  <span className="font-bold text-emerald-200 shrink-0">NASS CBS Information Group:</span>
+                  <span className="font-bold text-emerald-200 shrink-0">NASS CBS Freshers Group:</span>
                   <span className="text-emerald-100/90 truncate hidden md:inline">Join our official WhatsApp group for 100L freshers & college updates</span>
                 </div>
               </div>
