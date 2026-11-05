@@ -25,10 +25,10 @@ export default async function handler(req, res) {
 
   try {
     const [koraRes, supaRes] = await Promise.all([
-      fetch("https://api.korapay.com/merchant/api/v1/pay-ins?limit=100", {
+      fetch("https://api.korapay.com/merchant/api/v1/pay-ins?limit=50", {
         headers: { Authorization: `Bearer ${KORAPAY_SECRET}` },
       }),
-      fetch(`${SUPABASE_URL}/rest/v1/students?select=*`, {
+      fetch(`${SUPABASE_URL}/rest/v1/students?select=*&limit=2000`, {
         headers: {
           apikey: SUPABASE_ANON_KEY,
           Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
@@ -42,7 +42,24 @@ export default async function handler(req, res) {
 
     const koraData = await koraRes.json();
     const students = await supaRes.json();
-    const payins = Array.isArray(koraData?.data?.payins) ? koraData.data.payins : [];
+    const payins = Array.isArray(koraData?.data?.payins) ? [...koraData.data.payins] : [];
+
+    // Fetch second page of 50 pay-ins if available so we cover the latest 100 transactions
+    if (koraData?.data?.has_more && payins.length > 0) {
+      const lastPointer = payins[payins.length - 1]?.pointer;
+      if (lastPointer) {
+        const page2Res = await fetch(
+          `https://api.korapay.com/merchant/api/v1/pay-ins?limit=50&ending_before=${encodeURIComponent(lastPointer)}`,
+          { headers: { Authorization: `Bearer ${KORAPAY_SECRET}` } }
+        );
+        if (page2Res.ok) {
+          const page2Data = await page2Res.json();
+          if (Array.isArray(page2Data?.data?.payins)) {
+            payins.push(...page2Data.data.payins);
+          }
+        }
+      }
+    }
 
     let syncedDues = 0;
     let syncedLabcoats = 0;

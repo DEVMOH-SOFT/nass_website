@@ -1088,13 +1088,15 @@ const Dashboard = () => {
     const studentName = profile.fullName || "NASS Student";
     const cleanMatric = (profile.matricNumber || "SCHOLAR").replace(/[^A-Za-z0-9]/g, "");
     const ref = `NASS-DUES-${cleanMatric}-${Date.now().toString().slice(-4)}`;
+    // Use an internal no-reply gateway email for Korapay so students do not receive Korapay's automated "NACOS LASUSTECH" email after paying ₦2,500 NASS Dues
+    const korapayCheckoutEmail = `dues.${cleanMatric.toLowerCase()}@nasslasustech.org.ng`;
 
     toast({ title: "Opening Gateway...", description: "Connecting to Korapay checkout." });
 
     // Launch Korapay inline modal with Live Public Key
     const opened = await triggerKorapayCheckout({
       amount: 2500,
-      email: studentEmail,
+      email: korapayCheckoutEmail,
       name: studentName,
       reference: ref,
       merchant_bears_cost: false,
@@ -1143,12 +1145,14 @@ const Dashboard = () => {
     const rawAmt = pay.amount || 2500;
     const finalAmount = rawAmt > 10000 ? rawAmt / 100 : rawAmt;
     const ref = pay.reference || `NASS-PAY-${Date.now()}`;
+    const cleanMatric = (profile.matricNumber || "SCHOLAR").replace(/[^A-Za-z0-9]/g, "").toLowerCase();
+    const korapayCheckoutEmail = `dues.${cleanMatric}@nasslasustech.org.ng`;
 
     toast({ title: "Opening Gateway...", description: `Connecting to Korapay checkout for ${pay.payment_type}.` });
 
     await triggerKorapayCheckout({
       amount: finalAmount,
-      email: studentEmail,
+      email: korapayCheckoutEmail,
       name: studentName,
       reference: ref,
       merchant_bears_cost: false,
