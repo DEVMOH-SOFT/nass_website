@@ -2265,48 +2265,122 @@ const Dashboard = () => {
                     </div>
                   </div>
 
-                  <Button 
-                    onClick={() => setActiveTab("payments")} 
-                    className="mt-6 w-full rounded-xl bg-white border border-slate-200/90 text-slate-800 hover:bg-emerald-50 hover:text-emerald-900 font-bold text-xs gap-1.5 shadow-2xs group-hover:border-emerald-500/50" 
-                    variant="outline"
-                  >
-                    <span>View Payment History</span>
-                    <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
-                  </Button>
+                  {profile.duesStatus === "Paid" ? (
+                    <div className="mt-6 flex flex-col gap-2">
+                      <Button
+                        onClick={() => {
+                          const duesPay = payments.find(
+                            (p: any) =>
+                              String(p.payment_type || "").toLowerCase().includes("due") &&
+                              (p.status === "Paid" || String(p.status).toLowerCase() === "paid")
+                          );
+                          const found = duesPay || {
+                            reference: `NASS-DUES-${profile.matricNumber || "PAID"}`,
+                            student_name: profile.fullName || "Student Scholar",
+                            matric_number: profile.matricNumber || "",
+                            department: profile.department || "Basic Sciences",
+                            level: profile.level || "100L",
+                            payment_type: "2026/2027 Session Dues",
+                            amount: duesPaidAmount,
+                            channel: "Korapay Online",
+                            status: "Paid",
+                            created_at: new Date().toISOString(),
+                          };
+                          setActiveReceipt(found);
+                          setReceiptModalOpen(true);
+                        }}
+                        className="w-full rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs gap-1.5 shadow-sm"
+                      >
+                        <Printer className="h-3.5 w-3.5" />
+                        <span>Print / Download Dues Receipt</span>
+                      </Button>
+                      <Button
+                        onClick={() => setActiveTab("payments")}
+                        className="w-full rounded-xl bg-white border border-slate-200/90 text-slate-800 hover:bg-emerald-50 hover:text-emerald-900 font-bold text-xs gap-1.5 shadow-2xs"
+                        variant="outline"
+                      >
+                        <span>View All Receipts ({payments.length})</span>
+                        <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button 
+                      onClick={() => setActiveTab("payments")} 
+                      className="mt-6 w-full rounded-xl bg-white border border-slate-200/90 text-slate-800 hover:bg-emerald-50 hover:text-emerald-900 font-bold text-xs gap-1.5 shadow-2xs group-hover:border-emerald-500/50" 
+                      variant="outline"
+                    >
+                      <span>Pay Session Dues (₦2,500)</span>
+                      <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+                    </Button>
+                  )}
                 </div>
 
                 {/* 2. NASS Store & Lab Essentials Card */}
-                <div className="group rounded-3xl border-2 border-emerald-500/20 bg-gradient-to-br from-white via-emerald-50/30 to-white p-6 shadow-sm transition-all duration-300 hover:border-emerald-600/40 hover:shadow-lg hover:-translate-y-1 flex flex-col justify-between">
-                  <div>
-                    <div className="flex items-center justify-between">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-800 shadow-2xs group-hover:scale-105 transition-transform">
-                        <ShoppingBag className="h-6 w-6" />
+                {(() => {
+                  const paidLabcoatOrder = payments.find(
+                    (p: any) =>
+                      String(p.payment_type || "").toLowerCase().includes("lab coat") &&
+                      String(p.status || "").toLowerCase() === "paid"
+                  );
+                  return (
+                    <div className="group rounded-3xl border-2 border-emerald-500/20 bg-gradient-to-br from-white via-emerald-50/30 to-white p-6 shadow-sm transition-all duration-300 hover:border-emerald-600/40 hover:shadow-lg hover:-translate-y-1 flex flex-col justify-between">
+                      <div>
+                        <div className="flex items-center justify-between">
+                          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-800 shadow-2xs group-hover:scale-105 transition-transform">
+                            <ShoppingBag className="h-6 w-6" />
+                          </div>
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-emerald-100 text-emerald-800">
+                            <span className="h-1.5 w-1.5 rounded-full bg-emerald-600" />
+                            {paidLabcoatOrder ? "Lab Coat Paid (₦6,500)" : "Customized Kits"}
+                          </span>
+                        </div>
+
+                        <div className="mt-5">
+                          <h3 className="font-display text-base font-bold text-slate-900">NASS Store & Essentials</h3>
+                          <p className="mt-1 font-mono text-xl font-black text-emerald-800">
+                            {paidLabcoatOrder ? `✓ Lab Coat (${paidLabcoatOrder.size || "Ordered"})` : "Lab Coat & Manuals"}
+                          </p>
+                          <p className="mt-1 text-xs text-slate-500 leading-relaxed">
+                            {paidLabcoatOrder
+                              ? `Official CBS Lab Coat paid & verified (${paidLabcoatOrder.reference}). Print your receipt below for collection.`
+                              : "Acquire customized lab coats (with custom student name embroidery) and approved practical manuals."}
+                          </p>
+                        </div>
                       </div>
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-emerald-100 text-emerald-800">
-                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-600" />
-                        Customized Kits
-                      </span>
-                    </div>
 
-                    <div className="mt-5">
-                      <h3 className="font-display text-base font-bold text-slate-900">NASS Store & Essentials</h3>
-                      <p className="mt-1 font-mono text-xl font-black text-emerald-800">
-                        Lab Coat & Manuals
-                      </p>
-                      <p className="mt-1 text-xs text-slate-500 leading-relaxed">
-                        Acquire customized lab coats (with custom student name embroidery) and approved practical manuals.
-                      </p>
+                      {paidLabcoatOrder ? (
+                        <div className="mt-6 flex flex-col gap-2">
+                          <Button
+                            onClick={() => {
+                              setActiveReceipt(paidLabcoatOrder);
+                              setReceiptModalOpen(true);
+                            }}
+                            className="w-full rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs gap-1.5 shadow-sm"
+                          >
+                            <Printer className="h-3.5 w-3.5" />
+                            <span>Print / Download Lab Coat Receipt</span>
+                          </Button>
+                          <Button
+                            onClick={() => setActiveTab("store")}
+                            variant="outline"
+                            className="w-full rounded-xl bg-white border border-slate-200/90 text-slate-800 hover:bg-emerald-50 hover:text-emerald-900 font-bold text-xs gap-1.5 shadow-2xs"
+                          >
+                            <ShoppingBag className="h-3.5 w-3.5" />
+                            <span>Open NASS Store</span>
+                          </Button>
+                        </div>
+                      ) : (
+                        <Button 
+                          onClick={() => setActiveTab("store")} 
+                          className="mt-6 w-full rounded-xl bg-[#145a32] hover:bg-[#0f4426] text-white font-bold text-xs gap-1.5 shadow-md shadow-emerald-950/15"
+                        >
+                          <ShoppingBag className="h-3.5 w-3.5" />
+                          <span>View NASS Store</span>
+                        </Button>
+                      )}
                     </div>
-                  </div>
-
-                  <Button 
-                    onClick={() => setActiveTab("store")} 
-                    className="mt-6 w-full rounded-xl bg-[#145a32] hover:bg-[#0f4426] text-white font-bold text-xs gap-1.5 shadow-md shadow-emerald-950/15"
-                  >
-                    <ShoppingBag className="h-3.5 w-3.5" />
-                    <span>View NASS Store</span>
-                  </Button>
-                </div>
+                  );
+                })()}
 
                 {/* 3. Science Resources Card */}
                 <div className="group rounded-3xl border-2 border-blue-500/20 bg-gradient-to-br from-white via-blue-50/30 to-white p-6 shadow-sm transition-all duration-300 hover:border-blue-600/40 hover:shadow-lg hover:-translate-y-1 flex flex-col justify-between">
@@ -3076,23 +3150,23 @@ const Dashboard = () => {
                     </div>
                   </div>
 
-                  {/* Email Delivery & Spam Instruction Notice */}
+                  {/* Official Cloud Receipt & Instant Print Notice */}
                   <div className="rounded-2xl border border-emerald-500/30 bg-gradient-to-r from-emerald-50 via-teal-50/70 to-emerald-50/80 p-4 text-emerald-950 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
                     <div className="flex items-start gap-3">
                       <div className="h-9 w-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs mt-0.5">
-                        <Mail className="h-4 w-4" />
+                        <Printer className="h-4 w-4" />
                       </div>
                       <div className="space-y-0.5">
                         <div className="flex items-center gap-2 flex-wrap">
                           <h4 className="font-bold text-xs sm:text-sm text-emerald-950">
-                            Looking for your official email receipt copy?
+                            Official NASS Printable Receipts (Sessional Dues & CBS Lab Coat)
                           </h4>
                           <span className="text-[10px] bg-emerald-200/90 text-emerald-900 font-extrabold px-2 py-0.5 rounded-full uppercase">
-                            Check Spam / Junk
+                            Cloud Synced • A4 PDF
                           </span>
                         </div>
                         <p className="text-xs text-emerald-800 leading-relaxed max-w-4xl">
-                          Every cleared payment triggers an automated receipt to your registered Gmail (<strong className="text-emerald-950">{profile.email || "registered Gmail"}</strong>). If it has not arrived in your Primary inbox, please check your <strong>Spam / Junk folder</strong> or <strong>Promotions tab</strong>, and click <strong>"Report Not Spam"</strong> to guarantee all subsequent semester clearance passes land in your inbox.
+                          All verified NASS payments are permanently saved to your student profile (<strong className="text-emerald-950">{profile.matricNumber || profile.email}</strong>). Click <strong>"Print / Download Receipt"</strong> on any item below to save the official PDF or print your A4 clearance copy on any device.
                         </p>
                       </div>
                     </div>
@@ -3213,10 +3287,10 @@ const Dashboard = () => {
                                       });
                                       setReceiptModalOpen(true);
                                     }}
-                                    className="h-8 text-xs bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold rounded-lg gap-1.5 shadow-2xs"
+                                    className="h-8 text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg gap-1.5 shadow-2xs"
                                   >
-                                    <Printer className="h-3.5 w-3.5 text-emerald-700" />
-                                    <span>View Receipt</span>
+                                    <Printer className="h-3.5 w-3.5" />
+                                    <span>Print / Download Receipt</span>
                                   </Button>
                                 )}
                               </div>
@@ -4622,7 +4696,7 @@ const Dashboard = () => {
                       onClick={() => printElementById("printable-receipt", "NASS LASUSTECH - Official Payment Receipt")}
                       size="sm"
                       variant="outline"
-                      className="h-8 gap-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white border-white/20 font-bold text-xs shadow-xs px-2 sm:px-2.5 hidden sm:inline-flex"
+                      className="h-8 gap-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white border-white/20 font-bold text-xs shadow-xs px-2 sm:px-2.5 inline-flex"
                     >
                       <Printer className="h-3.5 w-3.5" />
                       <span>Print</span>

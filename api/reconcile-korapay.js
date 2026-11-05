@@ -99,10 +99,26 @@ export default async function handler(req, res) {
 
       // 2. Reconcile NASS-LABCOAT-*
       if (ref.startsWith("NASS-LABCOAT-")) {
+        const desc = String(pay.description || "").trim();
+        let st = null;
         const m = ref.match(/^NASS-LABCOAT-([A-Za-z0-9-]+)-\d+$/i);
-        if (!m) continue;
-        const token = stripAlnum(m[1]);
-        const st = students.find((s) => stripAlnum(s.matric_number) === token);
+        if (m) {
+          const token = stripAlnum(m[1]);
+          st = students.find((s) => stripAlnum(s.matric_number) === token);
+        }
+        // Fallback: match by student name or WhatsApp number in description if matric changed
+        if (!st && desc) {
+          const nameWaMatch = desc.match(/-\s+(.+?)\s+WA\s+([0-9+]+)/i);
+          if (nameWaMatch) {
+            const targetName = nameWaMatch[1].replace(/\s+/g, " ").trim().toUpperCase();
+            const targetPhone = nameWaMatch[2].trim();
+            st =
+              students.find(
+                (s) => String(s.full_name || "").replace(/\s+/g, " ").trim().toUpperCase() === targetName
+              ) ||
+              students.find((s) => s.phone && String(s.phone).trim() === targetPhone);
+          }
+        }
         if (!st) continue;
 
         let existingOrders = [];
@@ -114,7 +130,6 @@ export default async function handler(req, res) {
         } catch {}
 
         if (!existingOrders.some((o) => o && o.reference === ref)) {
-          const desc = String(pay.description || "").trim();
           let size = "Large (L)";
           if (desc.includes("Extra Large XL")) size = "Extra Large (XL)";
           else if (desc.includes("2X Large XXL")) size = "2X Large (XXL)";
