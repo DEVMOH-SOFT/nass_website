@@ -23,7 +23,7 @@ import { useToast } from "@/hooks/use-toast";
 import { fetchApi, API_BASE_URL } from "@/lib/api";
 import { events as staticEvents } from "@/data/events";
 import { fetchStudentProfile, updateStudentProfile, logoutStudent, markDuesPaid, resolveStudentDuesPaidAmount, parseStudentStoreOrders, recordStudentStoreOrder } from "@/lib/student-auth";
-import { triggerKorapayCheckout, NASS_PRESIDENT_WHATSAPP_URL } from "@/lib/korapay";
+import { triggerKorapayCheckout, verifyKorapayPayment, NASS_PRESIDENT_WHATSAPP_URL } from "@/lib/korapay";
 import { downloadFile, getDownloadUrl } from "@/lib/download";
 import { downloadElementAsPdf } from "@/lib/pdf-service";
 import { getStoreProducts, StoreProduct } from "@/lib/store-service";
@@ -705,19 +705,32 @@ const Dashboard = () => {
         const studentLevel = liveStudent?.level || localUser?.level || "100L";
         const studentEmail = liveStudent?.email || localUser?.email || "";
 
-        const isDuesPaid = Boolean(
-          liveStudent?.dues_status?.toLowerCase() === "paid" ||
-          localUser?.dues_status?.toLowerCase() === "paid" ||
-          (studentMatric && localStorage.getItem(`nass_dues_${studentMatric}`) === "Paid")
-        );
+        // Authoritative verification: when liveStudent is loaded from Supabase (after /api/reconcile-korapay),
+        // only trust liveStudent.dues_status === "paid" so stale localStorage can never falsely mark an unpaid student as Paid.
+        const isDuesPaid = liveStudent
+          ? liveStudent.dues_status?.toLowerCase() === "paid"
+          : Boolean(
+              localUser?.dues_status?.toLowerCase() === "paid" ||
+              (studentMatric && localStorage.getItem(`nass_dues_${studentMatric}`) === "Paid")
+            );
 
-        // If Supabase confirms Paid, sync localStorage user cache immediately so reload/tabs never show Pending
-        if (isDuesPaid && localUser && localUser.dues_status !== "Paid") {
+        if (isDuesPaid) {
+          if (localUser && localUser.dues_status !== "Paid") {
+            try {
+              localUser.dues_status = "Paid";
+              localUser.id_card_status = "Ready";
+              localStorage.setItem("user", JSON.stringify(localUser));
+              if (studentMatric) localStorage.setItem(`nass_dues_${studentMatric}`, "Paid");
+            } catch {}
+          }
+        } else if (liveStudent) {
+          // Clear any mistaken local cache if Supabase confirms student is Unpaid
           try {
-            localUser.dues_status = "Paid";
-            localUser.id_card_status = "Ready";
-            localStorage.setItem("user", JSON.stringify(localUser));
-            if (studentMatric) localStorage.setItem(`nass_dues_${studentMatric}`, "Paid");
+            if (studentMatric) localStorage.removeItem(`nass_dues_${studentMatric}`);
+            if (localUser && localUser.dues_status === "Paid") {
+              localUser.dues_status = "Unpaid";
+              localStorage.setItem("user", JSON.stringify(localUser));
+            }
           } catch {}
         }
 
@@ -945,9 +958,13 @@ const Dashboard = () => {
         });
       }
 
-      // 2. Update localStorage active matric and dues clearance
+      // 2. Update localStorage active matric and dues clearance (only if already verified Paid)
       localStorage.setItem("student_matric", cleanNewMatric);
-      localStorage.setItem(`nass_dues_${cleanNewMatric}`, "Paid");
+      if (profile.duesStatus === "Paid") {
+        localStorage.setItem(`nass_dues_${cleanNewMatric}`, "Paid");
+      } else {
+        localStorage.removeItem(`nass_dues_${cleanNewMatric}`);
+      }
 
       // 3. Update localStorage user object
       try {
@@ -1026,10 +1043,11 @@ const Dashboard = () => {
     }
   };
 
-  const handleDirectDuesClearance = async (channelName = "Collegiate Direct Transfer") => {
+  // Only called AFTER /api/verify-korapay has confirmed the exact Korapay reference succeeded.
+  const handleDirectDuesClearance = async (channelName: string, verifiedRef: string) => {
+    if (!verifiedRef) return;
     const studentEmail = profile.email || `${profile.matricNumber || 'student'}@lasustech.edu.ng`;
-    const cleanMatric = (profile.matricNumber || "SCHOLAR").replace(/[^A-Za-z0-9]/g, "");
-    const ref = `NASS-DUES-${cleanMatric}-${Date.now().toString().slice(-4)}`;
+    const ref = verifiedRef;
 
     const confirmedRecord = {
       id: `pay-dues-${profile.matricNumber || Date.now()}`,
@@ -1101,8 +1119,20 @@ const Dashboard = () => {
       reference: ref,
       merchant_bears_cost: false,
       narration: `NASS LASUSTECH Session Dues - ${profile.matricNumber || studentName}`,
-      onSuccess: () => {
-        handleDirectDuesClearance("Korapay Online");
+      onSuccess: async () => {
+        toast({ title: "Verifying Payment...", description: "Confirming your ₦2,500 with Korapay. Please keep this page open." });
+        const check = await verifyKorapayPayment(ref, 2500);
+        if (check.verified) {
+          await handleDirectDuesClearance("Korapay Online", ref);
+        } else {
+          toast({
+            title: "Payment Not Yet Confirmed",
+            description: check.reason === "amount_mismatch"
+              ? "Korapay did not receive the exact amount. Any short transfer is reversed to your bank automatically."
+              : "We have not received confirmation from Korapay yet. If you were debited, your dashboard will update automatically once it is confirmed — do not pay again.",
+            variant: "destructive",
+          });
+        }
       },
       onClose: () => {
         toast({ title: "Checkout Closed", description: "Korapay payment modal closed. You can resume this payment anytime." });
@@ -1157,7 +1187,17 @@ const Dashboard = () => {
       reference: ref,
       merchant_bears_cost: false,
       narration: `NASS LASUSTECH: ${pay.payment_type}`,
-      onSuccess: () => {
+      onSuccess: async () => {
+        toast({ title: "Verifying Payment...", description: "Confirming with Korapay. Please keep this page open." });
+        const check = await verifyKorapayPayment(ref, finalAmount);
+        if (!check.verified) {
+          toast({
+            title: "Payment Not Yet Confirmed",
+            description: "Korapay has not confirmed this payment yet. If you were debited, it will update automatically once confirmed — do not pay again.",
+            variant: "destructive",
+          });
+          return;
+        }
         const confirmedRecord = {
           ...pay,
           reference: ref,
@@ -1398,10 +1438,23 @@ const Dashboard = () => {
       merchant_bears_cost: false,
       narration: `NASS LASUSTECH: ${finalTitle} (WA: ${cleanWa})`,
       onSuccess: async () => {
+        toast({ title: "Verifying Payment...", description: `Confirming your ${finalTitle} payment with Korapay. Please keep this page open.` });
+        const check = await verifyKorapayPayment(ref, finalPrice);
+        if (!check.verified) {
+          toast({
+            title: "Payment Not Yet Confirmed",
+            description: check.reason === "amount_mismatch"
+              ? "Korapay did not receive the exact amount. Any short transfer is reversed to your bank automatically."
+              : "Korapay has not confirmed this payment yet. If you were debited, your order will appear automatically once confirmed — do not pay again.",
+            variant: "destructive",
+          });
+          return;
+        }
+
         const confirmedRecord = {
           ...initiatedRecord,
           status: "Paid",
-          created_at: new Date().toISOString(),
+          created_at: check.paid_at || new Date().toISOString(),
         };
 
         await recordStudentStoreOrder(confirmedRecord);

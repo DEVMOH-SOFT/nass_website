@@ -206,3 +206,43 @@ export const triggerKorapayCheckout = async (options: {
   console.warn("Korapay gateway script not available on window.");
   return false;
 };
+
+/**
+ * Server-side verification of a Korapay charge.
+ * The browser onSuccess callback alone is never trusted — a payment is only treated
+ * as "Paid" once /api/verify-korapay confirms with Korapay (secret key) that the charge
+ * status is "success", money was received, and the accepted amount matches the NASS price.
+ *
+ * Retries a few times because bank transfers can take a few seconds to settle on Korapay.
+ */
+export const verifyKorapayPayment = async (
+  reference: string,
+  expectedAmount: number,
+  attempts = 6,
+  delayMs = 4000
+): Promise<{ verified: boolean; reason?: string; paid_at?: string | null }> => {
+  for (let i = 0; i < attempts; i++) {
+    try {
+      const res = await fetch(
+        `/api/verify-korapay?reference=${encodeURIComponent(reference)}&expected=${encodeURIComponent(String(expectedAmount))}`,
+        { cache: "no-store" }
+      );
+      if (res.ok) {
+        const data = await res.json();
+        if (data?.verified) {
+          return { verified: true, paid_at: data.paid_at || null };
+        }
+        // Definitive failures — stop retrying
+        if (data?.reason === "amount_mismatch" || data?.reason === "status_failed" || data?.reason === "invalid_reference") {
+          return { verified: false, reason: data.reason };
+        }
+      }
+    } catch {
+      // network hiccup — retry
+    }
+    if (i < attempts - 1) {
+      await new Promise((r) => setTimeout(r, delayMs));
+    }
+  }
+  return { verified: false, reason: "pending" };
+};
