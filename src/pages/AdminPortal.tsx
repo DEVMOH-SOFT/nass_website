@@ -1049,7 +1049,13 @@ Secretariat, NASS LASUSTECH`);
           .select("*")
           .order("created_at", { ascending: false });
         if (!error && Array.isArray(data)) {
-          supaStudents = data;
+          // Filter out archived duplicate accounts
+          supaStudents = data.filter(
+            (s) =>
+              !String(s?.full_name || "").startsWith("[DUPLICATE REMOVED]") &&
+              !String(s?.matric_number || "").startsWith("DUP-") &&
+              s?.dues_status !== "Archived Duplicate"
+          );
         }
       } catch (e) {
         console.warn("Supabase students load notice:", e);
