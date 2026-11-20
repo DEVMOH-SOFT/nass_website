@@ -1465,9 +1465,12 @@ const Dashboard = () => {
         }));
         setPayments(prev => [confirmedRecord, ...prev.filter(p => p.reference !== ref)]);
 
+        const isLabcoatItem = selectedStoreItem.category === "labcoat";
         toast({
           title: "Payment Confirmed!",
-          description: `Your order for ${finalTitle} has been verified and saved! Your official payment receipt is ready.`,
+          description: isLabcoatItem
+            ? `Your order for ${finalTitle} has been verified! Important: Your custom lab coat will be ready for collection next week Wednesday at CBS Ground Floor.`
+            : `Your order for ${finalTitle} has been verified and saved! Your official payment receipt is ready.`,
         });
 
         // Immediately issue the receipt
@@ -3931,6 +3934,26 @@ const Dashboard = () => {
                                   <span>100% Acid & Stain Resistant Cotton Drill</span>
                                 </span>
                               </div>
+
+                              {/* Collection Schedule Alert Banner */}
+                              <div className="mt-4 rounded-2xl border border-amber-300 bg-gradient-to-r from-amber-50 to-orange-50/70 p-3.5 sm:p-4 flex items-start gap-3 shadow-xs">
+                                <div className="h-8 w-8 rounded-xl bg-amber-500/15 flex items-center justify-center shrink-0 text-amber-800 mt-0.5">
+                                  <Calendar className="h-4 w-4" />
+                                </div>
+                                <div className="text-xs">
+                                  <div className="flex items-center gap-2">
+                                    <span className="font-black text-amber-950 uppercase tracking-wide">
+                                      Collection Schedule Notice
+                                    </span>
+                                    <span className="bg-amber-200/90 text-amber-900 text-[9px] font-black px-1.5 py-0.5 rounded uppercase">
+                                      Important
+                                    </span>
+                                  </div>
+                                  <p className="text-amber-900 mt-1 leading-relaxed">
+                                    Students placing orders for lab coats now will get their lab coats <strong>next week Wednesday</strong> at the College of Basic Science Ground Floor upon completion of custom chest embroidery.
+                                  </p>
+                                </div>
+                              </div>
                             </div>
 
                             {/* Action */}
@@ -3990,9 +4013,9 @@ const Dashboard = () => {
                                   </>
                                 );
                               })()}
-                              <p className="text-[11px] text-slate-400 mt-2 flex items-center gap-1.5">
+                              <p className="text-[11px] text-slate-600 font-medium mt-2 flex items-center gap-1.5">
                                 <MapPin className="h-3.5 w-3.5 text-emerald-700 shrink-0" />
-                                <span>Collection at College of Basic Science Ground Floor upon completion of custom embroidery.</span>
+                                <span>Collection scheduled for <strong>next week Wednesday</strong> at College of Basic Science Ground Floor.</span>
                               </p>
                             </div>
                           </div>
@@ -4399,7 +4422,17 @@ const Dashboard = () => {
 
                   {/* SPECIFIC SELECTOR 1: LAB COAT SIZES */}
                   {selectedStoreItem.category === "labcoat" && (
-                    <div className="space-y-2.5">
+                    <div className="space-y-3">
+                      {/* Urgent Collection Date Banner */}
+                      <div className="rounded-2xl border-2 border-amber-300 bg-amber-50/90 p-3.5 flex items-start gap-2.5 shadow-xs">
+                        <Calendar className="h-4 w-4 text-amber-700 shrink-0 mt-0.5" />
+                        <div className="text-xs text-amber-950 leading-relaxed">
+                          <strong className="font-black text-amber-900 block uppercase tracking-wide text-[11px]">
+                            Collection Date: Next Week Wednesday
+                          </strong>
+                          Please note that any lab coat paid for now will be ready for collection <strong>next week Wednesday</strong> at the NASS Secretariat (College of Basic Science Ground Floor) after custom name embroidery.
+                        </div>
+                      </div>
                       <div className="flex items-center justify-between">
                         <label className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
                           <Tag className="h-3.5 w-3.5 text-emerald-700" />
@@ -4952,7 +4985,10 @@ const Dashboard = () => {
                       {/* Pickup / Clearance Notice */}
                       {activeReceipt.payment_type && !String(activeReceipt.payment_type).toLowerCase().includes("due") ? (
                         <div className="rounded-xl bg-amber-50 border border-amber-200 p-2.5 sm:p-3 text-[9.5px] sm:text-[10.5px] text-amber-950 mb-3.5 sm:mb-5 leading-relaxed">
-                          <strong>Collection Instructions:</strong> Present this receipt (printed or on your phone) at the <strong>NASS Secretariat, College of Basic Science Ground Floor</strong>. Official dispatch notification will also be sent to your WhatsApp line.
+                          <strong>Collection Instructions:</strong> Present this receipt (printed or on your phone) at the <strong>NASS Secretariat, College of Basic Science Ground Floor</strong>.
+                          {(String(activeReceipt.payment_type || '').toLowerCase().includes("lab coat") || String(activeReceipt.reference || '').toUpperCase().includes("LABCOAT")) && (
+                            <span> <strong>Notice:</strong> Lab coats ordered now are scheduled for collection <strong>next week Wednesday</strong> upon completion of custom chest embroidery.</span>
+                          )} Official dispatch notification will also be sent to your WhatsApp line.
                         </div>
                       ) : (
                         <div className="rounded-xl bg-emerald-50 border border-emerald-200 p-2.5 sm:p-3 text-[9.5px] sm:text-[10.5px] text-emerald-950 mb-3.5 sm:mb-5 leading-relaxed">

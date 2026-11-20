@@ -26,6 +26,7 @@ export const DEFAULT_STORE_PRODUCTS: StoreProduct[] = [
     badge: "Embroidered Crest & Custom Name",
     description: "Heavyweight 100% white cotton drill fabric, customized with official embroidered NASS LASUSTECH crest on the left chest pocket and student's custom name embroidery on the right chest in collegiate green stitching. Features 3 reinforced deep pockets, side slits, and anti-corrosion press buttons.",
     features: [
+      "Scheduled Collection: Lab coats ordered now will be ready for pickup next week Wednesday at CBS Ground Floor",
       "Official NASS LASUSTECH embroidered crest on left chest pocket",
       "Bespoke student name embroidered in green on right chest (e.g. ADEGOKE M. A.)",
       "100% heavy cotton drill with acid & stain resistance",
