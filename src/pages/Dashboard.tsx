@@ -2067,63 +2067,54 @@ const Dashboard = () => {
           )}
 
           {/* Academic Session Bar */}
-          <div className="mb-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-4 py-2.5 rounded-xl bg-white/95 backdrop-blur-md border border-emerald-900/15 shadow-xs">
-            <div className="flex items-center gap-2.5">
-              <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-emerald-600 to-[#145a32] text-white flex items-center justify-center shrink-0 shadow-xs">
+          <div className="mb-3 flex items-center justify-between gap-3 px-3.5 py-2 sm:py-2.5 rounded-xl bg-white/95 backdrop-blur-md border border-emerald-900/10 shadow-xs">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="h-7 w-7 rounded-lg bg-gradient-to-br from-emerald-600 to-[#145a32] text-white flex items-center justify-center shrink-0 shadow-xs">
                 <GraduationCap className="h-4 w-4 text-emerald-100" />
               </div>
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-[10px] font-extrabold uppercase tracking-widest text-emerald-800">
-                  DEVMOH-Led Administration
-                </span>
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-black uppercase bg-emerald-100 text-emerald-800 border border-emerald-300/60">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-600 animate-ping" />
-                  Active
-                </span>
-                <span className="text-xs font-extrabold text-slate-800">
+              <div className="flex items-center gap-2 truncate">
+                <span className="font-extrabold text-slate-900 text-xs sm:text-sm truncate">
                   {academicSettings.session || "2026/2027 Session"} {academicSettings.semester ? `• ${academicSettings.semester}` : "• First Semester"}
+                </span>
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300/60 shrink-0">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-600" />
+                  Active
                 </span>
               </div>
             </div>
-            <div className="flex items-center gap-2 self-start sm:self-auto">
-              <div className="px-2.5 py-1 rounded-lg bg-slate-100 border border-slate-200 text-[10.5px] font-bold text-slate-600 flex items-center gap-1.5">
-                <Calendar className="h-3 w-3 text-emerald-700" />
-                <span>{new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}</span>
-              </div>
-              <div className="px-2.5 py-1 rounded-lg bg-emerald-50 border border-emerald-200 text-[10.5px] font-black text-emerald-800 flex items-center gap-1">
-                <CheckCircle2 className="h-3 w-3 text-emerald-600" />
-                <span>CBS Portal Active</span>
-              </div>
+            <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 border border-slate-200 text-[10.5px] font-bold text-slate-600 shrink-0">
+              <Calendar className="h-3 w-3 text-emerald-700" />
+              <span>{new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}</span>
             </div>
           </div>
 
-          {/* Tiny Slim WhatsApp Information Group Strip (Below the Active Session Bar - Freshers Only) */}
+          {/* Tiny Slim WhatsApp Information Group Strip (Freshers Only) */}
           {showWhatsAppBanner && isFresherScholar && (
-            <div className="mb-4 flex items-center justify-between gap-3 px-3.5 py-2 rounded-xl bg-gradient-to-r from-[#062018] via-[#093525] to-[#125c40] text-white shadow-xs border border-emerald-700/40">
-              <div className="flex items-center gap-2.5 min-w-0">
-                <div className="h-6 w-6 rounded-lg bg-[#25D366] text-white flex items-center justify-center shrink-0">
-                  <MessageCircle className="h-3.5 w-3.5" />
+            <div className="mb-3 flex items-center justify-between gap-2.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-[#062018] via-[#093525] to-[#125c40] text-white shadow-xs border border-emerald-700/40">
+              <div className="flex items-center gap-2 min-w-0">
+                <div className="h-5 w-5 rounded-md bg-[#25D366] text-white flex items-center justify-center shrink-0">
+                  <MessageCircle className="h-3 w-3" />
                 </div>
-                <div className="flex items-center gap-2 truncate text-xs">
-                  <span className="font-bold text-emerald-200 shrink-0">NASS CBS Freshers Group:</span>
-                  <span className="text-emerald-100/90 truncate hidden md:inline">Join our official WhatsApp group for 100L freshers & college updates</span>
+                <div className="flex items-center gap-1.5 truncate text-[11px]">
+                  <span className="font-bold text-emerald-200 shrink-0">NASS Freshers Group:</span>
+                  <span className="text-emerald-100/90 truncate hidden sm:inline">Join official WhatsApp group for 100L updates</span>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 shrink-0">
+              <div className="flex items-center gap-1.5 shrink-0">
                 <a
                   href={NASS_CBS_WHATSAPP_GROUP}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 rounded-lg bg-[#25D366] hover:bg-[#20ba59] text-white font-extrabold px-3 py-1 text-[11px] shadow-xs transition-transform active:scale-95 uppercase tracking-wider"
+                  className="inline-flex items-center gap-1 rounded-lg bg-[#25D366] hover:bg-[#20ba59] text-white font-black px-2.5 py-0.5 text-[10px] shadow-xs uppercase tracking-wider"
                 >
-                  <span>JOIN NOW</span>
-                  <ExternalLink className="h-3 w-3" />
+                  <span>JOIN</span>
+                  <ExternalLink className="h-2.5 w-2.5" />
                 </a>
                 <button
                   type="button"
                   onClick={handleCloseWhatsAppBanner}
-                  className="rounded-lg p-1 text-emerald-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+                  className="rounded-lg p-0.5 text-emerald-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
                   aria-label="Close"
                   title="Dismiss"
                 >
@@ -2135,23 +2126,21 @@ const Dashboard = () => {
 
           {/* Profile Incomplete Banner */}
           {isProfileIncomplete && (
-            <div className="mb-4 rounded-xl border border-blue-200/80 bg-gradient-to-r from-[#0d346c] via-[#1a4480] to-[#0f2c59] px-4 py-2.5 shadow-xs text-white flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-              <div className="flex items-center gap-2.5 min-w-0">
-                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-white/10 text-amber-300 border border-white/20">
-                  <AlertCircle className="h-4 w-4" />
+            <div className="mb-3 rounded-xl border border-blue-200/80 bg-gradient-to-r from-[#0d346c] via-[#1a4480] to-[#0f2c59] px-3.5 py-2 shadow-xs text-white flex items-center justify-between gap-2.5">
+              <div className="flex items-center gap-2 min-w-0">
+                <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-white/10 text-amber-300 border border-white/20">
+                  <AlertCircle className="h-3.5 w-3.5" />
                 </div>
-                <div className="min-w-0">
-                  <p className="text-xs font-medium text-blue-100 leading-tight">
-                    <strong className="text-white font-bold">Profile Notice:</strong> Add your official email and contact details to receive dues receipts and academic alerts.
-                  </p>
-                </div>
+                <p className="text-[11px] font-medium text-blue-100 truncate leading-tight">
+                  <strong className="text-white font-bold">Profile Notice:</strong> Add email and phone to receive dues receipts.
+                </p>
               </div>
               <Button 
                 onClick={() => setActiveTab("profile")}
                 size="sm"
-                className="shrink-0 bg-white hover:bg-emerald-50 text-[#0d346c] hover:text-[#1a4480] rounded-lg text-xs font-black h-7 px-3.5 shadow-xs transition-all self-end sm:self-auto"
+                className="shrink-0 bg-white hover:bg-emerald-50 text-[#0d346c] hover:text-[#1a4480] rounded-lg text-[10.5px] font-black h-6 px-2.5 shadow-xs transition-all"
               >
-                Update Details
+                Update
               </Button>
             </div>
           )}
@@ -2205,88 +2194,66 @@ const Dashboard = () => {
               )}
 
               {/* Executive Welcome Hero Banner */}
-              <div className="relative overflow-hidden rounded-3xl border border-emerald-900/15 bg-gradient-to-br from-[#0f4426] via-[#145a32] to-[#0a2f1a] text-white p-5 sm:p-6 shadow-lg">
+              <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl border border-emerald-900/15 bg-gradient-to-br from-[#0f4426] via-[#145a32] to-[#0a2f1a] text-white p-4 sm:p-6 shadow-md">
                 {/* Decorative Ambient Radial Glows */}
                 <div className="absolute -right-16 -top-16 h-64 w-64 rounded-full bg-emerald-400/10 blur-2xl pointer-events-none" />
                 <div className="absolute right-32 -bottom-20 h-64 w-64 rounded-full bg-amber-400/10 blur-3xl pointer-events-none" />
 
-                <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+                <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4 sm:gap-6">
                   <div className="max-w-xl">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-[11px] font-bold uppercase tracking-widest text-emerald-200 mb-3">
-                      <GraduationCap className="h-3.5 w-3.5 text-emerald-300" />
+                    <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-[10px] font-bold uppercase tracking-widest text-emerald-200 mb-2">
+                      <GraduationCap className="h-3 w-3 text-emerald-300" />
                       <span>Student Portal • CBS LASUSTECH</span>
                     </div>
-                    <h1 className="font-display text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white leading-tight">
+                    <h1 className="font-display text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight text-white leading-tight">
                       Welcome back, <span className="text-emerald-300 uppercase">{String(profile.fullName || "Scholar").split(' ')[0].toUpperCase()}</span> 👋
                     </h1>
-                    <p className="mt-2 text-xs sm:text-sm text-emerald-100/90 leading-relaxed">
-                      You are in good financial and academic standing for the 2026/2027 academic session. Access your official payment receipts, order your custom embroidered lab coat and practical manuals, or explore the science resource library.
+                    <p className="hidden sm:block mt-1 text-xs text-emerald-100/90 leading-relaxed">
+                      Access official dues clearance, custom embroidered lab coat ordering, and science academic materials.
                     </p>
 
                     {/* Quick Identity Tags */}
-                    <div className="flex flex-wrap items-center gap-2 mt-4 pt-4 border-t border-white/15 text-xs">
-                      <span className="px-2.5 py-1 rounded-lg bg-white/10 text-white font-medium">
+                    <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mt-3 pt-3 border-t border-white/15 text-[10.5px] sm:text-xs">
+                      <span className="px-2 py-0.5 rounded-lg bg-white/10 text-white font-medium">
                         🔬 {profile.department || "Computer Science"}
                       </span>
                       {isFresherScholar ? (
                         <>
-                          <span className="px-2.5 py-1 rounded-lg bg-white/10 text-white font-mono font-medium">
+                          <span className="px-2 py-0.5 rounded-lg bg-white/10 text-white font-mono font-medium">
                             📋 App ID: {profile.matricNumber}
                           </span>
-                          <span className="px-2.5 py-1 rounded-lg bg-amber-400/20 text-amber-200 font-bold border border-amber-400/30">
+                          <span className="px-2 py-0.5 rounded-lg bg-amber-400/20 text-amber-200 font-bold border border-amber-400/30">
                             🎓 Matric: Pending (100L)
                           </span>
                         </>
                       ) : (
-                        <span className="px-2.5 py-1 rounded-lg bg-white/10 text-white font-mono font-medium">
+                        <span className="px-2 py-0.5 rounded-lg bg-white/10 text-white font-mono font-medium">
                           🆔 {profile.matricNumber || "SCHOLAR"}
                         </span>
                       )}
-                      <span className="px-2.5 py-1 rounded-lg bg-emerald-400/20 text-emerald-200 font-bold border border-emerald-400/30">
+                      <span className="px-2 py-0.5 rounded-lg bg-emerald-400/20 text-emerald-200 font-bold border border-emerald-400/30">
                         ✓ {profile.duesStatus === 'Paid' ? `Dues Cleared (₦${duesPaidAmount.toLocaleString()})` : 'Dues Pending'}
                       </span>
                     </div>
                   </div>
 
                   {/* Hero CTA Shortcuts */}
-                  <div className="flex flex-col sm:flex-row md:flex-col gap-2.5 shrink-0">
+                  <div className="grid grid-cols-2 sm:flex sm:flex-row md:flex-col gap-2 shrink-0 pt-1 sm:pt-0">
                     <Button
                       onClick={() => setActiveTab("store")}
-                      className="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs sm:text-sm px-5 py-2.5 rounded-xl shadow-lg shadow-amber-950/20 gap-2 transition-all hover:scale-[1.02]"
+                      className="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs px-3.5 py-2 h-9 rounded-xl shadow-md gap-1.5 transition-all hover:scale-[1.02]"
                     >
-                      <ShoppingBag className="h-4 w-4" />
-                      <span>View NASS Store</span>
+                      <ShoppingBag className="h-3.5 w-3.5" />
+                      <span>NASS Store</span>
                     </Button>
                     <Button
                       onClick={() => setActiveTab("payments")}
                       variant="outline"
-                      className="bg-white/10 hover:bg-white/20 border-white/25 text-white font-semibold text-xs rounded-xl gap-2 transition-all"
+                      className="bg-white/10 hover:bg-white/20 border-white/25 text-white font-semibold text-xs px-3.5 py-2 h-9 rounded-xl gap-1.5 transition-all"
                     >
-                      <CreditCard className="h-4 w-4" />
-                      <span>View Receipts</span>
+                      <CreditCard className="h-3.5 w-3.5" />
+                      <span>Receipts</span>
                     </Button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Delivery Advisory: Check Spam & Mark Not Spam */}
-              <div className="rounded-2xl border border-emerald-500/30 bg-gradient-to-r from-emerald-50/90 via-teal-50/70 to-emerald-50/80 p-4 text-emerald-950 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
-                <div className="flex items-start gap-3">
-                  <div className="h-9 w-9 rounded-xl bg-emerald-700 text-white flex items-center justify-center shrink-0 shadow-xs mt-0.5">
-                    <Mail className="h-4 w-4" />
-                  </div>
-                  <div className="space-y-0.5">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <h4 className="font-bold text-xs sm:text-sm text-emerald-950">
-                        Official Collegiate Email & Receipt Delivery Notice
-                      </h4>
-                      <span className="text-[10px] bg-emerald-200/90 text-emerald-900 font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider">
-                        Inbox Tip
-                      </span>
-                    </div>
-                    <p className="text-xs text-emerald-800 leading-relaxed max-w-4xl">
-                      Official clearance receipts and broadcasts are sent to your registered Gmail address from <strong className="text-emerald-950 font-bold">nasslasustech@gmail.com</strong>. If any message appears in your <strong>Spam / Junk folder</strong> or <strong>Promotions tab</strong>, please click <strong className="underline decoration-emerald-600">"Report Not Spam"</strong> and add our address to your contacts so critical academic notifications land directly in your Primary inbox.
-                    </p>
                   </div>
                 </div>
               </div>
@@ -2496,6 +2463,28 @@ const Dashboard = () => {
                   <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">Faculty Division</span>
                   <p className="text-sm font-black text-emerald-950 mt-1 truncate">Basic Sciences</p>
                   <p className="text-[10px] text-slate-500 font-medium">5 Departments</p>
+                </div>
+              </div>
+
+              {/* Delivery Advisory: Check Spam & Mark Not Spam */}
+              <div className="rounded-2xl border border-emerald-500/30 bg-gradient-to-r from-emerald-50/90 via-teal-50/70 to-emerald-50/80 p-3.5 sm:p-4 text-emerald-950 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
+                <div className="flex items-start gap-3">
+                  <div className="h-8 w-8 rounded-xl bg-emerald-700 text-white flex items-center justify-center shrink-0 shadow-xs mt-0.5">
+                    <Mail className="h-4 w-4" />
+                  </div>
+                  <div className="space-y-0.5">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h4 className="font-bold text-xs sm:text-sm text-emerald-950">
+                        Official Collegiate Email & Receipt Delivery Notice
+                      </h4>
+                      <span className="text-[9.5px] bg-emerald-200/90 text-emerald-900 font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                        Inbox Tip
+                      </span>
+                    </div>
+                    <p className="text-xs text-emerald-800 leading-relaxed max-w-4xl">
+                      Official clearance receipts and broadcasts are sent to your registered Gmail address from <strong className="text-emerald-950 font-bold">nasslasustech@gmail.com</strong>. If any message appears in your <strong>Spam / Junk folder</strong> or <strong>Promotions tab</strong>, please click <strong className="underline decoration-emerald-600">"Report Not Spam"</strong> and add our address to your contacts so critical academic notifications land directly in your Primary inbox.
+                    </p>
+                  </div>
                 </div>
               </div>
 
