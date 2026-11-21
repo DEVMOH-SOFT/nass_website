@@ -1496,7 +1496,7 @@ Secretariat, NASS LASUSTECH`);
   ] as const;
 
   return (
-    <div className="min-h-screen bg-[#f5f7f2] flex flex-col">
+    <div className="min-h-screen bg-[#f5f7f2] flex flex-col w-full max-w-full overflow-x-hidden">
       {/* Top Header Bar for Desktop */}
       <header className="hidden lg:flex items-center justify-between bg-[#062018] px-6 py-3.5 text-white border-b border-emerald-950/80 shadow-md">
         <div className="flex items-center gap-3">
@@ -1516,7 +1516,7 @@ Secretariat, NASS LASUSTECH`);
         </div>
       </header>
         {/* Mobile Header */}
-        <header className="flex items-center justify-between bg-[#062018] px-5 py-4 text-white lg:hidden shadow-md">
+        <header className="flex items-center justify-between bg-[#062018] px-4 py-3.5 sm:px-5 sm:py-4 text-white lg:hidden shadow-md sticky top-0 z-40">
           <div className="flex flex-col">
             <span className="text-[10px] uppercase tracking-[0.35em] text-primary/80 font-bold">NASS Admin</span>
             <span className="font-display text-sm font-bold">Control Centre</span>
@@ -1579,7 +1579,7 @@ Secretariat, NASS LASUSTECH`);
           </div>
         )}
 
-        <div className="mx-auto flex max-w-[1600px] gap-6 px-4 py-6 lg:px-6">
+        <div className="mx-auto flex w-full max-w-[1600px] flex-col lg:flex-row gap-4 sm:gap-6 px-3 sm:px-4 py-4 sm:py-6 lg:px-6 min-w-0">
           <aside className="hidden w-72 shrink-0 rounded-[2rem] bg-[#062018] p-6 text-white lg:block sticky top-6 h-fit">
             <p className="text-xs uppercase tracking-[0.35em] text-primary/80">NASS Admin</p>
             <h1 className="mt-4 font-display text-2xl font-bold">Control Centre</h1>
@@ -1598,26 +1598,26 @@ Secretariat, NASS LASUSTECH`);
             </Button>
           </aside>
 
-          <main className="min-w-0 flex-1 space-y-6">
-            <div className="rounded-[2rem] bg-white p-6 shadow-sm">
+          <main className="min-w-0 w-full flex-1 space-y-4 sm:space-y-6">
+            <div className="rounded-2xl sm:rounded-[2rem] bg-white p-4 sm:p-6 shadow-sm border border-border/40">
               <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-[0.3em] text-primary/80">Website + Voting Admin</p>
-                  <h2 className="mt-2 font-display text-3xl font-bold text-foreground">Everything in one dashboard.</h2>
-                  <p className="mt-2 text-sm text-muted-foreground">Main backend and Korapay voting backend are both connected here.</p>
+                  <p className="text-[11px] sm:text-xs font-bold uppercase tracking-[0.3em] text-primary/80">Website + Voting Admin</p>
+                  <h2 className="mt-1 sm:mt-2 font-display text-xl sm:text-2xl lg:text-3xl font-bold text-foreground break-words">Everything in one dashboard.</h2>
+                  <p className="mt-1 text-xs sm:text-sm text-muted-foreground">Main backend and Korapay voting backend are both connected here.</p>
                 </div>
-                <div className="grid gap-3 sm:grid-cols-3">
-                  <div className="rounded-2xl bg-[#f7fbf6] p-4">
-                    <p className="text-xs uppercase tracking-widest text-muted-foreground">Students</p>
-                    <p className="mt-2 text-2xl font-bold">{dashboard?.stats?.totalStudents || students.length || 0}</p>
+                <div className="grid gap-2.5 sm:gap-3 grid-cols-1 sm:grid-cols-3 w-full lg:w-auto">
+                  <div className="rounded-xl sm:rounded-2xl bg-[#f7fbf6] p-3 sm:p-4 border border-emerald-950/5">
+                    <p className="text-[10px] sm:text-xs uppercase tracking-widest text-muted-foreground">Students</p>
+                    <p className="mt-1 sm:mt-2 text-xl sm:text-2xl font-bold truncate">{dashboard?.stats?.totalStudents || students.length || 0}</p>
                   </div>
-                  <div className="rounded-2xl bg-[#f7fbf6] p-4">
-                    <p className="text-xs uppercase tracking-widest text-muted-foreground">Flagged</p>
-                    <p className="mt-2 text-2xl font-bold">{dashboard?.stats?.flaggedStudents || 0}</p>
+                  <div className="rounded-xl sm:rounded-2xl bg-[#f7fbf6] p-3 sm:p-4 border border-emerald-950/5">
+                    <p className="text-[10px] sm:text-xs uppercase tracking-widest text-muted-foreground">Flagged</p>
+                    <p className="mt-1 sm:mt-2 text-xl sm:text-2xl font-bold truncate">{dashboard?.stats?.flaggedStudents || 0}</p>
                   </div>
-                  <div className="rounded-2xl bg-[#f7fbf6] p-4">
-                    <p className="text-xs uppercase tracking-widest text-muted-foreground">Total Dues Collected</p>
-                    <p className="mt-2 text-2xl font-bold">
+                  <div className="rounded-xl sm:rounded-2xl bg-[#f7fbf6] p-3 sm:p-4 border border-emerald-950/5">
+                    <p className="text-[10px] sm:text-xs uppercase tracking-widest text-muted-foreground">Total Dues Collected</p>
+                    <p className="mt-1 sm:mt-2 text-xl sm:text-2xl font-bold truncate">
                       {formatCurrency(
                         votingDashboard?.totals?.totalAmount ||
                         filteredStudentPayments
@@ -1632,7 +1632,7 @@ Secretariat, NASS LASUSTECH`);
 
             {activeTab === "overview" && (
               <div className="grid gap-6 xl:grid-cols-2">
-                <div className="rounded-[2rem] bg-white p-6 shadow-sm">
+                <div className="rounded-2xl sm:rounded-[2rem] bg-white p-4 sm:p-6 shadow-sm">
                   <h3 className="font-display text-xl font-bold">Site Snapshot</h3>
                   <div className="mt-6 grid gap-4 sm:grid-cols-3">
                     <div className="rounded-2xl bg-[#f7fbf6] p-4"><p className="text-xs uppercase tracking-widest text-muted-foreground">Session</p><p className="mt-2 font-semibold">{dashboard?.stats?.currentSession || "Not set"}</p></div>
@@ -1640,7 +1640,7 @@ Secretariat, NASS LASUSTECH`);
                     <div className="rounded-2xl bg-[#f7fbf6] p-4"><p className="text-xs uppercase tracking-widest text-muted-foreground">Executives</p><p className="mt-2 font-semibold">{dashboard?.stats?.executives || 0}</p></div>
                   </div>
                 </div>
-                <div className="rounded-[2rem] bg-white p-6 shadow-sm">
+                <div className="rounded-2xl sm:rounded-[2rem] bg-white p-4 sm:p-6 shadow-sm">
                   <h3 className="font-display text-xl font-bold">Voting Snapshot</h3>
                   <div className="mt-6 grid gap-4 sm:grid-cols-2">
                     <div className="rounded-2xl bg-[#f7fbf6] p-4"><p className="text-xs uppercase tracking-widest text-muted-foreground">Total Votes</p><p className="mt-2 font-semibold">{votingDashboard?.totals?.totalVotes || 0}</p></div>
@@ -1654,7 +1654,7 @@ Secretariat, NASS LASUSTECH`);
 
             {activeTab === "students" && (
               <div className="grid gap-6 xl:grid-cols-[0.95fr_1.05fr]">
-                <div className="rounded-[2rem] bg-white p-6 shadow-sm h-fit">
+                <div className="rounded-2xl sm:rounded-[2rem] bg-white p-4 sm:p-6 shadow-sm h-fit">
                   <div className="flex items-center gap-3"><Flag className="h-5 w-5 text-primary" /><h3 className="font-display text-xl font-bold">Flag Student Account</h3></div>
                   <div className="mt-6 space-y-4">
                     <Input placeholder="Matric number" value={flagForm.matric_number} onChange={(e) => setFlagForm({ ...flagForm, matric_number: e.target.value })} />
@@ -1668,7 +1668,7 @@ Secretariat, NASS LASUSTECH`);
                     }, "Student flag saved and will show on the dashboard.")}>Save Flag</Button>
                   </div>
                 </div>
-                <div className="rounded-[2rem] bg-white p-6 shadow-sm">
+                <div className="rounded-2xl sm:rounded-[2rem] bg-white p-4 sm:p-6 shadow-sm">
                   <h3 className="font-display text-xl font-bold">Student Directory</h3>
                   <div className="mt-4">
                     <Input
@@ -1759,35 +1759,35 @@ Secretariat, NASS LASUSTECH`);
             )}
 
             {activeTab === "payments" && (
-              <div className="space-y-6">
+              <div className="space-y-4 sm:space-y-6">
                 {/* Header Strip with Metrics */}
-                <div className="rounded-[2rem] bg-white p-6 shadow-sm border border-border/40">
-                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="rounded-2xl sm:rounded-[2rem] bg-white p-4 sm:p-6 shadow-sm border border-border/40">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                       <div className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-800 mb-2">
                         <CreditCard className="h-3.5 w-3.5" />
                         Financial Audit & Collections
                       </div>
-                      <h2 className="font-display text-2xl font-bold tracking-tight text-slate-900">
+                      <h2 className="font-display text-xl sm:text-2xl font-bold tracking-tight text-slate-900">
                         Student Payment History
                       </h2>
-                      <p className="mt-1 text-sm text-muted-foreground">
+                      <p className="mt-1 text-xs sm:text-sm text-muted-foreground">
                         Comprehensive ledger of sessional dues, departmental fees, and awards voting transactions.
                       </p>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-3">
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
                       <Button
                         onClick={() => window.print()}
                         variant="outline"
-                        className="rounded-xl border-border hover:bg-muted/40 font-semibold gap-2"
+                        className="w-full sm:w-auto rounded-xl border-border hover:bg-muted/40 font-semibold gap-2 justify-center text-xs sm:text-sm h-10"
                       >
                         <Printer className="h-4 w-4" />
                         Print Summary
                       </Button>
                       <Button
                         onClick={handleDownloadPaymentsCSV}
-                        className="rounded-xl bg-[#062018] text-white hover:bg-[#062018]/90 font-semibold gap-2 shadow-sm"
+                        className="w-full sm:w-auto rounded-xl bg-[#062018] text-white hover:bg-[#062018]/90 font-semibold gap-2 shadow-sm justify-center text-xs sm:text-sm h-10"
                       >
                         <FileSpreadsheet className="h-4 w-4" />
                         Download CSV / Excel
@@ -1796,58 +1796,58 @@ Secretariat, NASS LASUSTECH`);
                   </div>
 
                   {/* Summary Metric Cards */}
-                  <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
-                    <div className="rounded-2xl bg-emerald-50/70 p-4 border border-emerald-100">
-                      <p className="text-xs font-bold uppercase tracking-wider text-emerald-800">
+                  <div className="mt-4 sm:mt-6 grid grid-cols-2 gap-2.5 sm:gap-4 lg:grid-cols-4">
+                    <div className="rounded-xl sm:rounded-2xl bg-emerald-50/70 p-3 sm:p-4 border border-emerald-100 min-w-0">
+                      <p className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-emerald-800 truncate">
                         {paymentTypeFilter === "labcoat"
                           ? "Lab Coat Revenue"
                           : paymentTypeFilter === "dues"
                             ? "Total Dues Collected"
                             : "Total Revenue Collected"}
                       </p>
-                      <p className="mt-2 text-2xl font-bold text-emerald-950">
+                      <p className="mt-1 sm:mt-2 text-base sm:text-xl lg:text-2xl font-bold text-emerald-950 truncate">
                         {formatCurrency(
                           filteredStudentPayments
                             .filter(p => p.status.toLowerCase() === "paid")
                             .reduce((sum, p) => sum + Number(p.amount || 0), 0)
                         )}
                       </p>
-                      <p className="mt-1 text-[11px] text-emerald-700/80 font-medium">From verified student receipts</p>
+                      <p className="mt-0.5 sm:mt-1 text-[10px] sm:text-[11px] text-emerald-700/80 font-medium truncate">From verified student receipts</p>
                     </div>
 
-                    <div className="rounded-2xl bg-blue-50/70 p-4 border border-blue-100">
-                      <p className="text-xs font-bold uppercase tracking-wider text-blue-800">
+                    <div className="rounded-xl sm:rounded-2xl bg-blue-50/70 p-3 sm:p-4 border border-blue-100 min-w-0">
+                      <p className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-blue-800 truncate">
                         {paymentTypeFilter === "labcoat" ? "Paid Lab Coats" : "Cleared Students"}
                       </p>
-                      <p className="mt-2 text-2xl font-bold text-blue-950">
+                      <p className="mt-1 sm:mt-2 text-base sm:text-xl lg:text-2xl font-bold text-blue-950 truncate">
                         {filteredStudentPayments.filter(p => p.status.toLowerCase() === "paid").length}
                       </p>
-                      <p className="mt-1 text-[11px] text-blue-700/80 font-medium">
+                      <p className="mt-0.5 sm:mt-1 text-[10px] sm:text-[11px] text-blue-700/80 font-medium truncate">
                         {paymentTypeFilter === "labcoat" ? "Confirmed lab coat orders" : "Confirmed payments validated"}
                       </p>
                     </div>
 
-                    <div className="rounded-2xl bg-amber-50/70 p-4 border border-amber-100">
-                      <p className="text-xs font-bold uppercase tracking-wider text-amber-800">Pending Dues</p>
-                      <p className="mt-2 text-2xl font-bold text-amber-950">
+                    <div className="rounded-xl sm:rounded-2xl bg-amber-50/70 p-3 sm:p-4 border border-amber-100 min-w-0">
+                      <p className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-amber-800 truncate">Pending Dues</p>
+                      <p className="mt-1 sm:mt-2 text-base sm:text-xl lg:text-2xl font-bold text-amber-950 truncate">
                         {filteredStudentPayments.filter(p => p.status.toLowerCase() !== "paid").length}
                       </p>
-                      <p className="mt-1 text-[11px] text-amber-700/80 font-medium">Awaiting collegiate confirmation</p>
+                      <p className="mt-0.5 sm:mt-1 text-[10px] sm:text-[11px] text-amber-700/80 font-medium truncate">Awaiting confirmation</p>
                     </div>
 
-                    <div className="rounded-2xl bg-purple-50/70 p-4 border border-purple-100">
-                      <p className="text-xs font-bold uppercase tracking-wider text-purple-800">Total Records</p>
-                      <p className="mt-2 text-2xl font-bold text-purple-950">
+                    <div className="rounded-xl sm:rounded-2xl bg-purple-50/70 p-3 sm:p-4 border border-purple-100 min-w-0">
+                      <p className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-purple-800 truncate">Total Records</p>
+                      <p className="mt-1 sm:mt-2 text-base sm:text-xl lg:text-2xl font-bold text-purple-950 truncate">
                         {filteredStudentPayments.length}
                       </p>
-                      <p className="mt-1 text-[11px] text-purple-700/80 font-medium">Showing matched records</p>
+                      <p className="mt-0.5 sm:mt-1 text-[10px] sm:text-[11px] text-purple-700/80 font-medium truncate">Showing matched records</p>
                     </div>
                   </div>
                 </div>
 
                 {/* Filters & Search Toolbar */}
-                <div className="rounded-[2rem] bg-white p-6 shadow-sm border border-border/40">
-                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <div className="rounded-2xl sm:rounded-[2rem] bg-white p-4 sm:p-6 shadow-sm border border-border/40">
+                  <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
                     <div className="sm:col-span-2 lg:col-span-1">
                       <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1 block">Search Records</label>
                       <div className="relative">
@@ -1856,7 +1856,7 @@ Secretariat, NASS LASUSTECH`);
                           placeholder="Search name, matric, ref..."
                           value={paymentSearch}
                           onChange={(e) => setPaymentSearch(e.target.value)}
-                          className="rounded-xl pl-9 bg-muted/20 border-border"
+                          className="rounded-xl pl-9 bg-muted/20 border-border h-10 text-xs sm:text-sm"
                         />
                       </div>
                     </div>
@@ -1866,7 +1866,7 @@ Secretariat, NASS LASUSTECH`);
                       <select
                         value={paymentStatusFilter}
                         onChange={(e) => setPaymentStatusFilter(e.target.value)}
-                        className="flex h-10 w-full rounded-xl border border-border bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                        className="flex h-10 w-full rounded-xl border border-border bg-background px-3 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                       >
                         <option value="all">All Statuses</option>
                         <option value="paid">Paid / Confirmed</option>
@@ -1879,7 +1879,7 @@ Secretariat, NASS LASUSTECH`);
                       <select
                         value={paymentDeptFilter}
                         onChange={(e) => setPaymentDeptFilter(e.target.value)}
-                        className="flex h-10 w-full rounded-xl border border-border bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                        className="flex h-10 w-full rounded-xl border border-border bg-background px-3 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                       >
                         <option value="all">All Departments</option>
                         <option value="Computer Science">Computer Science</option>
@@ -1899,7 +1899,7 @@ Secretariat, NASS LASUSTECH`);
                       <select
                         value={paymentTypeFilter}
                         onChange={(e) => setPaymentTypeFilter(e.target.value)}
-                        className="flex h-10 w-full rounded-xl border border-border bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                        className="flex h-10 w-full rounded-xl border border-border bg-background px-3 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                       >
                         <option value="all">All Payment Types</option>
                         <option value="dues">Collegiate Session Dues</option>
@@ -1911,16 +1911,16 @@ Secretariat, NASS LASUSTECH`);
                   </div>
 
                   {/* Payment Records Table */}
-                  <div className="mt-6 overflow-x-auto rounded-2xl border border-border/70">
-                    <table className="w-full text-left text-sm">
-                      <thead className="bg-[#f8faf7] text-xs font-bold uppercase tracking-wider text-slate-700 border-b border-border">
+                  <div className="mt-4 sm:mt-6 w-full max-w-full overflow-x-auto rounded-xl sm:rounded-2xl border border-border/70">
+                    <table className="w-full min-w-[680px] text-left text-xs sm:text-sm">
+                      <thead className="bg-[#f8faf7] text-[11px] sm:text-xs font-bold uppercase tracking-wider text-slate-700 border-b border-border">
                         <tr>
-                          <th className="py-3 px-4">Student & Matric</th>
-                          <th className="py-3 px-4">Category & Ref</th>
-                          <th className="py-3 px-4">Department / Level</th>
-                          <th className="py-3 px-4">Amount</th>
-                          <th className="py-3 px-4">Channel / Date</th>
-                          <th className="py-3 px-4 text-center">Status</th>
+                          <th className="py-2.5 sm:py-3 px-3 sm:px-4">Student & Matric</th>
+                          <th className="py-2.5 sm:py-3 px-3 sm:px-4">Category & Ref</th>
+                          <th className="py-2.5 sm:py-3 px-3 sm:px-4">Department / Level</th>
+                          <th className="py-2.5 sm:py-3 px-3 sm:px-4">Amount</th>
+                          <th className="py-2.5 sm:py-3 px-3 sm:px-4">Channel / Date</th>
+                          <th className="py-2.5 sm:py-3 px-3 sm:px-4 text-center">Status</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-border/60">
@@ -2020,35 +2020,35 @@ Secretariat, NASS LASUSTECH`);
             )}
 
             {activeTab === "store" && (
-              <div className="space-y-6">
+              <div className="space-y-4 sm:space-y-6">
                 {/* Header Strip with Metrics */}
-                <div className="rounded-[2rem] bg-white p-6 shadow-sm border border-border/40">
-                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="rounded-2xl sm:rounded-[2rem] bg-white p-4 sm:p-6 shadow-sm border border-border/40">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                       <div className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-800 mb-2">
                         <ShoppingBag className="h-3.5 w-3.5 text-emerald-700" />
                         Merchandise & Inventory Command
                       </div>
-                      <h2 className="font-display text-2xl font-bold tracking-tight text-slate-900">
+                      <h2 className="font-display text-xl sm:text-2xl font-bold tracking-tight text-slate-900">
                         Store Inventory & Order Management
                       </h2>
-                      <p className="mt-1 text-sm text-muted-foreground">
+                      <p className="mt-1 text-xs sm:text-sm text-muted-foreground">
                         Add collegiate items, edit pricing in real-time, toggle price enactments, and oversee student kit orders.
                       </p>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-3">
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
                       <Button
                         onClick={handleResetStoreDefaults}
                         variant="outline"
-                        className="rounded-xl border-slate-200 text-slate-600 hover:bg-slate-50 font-semibold gap-2"
+                        className="w-full sm:w-auto rounded-xl border-slate-200 text-slate-600 hover:bg-slate-50 font-semibold gap-2 justify-center text-xs sm:text-sm h-10"
                       >
                         <RefreshCw className="h-4 w-4" />
                         Reset Defaults
                       </Button>
                       <Button
                         onClick={handleOpenAddProduct}
-                        className="rounded-xl bg-[#062018] text-white hover:bg-[#062018]/90 font-semibold gap-2 shadow-sm"
+                        className="w-full sm:w-auto rounded-xl bg-[#062018] text-white hover:bg-[#062018]/90 font-semibold gap-2 shadow-sm justify-center text-xs sm:text-sm h-10"
                       >
                         <Plus className="h-4 w-4" />
                         Add New Product
@@ -2057,37 +2057,37 @@ Secretariat, NASS LASUSTECH`);
                   </div>
 
                   {/* Metrics Row */}
-                  <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
-                    <div className="rounded-2xl bg-emerald-50/70 p-4 border border-emerald-100">
-                      <p className="text-xs font-bold uppercase tracking-wider text-emerald-800">Total Products</p>
-                      <p className="mt-2 text-2xl font-bold text-emerald-950">
+                  <div className="mt-4 sm:mt-6 grid grid-cols-2 gap-2.5 sm:gap-4 lg:grid-cols-4">
+                    <div className="rounded-xl sm:rounded-2xl bg-emerald-50/70 p-3 sm:p-4 border border-emerald-100 min-w-0">
+                      <p className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-emerald-800 truncate">Total Products</p>
+                      <p className="mt-1 sm:mt-2 text-base sm:text-xl lg:text-2xl font-bold text-emerald-950 truncate">
                         {adminStoreProducts.length}
                       </p>
-                      <p className="mt-1 text-[11px] text-emerald-700/80 font-medium">In catalog repository</p>
+                      <p className="mt-0.5 sm:mt-1 text-[10px] sm:text-[11px] text-emerald-700/80 font-medium truncate">In catalog repository</p>
                     </div>
 
-                    <div className="rounded-2xl bg-blue-50/70 p-4 border border-blue-100">
-                      <p className="text-xs font-bold uppercase tracking-wider text-blue-800">Live Checkout</p>
-                      <p className="mt-2 text-2xl font-bold text-blue-950">
+                    <div className="rounded-xl sm:rounded-2xl bg-blue-50/70 p-3 sm:p-4 border border-blue-100 min-w-0">
+                      <p className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-blue-800 truncate">Live Checkout</p>
+                      <p className="mt-1 sm:mt-2 text-base sm:text-xl lg:text-2xl font-bold text-blue-950 truncate">
                         {adminStoreProducts.filter(p => p.priceConfirmed && p.price > 0).length}
                       </p>
-                      <p className="mt-1 text-[11px] text-blue-700/80 font-medium">Students can pay now</p>
+                      <p className="mt-0.5 sm:mt-1 text-[10px] sm:text-[11px] text-blue-700/80 font-medium truncate">Students can pay now</p>
                     </div>
 
-                    <div className="rounded-2xl bg-amber-50/70 p-4 border border-amber-100">
-                      <p className="text-xs font-bold uppercase tracking-wider text-amber-800">Pending Enactment</p>
-                      <p className="mt-2 text-2xl font-bold text-amber-950">
+                    <div className="rounded-xl sm:rounded-2xl bg-amber-50/70 p-3 sm:p-4 border border-amber-100 min-w-0">
+                      <p className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-amber-800 truncate">Pending Enactment</p>
+                      <p className="mt-1 sm:mt-2 text-base sm:text-xl lg:text-2xl font-bold text-amber-950 truncate">
                         {adminStoreProducts.filter(p => !p.priceConfirmed || p.price <= 0).length}
                       </p>
-                      <p className="mt-1 text-[11px] text-amber-700/80 font-medium">Set to Check Back Later</p>
+                      <p className="mt-0.5 sm:mt-1 text-[10px] sm:text-[11px] text-amber-700/80 font-medium truncate">Set to Check Back</p>
                     </div>
 
-                    <div className="rounded-2xl bg-purple-50/70 p-4 border border-purple-100">
-                      <p className="text-xs font-bold uppercase tracking-wider text-purple-800">Store Orders</p>
-                      <p className="mt-2 text-2xl font-bold text-purple-950">
+                    <div className="rounded-xl sm:rounded-2xl bg-purple-50/70 p-3 sm:p-4 border border-purple-100 min-w-0">
+                      <p className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-purple-800 truncate">Store Orders</p>
+                      <p className="mt-1 sm:mt-2 text-base sm:text-xl lg:text-2xl font-bold text-purple-950 truncate">
                         {getAllStudentPayments().filter(p => !String(p.payment_type || '').toLowerCase().includes("due") && !String(p.payment_type || '').toLowerCase().includes("vote")).length}
                       </p>
-                      <p className="mt-1 text-[11px] text-purple-700/80 font-medium">
+                      <p className="mt-0.5 sm:mt-1 text-[10px] sm:text-[11px] text-purple-700/80 font-medium truncate">
                         Total {formatCurrency(
                           getAllStudentPayments()
                             .filter(p => !String(p.payment_type || '').toLowerCase().includes("due") && !String(p.payment_type || '').toLowerCase().includes("vote") && p.status?.toLowerCase() === "paid")
@@ -2099,7 +2099,7 @@ Secretariat, NASS LASUSTECH`);
                 </div>
 
                 {/* Products Filter & Catalog Grid */}
-                <div className="rounded-[2rem] bg-white p-6 shadow-sm border border-border/40 space-y-6">
+                <div className="rounded-2xl sm:rounded-[2rem] bg-white p-4 sm:p-6 shadow-sm border border-border/40 space-y-6">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
                       <h3 className="font-display text-lg font-bold text-slate-900">
@@ -2272,7 +2272,7 @@ Secretariat, NASS LASUSTECH`);
                 </div>
 
                 {/* Student Store Orders Ledger */}
-                <div className="rounded-[2rem] bg-white p-6 shadow-sm border border-border/40 space-y-4">
+                <div className="rounded-2xl sm:rounded-[2rem] bg-white p-4 sm:p-6 shadow-sm border border-border/40 space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
                       <h3 className="font-display text-lg font-bold text-slate-900">
@@ -2284,8 +2284,8 @@ Secretariat, NASS LASUSTECH`);
                     </div>
                   </div>
 
-                  <div className="overflow-x-auto rounded-2xl border border-slate-200">
-                    <table className="w-full text-left text-xs">
+                  <div className="overflow-x-auto rounded-xl sm:rounded-2xl border border-slate-200 w-full max-w-full">
+                    <table className="w-full min-w-[650px] text-left text-xs">
                       <thead className="bg-slate-50 border-b border-slate-200 text-[11px] font-bold text-slate-600 uppercase">
                         <tr>
                           <th className="py-3 px-4">Student</th>
@@ -2560,7 +2560,7 @@ Secretariat, NASS LASUSTECH`);
             {activeTab === "pastQuestions" && (
               <div className="grid gap-6 xl:grid-cols-[1.1fr_1.3fr]">
                 {/* Upload Form */}
-                <div className="rounded-[2rem] bg-white p-6 shadow-sm border border-border/40 h-fit">
+                <div className="rounded-2xl sm:rounded-[2rem] bg-white p-4 sm:p-6 shadow-sm border border-border/40 h-fit">
                   <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary mb-3">
                     <FolderUp className="h-3.5 w-3.5" />
                     Academic Repository
@@ -2714,7 +2714,7 @@ Secretariat, NASS LASUSTECH`);
                 </div>
 
                 {/* Published Materials List */}
-                <div className="rounded-[2rem] bg-white p-6 shadow-sm border border-border/40 flex flex-col">
+                <div className="rounded-2xl sm:rounded-[2rem] bg-white p-4 sm:p-6 shadow-sm border border-border/40 flex flex-col">
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <div>
                       <h3 className="font-display text-xl font-bold text-slate-900">Published Resources ({pastQuestions.length})</h3>
@@ -3079,7 +3079,7 @@ Secretariat, NASS LASUSTECH`);
 
                 <div className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
                   {/* Left Column: Email Composer */}
-                  <div className="rounded-[2rem] bg-white p-6 shadow-sm border border-border/40 space-y-5">
+                  <div className="rounded-2xl sm:rounded-[2rem] bg-white p-4 sm:p-6 shadow-sm border border-border/40 space-y-5">
                     <div>
                       <h4 className="font-display text-lg font-bold text-slate-900">Compose Broadcast Message</h4>
                       <p className="text-xs text-muted-foreground mt-0.5">
@@ -3316,7 +3316,7 @@ Secretariat, NASS LASUSTECH`);
                   {/* Right Column: Matched Recipient List & Past Dispatches */}
                   <div className="space-y-6">
                     {/* Active Recipients Preview */}
-                    <div className="rounded-[2rem] bg-white p-6 shadow-sm border border-border/40 space-y-3">
+                    <div className="rounded-2xl sm:rounded-[2rem] bg-white p-4 sm:p-6 shadow-sm border border-border/40 space-y-3">
                       <div className="flex items-center justify-between">
                         <h4 className="font-display text-sm font-bold text-slate-900">
                           Active Recipient Preview ({getFilteredRecipients().length})
@@ -3348,7 +3348,7 @@ Secretariat, NASS LASUSTECH`);
                     </div>
 
                     {/* Past Dispatch History */}
-                    <div className="rounded-[2rem] bg-white p-6 shadow-sm border border-border/40 space-y-3">
+                    <div className="rounded-2xl sm:rounded-[2rem] bg-white p-4 sm:p-6 shadow-sm border border-border/40 space-y-3">
                       <h4 className="font-display text-sm font-bold text-slate-900">
                         Recent Broadcast Dispatch Logs
                       </h4>
@@ -3382,7 +3382,7 @@ Secretariat, NASS LASUSTECH`);
             )}
 
             {activeTab === "academics" && (
-              <div className="rounded-[2rem] bg-white p-6 shadow-sm">
+              <div className="rounded-2xl sm:rounded-[2rem] bg-white p-4 sm:p-6 shadow-sm">
                 <h3 className="font-display text-xl font-bold">Current Academic Session</h3>
                 <div className="mt-6 grid gap-4 md:grid-cols-2">
                   <Input placeholder="2026/2027 Session" value={academicForm.session} onChange={(e) => setAcademicForm({ ...academicForm, session: e.target.value })} />
@@ -3400,7 +3400,7 @@ Secretariat, NASS LASUSTECH`);
 
             {activeTab === "executives" && (
               <div className="grid gap-6 xl:grid-cols-[0.95fr_1.05fr]">
-                <div className="rounded-[2rem] bg-white p-6 shadow-sm h-fit">
+                <div className="rounded-2xl sm:rounded-[2rem] bg-white p-4 sm:p-6 shadow-sm h-fit">
                   <h3 className="font-display text-xl font-bold">{executiveForm.id ? "Edit Executive" : "Add Executive"}</h3>
                   <div className="mt-6 space-y-4">
                     <Input placeholder="Full name" value={executiveForm.name} onChange={(e) => setExecutiveForm({ ...executiveForm, name: e.target.value })} />
@@ -3437,7 +3437,7 @@ Secretariat, NASS LASUSTECH`);
                     </div>
                   </div>
                 </div>
-                <div className="rounded-[2rem] bg-white p-6 shadow-sm">
+                <div className="rounded-2xl sm:rounded-[2rem] bg-white p-4 sm:p-6 shadow-sm">
                   <h3 className="font-display text-xl font-bold">Executive List</h3>
                   <div className="mt-6 space-y-3">
                     {(dashboard?.executives || []).map((item: any) => (
@@ -3461,7 +3461,7 @@ Secretariat, NASS LASUSTECH`);
             {activeTab === "events" && (
               <div className="space-y-6">
                 <div className="grid gap-6 xl:grid-cols-[0.95fr_1.05fr]">
-                  <div className="rounded-[2rem] bg-white p-6 shadow-sm h-fit">
+                  <div className="rounded-2xl sm:rounded-[2rem] bg-white p-4 sm:p-6 shadow-sm h-fit">
                     <h3 className="font-display text-xl font-bold">{eventForm.id ? "Edit Event" : "Add Event"}</h3>
                     <div className="mt-6 grid gap-4 md:grid-cols-2">
                       <Input placeholder="Slug" value={eventForm.slug} onChange={(e) => setEventForm({ ...eventForm, slug: e.target.value })} />
@@ -3507,7 +3507,7 @@ Secretariat, NASS LASUSTECH`);
                       <Button variant="outline" onClick={() => setEventForm(emptyEvent)}>Clear</Button>
                     </div>
                   </div>
-                  <div className="rounded-[2rem] bg-white p-6 shadow-sm">
+                  <div className="rounded-2xl sm:rounded-[2rem] bg-white p-4 sm:p-6 shadow-sm">
                     <div className="flex items-center gap-3"><Image className="h-5 w-5 text-primary" /><h3 className="font-display text-xl font-bold">Event Gallery Image</h3></div>
                     <div className="mt-6 space-y-4">
                       <select className="flex h-10 w-full rounded-xl border border-border bg-background px-3 text-sm" value={galleryForm.eventId} onChange={(e) => setGalleryForm({ ...galleryForm, eventId: e.target.value })}>
@@ -3540,7 +3540,7 @@ Secretariat, NASS LASUSTECH`);
                     </div>
                   </div>
                 </div>
-                <div className="rounded-[2rem] bg-white p-6 shadow-sm">
+                <div className="rounded-2xl sm:rounded-[2rem] bg-white p-4 sm:p-6 shadow-sm">
                   <h3 className="font-display text-xl font-bold">Events</h3>
                   <div className="mt-6 space-y-4">
                     {(dashboard?.events || []).map((item: any) => (
@@ -3826,7 +3826,7 @@ Secretariat, NASS LASUSTECH`);
                 <div className="grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
 
                   {/* Settings Card */}
-                  <div className="rounded-[2rem] bg-white p-6 shadow-sm border border-slate-200">
+                  <div className="rounded-2xl sm:rounded-[2rem] bg-white p-4 sm:p-6 shadow-sm border border-slate-200">
                     <h3 className="font-display text-lg font-bold text-[#062018]">Voting Settings</h3>
                     <div className="mt-6 space-y-4">
                       <div>
@@ -3862,7 +3862,7 @@ Secretariat, NASS LASUSTECH`);
                   </div>
 
                   {/* Sections Card */}
-                  <div id="section-form-card" className="rounded-[2rem] bg-white p-6 shadow-sm border border-slate-200 h-fit">
+                  <div id="section-form-card" className="rounded-2xl sm:rounded-[2rem] bg-white p-4 sm:p-6 shadow-sm border border-slate-200 h-fit">
                     <h3 className="font-display text-lg font-bold text-[#062018]">Voting Sections</h3>
                     <div className="mt-4 grid gap-4 md:grid-cols-2">
                       <div>
@@ -3921,7 +3921,7 @@ Secretariat, NASS LASUSTECH`);
 
                 <div className="grid gap-6 xl:grid-cols-2">
                   {/* Category Add/Edit Card */}
-                  <div id="category-form-card" className="rounded-[2rem] bg-white p-6 shadow-sm border border-slate-200">
+                  <div id="category-form-card" className="rounded-2xl sm:rounded-[2rem] bg-white p-4 sm:p-6 shadow-sm border border-slate-200">
                     <h3 className="font-display text-lg font-bold text-[#062018]">{categoryForm.id ? "Edit Category" : "Add Category"}</h3>
                     <div className="mt-4 grid gap-4 md:grid-cols-2">
                       <div>
@@ -4004,7 +4004,7 @@ Secretariat, NASS LASUSTECH`);
                   </div>
 
                   {/* Nominee Add/Edit Card */}
-                  <div id="nominee-form-card" className="rounded-[2rem] bg-white p-6 shadow-sm border border-slate-200">
+                  <div id="nominee-form-card" className="rounded-2xl sm:rounded-[2rem] bg-white p-4 sm:p-6 shadow-sm border border-slate-200">
                     <h3 className="font-display text-lg font-bold text-[#062018]">{nomineeForm.id ? "Edit Nominee" : "Add Nominee"}</h3>
                     <div className="mt-4 space-y-4">
                       <div>
@@ -4241,10 +4241,10 @@ Secretariat, NASS LASUSTECH`);
                       </div>
 
                       {/* Scrollable Table */}
-                      <div className="rounded-2xl border border-slate-150 overflow-hidden shadow-sm">
-                        <div className="overflow-x-auto">
+                      <div className="rounded-xl sm:rounded-2xl border border-slate-150 overflow-hidden shadow-sm w-full max-w-full">
+                        <div className="overflow-x-auto w-full">
                           <div className="max-h-[450px] overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-slate-200 [&::-webkit-scrollbar-thumb]:rounded-full">
-                            <table className="w-full text-left border-collapse">
+                            <table className="w-full min-w-[700px] text-left border-collapse">
                               <thead className="sticky top-0 bg-slate-50 border-b border-slate-150 text-[10px] uppercase tracking-wider text-slate-500 font-bold z-10">
                                 <tr>
                                   <th className="p-4">Voter Profile</th>
@@ -4365,7 +4365,7 @@ Secretariat, NASS LASUSTECH`);
             )}
 
 
-            <div className="rounded-[2rem] bg-white p-6 shadow-sm">
+            <div className="rounded-2xl sm:rounded-[2rem] bg-white p-4 sm:p-6 shadow-sm">
               <h3 className="font-display text-xl font-bold">Operational Feed</h3>
               <div className="mt-6 grid gap-6 xl:grid-cols-2">
                 <div>
