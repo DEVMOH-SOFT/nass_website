@@ -2066,28 +2066,6 @@ const Dashboard = () => {
             </div>
           )}
 
-          {/* Academic Session Bar */}
-          <div className="mb-3 flex items-center justify-between gap-3 px-3.5 py-2 sm:py-2.5 rounded-xl bg-white/95 backdrop-blur-md border border-emerald-900/10 shadow-xs">
-            <div className="flex items-center gap-2.5 min-w-0">
-              <div className="h-7 w-7 rounded-lg bg-gradient-to-br from-emerald-600 to-[#145a32] text-white flex items-center justify-center shrink-0 shadow-xs">
-                <GraduationCap className="h-4 w-4 text-emerald-100" />
-              </div>
-              <div className="flex items-center gap-2 truncate">
-                <span className="font-extrabold text-slate-900 text-xs sm:text-sm truncate">
-                  {academicSettings.session || "2026/2027 Session"} {academicSettings.semester ? `• ${academicSettings.semester}` : "• First Semester"}
-                </span>
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300/60 shrink-0">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-600" />
-                  Active
-                </span>
-              </div>
-            </div>
-            <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 border border-slate-200 text-[10.5px] font-bold text-slate-600 shrink-0">
-              <Calendar className="h-3 w-3 text-emerald-700" />
-              <span>{new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}</span>
-            </div>
-          </div>
-
           {/* Tiny Slim WhatsApp Information Group Strip (Freshers Only) */}
           {showWhatsAppBanner && isFresherScholar && (
             <div className="mb-3 flex items-center justify-between gap-2.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-[#062018] via-[#093525] to-[#125c40] text-white shadow-xs border border-emerald-700/40">
@@ -2124,172 +2102,112 @@ const Dashboard = () => {
             </div>
           )}
 
-          {/* Profile Incomplete Banner */}
-          {isProfileIncomplete && (
-            <div className="mb-3 rounded-xl border border-blue-200/80 bg-gradient-to-r from-[#0d346c] via-[#1a4480] to-[#0f2c59] px-3.5 py-2 shadow-xs text-white flex items-center justify-between gap-2.5">
-              <div className="flex items-center gap-2 min-w-0">
-                <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-white/10 text-amber-300 border border-white/20">
-                  <AlertCircle className="h-3.5 w-3.5" />
-                </div>
-                <p className="text-[11px] font-medium text-blue-100 truncate leading-tight">
-                  <strong className="text-white font-bold">Profile Notice:</strong> Add email and phone to receive dues receipts.
-                </p>
-              </div>
-              <Button 
-                onClick={() => setActiveTab("profile")}
-                size="sm"
-                className="shrink-0 bg-white hover:bg-emerald-50 text-[#0d346c] hover:text-[#1a4480] rounded-lg text-[10.5px] font-black h-6 px-2.5 shadow-xs transition-all"
-              >
-                Update
-              </Button>
-            </div>
-          )}
-
           {/* ======================================================== */}
           {/* TAB: OVERVIEW */}
           {/* ======================================================== */}
           {activeTab === "overview" && (
-            <div className="space-y-5 animate-reveal">
-              {/* FRESHERS MATRICULATION NUMBER UPDATE DESK */}
-              {isFresherScholar && (
-                <div className="relative overflow-hidden rounded-3xl border-2 border-emerald-500/40 bg-gradient-to-br from-emerald-50/90 via-white to-sky-50/60 dark:from-emerald-950/40 dark:via-slate-900 dark:to-slate-900 p-5 sm:p-6 shadow-md space-y-4">
-                  <div className="flex items-start justify-between gap-4 flex-wrap">
-                    <div className="flex items-center gap-3.5">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-600 to-[#145a32] text-white shadow-md shrink-0">
-                        <GraduationCap className="h-6 w-6" />
+            <div className="space-y-4 animate-reveal">
+              {/* FRESHERS MATRICULATION NUMBER UPDATE PROMPT (Compact & Non-intrusive) */}
+              {profile.matricNumber?.toUpperCase().startsWith("FSH") && (
+                <div className="rounded-2xl border border-emerald-500/30 bg-gradient-to-r from-emerald-950 via-[#0a3520] to-[#041c14] text-white p-3 sm:p-4 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <div className="h-8 w-8 rounded-xl bg-emerald-500/20 text-emerald-300 flex items-center justify-center shrink-0 border border-emerald-400/30">
+                      <GraduationCap className="h-4 w-4" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <p className="text-xs font-bold text-white">Assigned Permanent Matric Number?</p>
+                        <span className="text-[9px] font-mono px-2 py-0.5 rounded-md bg-amber-400/20 text-amber-300 font-bold">
+                          Provisional: {profile.matricNumber}
+                        </span>
                       </div>
-                      <div>
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <h3 className="font-display text-base sm:text-lg font-extrabold text-slate-900 dark:text-white">
-                            Freshers Matriculation Number Update Desk
-                          </h3>
-                          <span className="rounded-full bg-amber-100 dark:bg-amber-950/60 border border-amber-300 dark:border-amber-700 px-2.5 py-0.5 text-[10px] font-black text-amber-900 dark:text-amber-300 uppercase">
-                            Provisional ID: {profile.matricNumber}
-                          </span>
-                        </div>
-                        <p className="text-xs text-slate-600 dark:text-slate-300 mt-1 max-w-2xl leading-relaxed">
-                          Once your permanent LASUSTECH matriculation number has been assigned by Academic Affairs, enter it below to upgrade your official collegiate record, dues clearance receipts, and digital ID card.
-                        </p>
-                      </div>
+                      <p className="text-[10.5px] text-emerald-200/80 truncate">Upgrade your collegiate records, dues receipts, and digital credentials.</p>
                     </div>
                   </div>
-
-                  <div className="pt-1 flex flex-col sm:flex-row items-center gap-3 max-w-xl">
+                  <div className="flex items-center gap-2 shrink-0">
                     <Input
                       value={freshersMatricInput}
                       onChange={(e) => setFreshersMatricInput(e.target.value)}
                       placeholder="e.g. 240303010045"
-                      className="h-11 rounded-xl font-mono uppercase bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700 focus:border-emerald-600 text-sm"
+                      className="h-8 text-xs font-mono uppercase bg-white/10 text-white placeholder:text-white/40 border-white/20 rounded-lg w-36 sm:w-44"
                     />
                     <Button
                       onClick={handleSaveOfficialMatric}
                       disabled={savingOfficialMatric}
-                      className="w-full sm:w-auto h-11 px-6 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs shrink-0 gap-2 shadow-md transition-all active:scale-[0.98]"
+                      size="sm"
+                      className="h-8 px-3 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs rounded-lg gap-1 shadow-xs"
                     >
-                      <Save className="h-4 w-4" />
-                      <span>{savingOfficialMatric ? "Saving..." : "Update Official Matric"}</span>
+                      <Save className="h-3 w-3" />
+                      <span>{savingOfficialMatric ? "..." : "Save"}</span>
                     </Button>
                   </div>
                 </div>
               )}
 
-              {/* Executive Welcome Hero Banner */}
-              <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl border border-emerald-900/15 bg-gradient-to-br from-[#0f4426] via-[#145a32] to-[#0a2f1a] text-white p-4 sm:p-6 shadow-md">
-                {/* Decorative Ambient Radial Glows */}
-                <div className="absolute -right-16 -top-16 h-64 w-64 rounded-full bg-emerald-400/10 blur-2xl pointer-events-none" />
-                <div className="absolute right-32 -bottom-20 h-64 w-64 rounded-full bg-amber-400/10 blur-3xl pointer-events-none" />
+              {/* Executive Welcome Hero Dossier */}
+              <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl border border-emerald-900/20 bg-gradient-to-br from-[#042417] via-[#093a24] to-[#041c14] text-white p-4 sm:p-6 shadow-xl">
+                {/* Decorative Ambient Radiance */}
+                <div className="absolute -right-16 -top-16 h-64 w-64 rounded-full bg-emerald-400/15 blur-3xl pointer-events-none" />
+                <div className="absolute right-36 -bottom-20 h-64 w-64 rounded-full bg-amber-400/10 blur-3xl pointer-events-none" />
 
                 <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4 sm:gap-6">
-                  <div className="max-w-xl">
-                    <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-[10px] font-bold uppercase tracking-widest text-emerald-200 mb-2">
-                      <GraduationCap className="h-3 w-3 text-emerald-300" />
-                      <span>Student Portal • CBS LASUSTECH</span>
-                    </div>
-                    <h1 className="font-display text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight text-white leading-tight">
-                      Welcome back, <span className="text-emerald-300 uppercase">{String(profile.fullName || "Scholar").split(' ')[0].toUpperCase()}</span> 👋
-                    </h1>
-                    <p className="hidden sm:block mt-1 text-xs text-emerald-100/90 leading-relaxed">
-                      Access official dues clearance, custom embroidered lab coat ordering, and science academic materials.
-                    </p>
-
-                    {/* Quick Identity Tags */}
-                    <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mt-3 pt-3 border-t border-white/15 text-[10.5px] sm:text-xs">
-                      <span className="px-2 py-0.5 rounded-lg bg-white/10 text-white font-medium">
-                        🔬 {profile.department || "Computer Science"}
+                  <div className="max-w-2xl min-w-0 space-y-2.5">
+                    {/* Integrated Session & Portal Status Badges */}
+                    <div className="flex items-center gap-2 flex-wrap text-xs">
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-[10.5px] font-bold text-emerald-200">
+                        <GraduationCap className="h-3.5 w-3.5 text-emerald-300" />
+                        <span>{academicSettings.session || "2026/2027 Session"} • {academicSettings.semester || "First Semester"}</span>
                       </span>
-                      {isFresherScholar ? (
-                        <>
-                          <span className="px-2 py-0.5 rounded-lg bg-white/10 text-white font-mono font-medium">
-                            📋 App ID: {profile.matricNumber}
-                          </span>
-                          <span className="px-2 py-0.5 rounded-lg bg-amber-400/20 text-amber-200 font-bold border border-amber-400/30">
-                            🎓 Matric: Pending (100L)
-                          </span>
-                        </>
-                      ) : (
-                        <span className="px-2 py-0.5 rounded-lg bg-white/10 text-white font-mono font-medium">
-                          🆔 {profile.matricNumber || "SCHOLAR"}
+                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9.5px] font-extrabold bg-emerald-400/20 text-emerald-300 border border-emerald-400/30">
+                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                        Active Portal
+                      </span>
+                    </div>
+
+                    {/* Greeting Header */}
+                    <div>
+                      <h1 className="font-display text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight text-white leading-tight">
+                        Welcome back, <span className="text-emerald-300 uppercase">{String(profile.fullName || "Scholar").split(' ')[0]}</span> 👋
+                      </h1>
+                      
+                      {/* Identity Row */}
+                      <div className="flex flex-wrap items-center gap-2 mt-2 text-xs">
+                        <span className="px-2.5 py-1 rounded-lg bg-white/10 text-white font-medium flex items-center gap-1">
+                          🔬 {profile.department || "Basic Sciences"}
                         </span>
-                      )}
-                      <span className="px-2 py-0.5 rounded-lg bg-emerald-400/20 text-emerald-200 font-bold border border-emerald-400/30">
-                        ✓ {profile.duesStatus === 'Paid' ? `Dues Cleared (₦${duesPaidAmount.toLocaleString()})` : 'Dues Pending'}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Hero CTA Shortcuts */}
-                  <div className="grid grid-cols-2 sm:flex sm:flex-row md:flex-col gap-2 shrink-0 pt-1 sm:pt-0">
-                    <Button
-                      onClick={() => setActiveTab("store")}
-                      className="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs px-3.5 py-2 h-9 rounded-xl shadow-md gap-1.5 transition-all hover:scale-[1.02]"
-                    >
-                      <ShoppingBag className="h-3.5 w-3.5" />
-                      <span>NASS Store</span>
-                    </Button>
-                    <Button
-                      onClick={() => setActiveTab("payments")}
-                      variant="outline"
-                      className="bg-white/10 hover:bg-white/20 border-white/25 text-white font-semibold text-xs px-3.5 py-2 h-9 rounded-xl gap-1.5 transition-all"
-                    >
-                      <CreditCard className="h-3.5 w-3.5" />
-                      <span>Receipts</span>
-                    </Button>
-                  </div>
-                </div>
-              </div>
-
-              {/* 3 High-Impact Action Cards */}
-              <div className="grid gap-6 sm:grid-cols-3">
-                {/* 1. Session Dues Card */}
-                <div className="group rounded-3xl border-2 border-emerald-500/20 bg-gradient-to-br from-white via-emerald-50/30 to-white p-6 shadow-sm transition-all duration-300 hover:border-emerald-600/40 hover:shadow-lg hover:-translate-y-1 flex flex-col justify-between">
-                  <div>
-                    <div className="flex items-center justify-between">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-800 shadow-2xs group-hover:scale-105 transition-transform">
-                        <CreditCard className="h-6 w-6" />
+                        <span className="px-2.5 py-1 rounded-lg bg-white/10 text-emerald-200 font-mono font-medium">
+                          {profile.matricNumber?.startsWith("FSH") ? `App ID: ${profile.matricNumber}` : (profile.matricNumber || "SCHOLAR")}
+                        </span>
+                        <span className={`px-2.5 py-1 rounded-lg font-bold border ${
+                          profile.duesStatus === 'Paid'
+                            ? 'bg-emerald-400/20 text-emerald-200 border-emerald-400/30'
+                            : 'bg-amber-400/20 text-amber-200 border-amber-400/30'
+                        }`}>
+                          {profile.duesStatus === 'Paid' ? `✓ Dues Cleared (₦${duesPaidAmount.toLocaleString()})` : '⏳ Dues Pending (₦2,500)'}
+                        </span>
                       </div>
-                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider ${
-                        profile.duesStatus === 'Paid' 
-                          ? 'bg-emerald-100 text-emerald-800' 
-                          : 'bg-amber-100 text-amber-800'
-                      }`}>
-                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-600" />
-                        {profile.duesStatus === 'Paid' ? 'Paid & Verified' : 'Payment Due'}
-                      </span>
                     </div>
 
-                    <div className="mt-5">
-                      <h3 className="font-display text-base font-bold text-slate-900">Session Dues</h3>
-                      <p className="mt-1 font-mono text-xl font-black text-slate-900">
-                        {profile.duesStatus === 'Paid' ? `₦${duesPaidAmount.toLocaleString()}` : '₦2,500'}
-                      </p>
-                      <p className="mt-1 text-xs text-slate-500 leading-relaxed">
-                        Official 2026/2027 collegiate contribution. Enables laboratory, exams, and chapter credentials.
-                      </p>
-                    </div>
+                    {/* Inline Contact Alert if Profile Incomplete */}
+                    {isProfileIncomplete && (
+                      <div className="flex items-center justify-between gap-2 px-3 py-1.5 rounded-xl bg-amber-500/15 border border-amber-400/30 text-amber-200 text-xs mt-2">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <AlertCircle className="h-3.5 w-3.5 text-amber-400 shrink-0" />
+                          <span className="text-[11px] truncate">Add official email & phone for dues receipt delivery</span>
+                        </div>
+                        <button 
+                          onClick={() => setActiveTab("profile")} 
+                          className="text-[10.5px] font-extrabold text-white underline underline-offset-2 shrink-0 hover:text-amber-100"
+                        >
+                          Update
+                        </button>
+                      </div>
+                    )}
                   </div>
 
-                  {profile.duesStatus === "Paid" ? (
-                    <div className="mt-6 flex flex-col gap-2">
+                  {/* Contextual Action CTAs (Dynamic based on standing) */}
+                  <div className="grid grid-cols-2 sm:flex sm:flex-row md:flex-col gap-2 shrink-0 pt-1 sm:pt-0">
+                    {profile.duesStatus === "Paid" ? (
                       <Button
                         onClick={() => {
                           const duesPay = payments.find(
@@ -2312,14 +2230,95 @@ const Dashboard = () => {
                           setActiveReceipt(found);
                           setReceiptModalOpen(true);
                         }}
-                        className="w-full rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs gap-1.5 shadow-sm"
+                        className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs px-4 py-2 h-9 rounded-xl shadow-md gap-1.5 transition-all"
+                      >
+                        <Printer className="h-3.5 w-3.5" />
+                        <span>Dues Receipt</span>
+                      </Button>
+                    ) : (
+                      <Button
+                        onClick={() => setActiveTab("payments")}
+                        className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs px-4 py-2 h-9 rounded-xl shadow-md gap-1.5 transition-all animate-pulse"
+                      >
+                        <CreditCard className="h-3.5 w-3.5" />
+                        <span>Pay Dues (₦2,500)</span>
+                      </Button>
+                    )}
+
+                    <Button
+                      onClick={() => setActiveTab("store")}
+                      variant="outline"
+                      className="bg-white/10 hover:bg-white/20 border-white/25 text-white font-semibold text-xs px-4 py-2 h-9 rounded-xl gap-1.5 transition-all"
+                    >
+                      <ShoppingBag className="h-3.5 w-3.5 text-amber-300" />
+                      <span>Order Lab Coat</span>
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              {/* 3 High-Impact Action Cards */}
+              <div className="grid gap-4 sm:gap-6 sm:grid-cols-3">
+                {/* 1. Session Dues Card */}
+                <div className="group rounded-2xl sm:rounded-3xl border border-emerald-500/20 bg-gradient-to-br from-white via-emerald-50/20 to-white p-4 sm:p-6 shadow-xs transition-all duration-300 hover:border-emerald-600/40 hover:shadow-md flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex h-11 w-11 items-center justify-center rounded-xl sm:rounded-2xl bg-emerald-100 text-emerald-800 shadow-2xs group-hover:scale-105 transition-transform">
+                        <CreditCard className="h-5 w-5 sm:h-6 sm:w-6" />
+                      </div>
+                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider ${
+                        profile.duesStatus === 'Paid' 
+                          ? 'bg-emerald-100 text-emerald-800' 
+                          : 'bg-amber-100 text-amber-800'
+                      }`}>
+                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-600" />
+                        {profile.duesStatus === 'Paid' ? 'Paid & Verified' : 'Payment Due'}
+                      </span>
+                    </div>
+
+                    <div className="mt-4 sm:mt-5">
+                      <h3 className="font-display text-base font-bold text-slate-900">Session Dues</h3>
+                      <p className="mt-1 font-mono text-xl font-black text-slate-900">
+                        {profile.duesStatus === 'Paid' ? `₦${duesPaidAmount.toLocaleString()}` : '₦2,500'}
+                      </p>
+                      <p className="mt-1 text-xs text-slate-500 leading-relaxed">
+                        Official 2026/2027 collegiate contribution. Enables laboratory, exams, and chapter credentials.
+                      </p>
+                    </div>
+                  </div>
+
+                  {profile.duesStatus === "Paid" ? (
+                    <div className="mt-5 sm:mt-6 flex flex-col gap-2">
+                      <Button
+                        onClick={() => {
+                          const duesPay = payments.find(
+                            (p: any) =>
+                              String(p.payment_type || "").toLowerCase().includes("due") &&
+                              (p.status === "Paid" || String(p.status).toLowerCase() === "paid")
+                          );
+                          const found = duesPay || {
+                            reference: `NASS-DUES-${profile.matricNumber || "PAID"}`,
+                            student_name: profile.fullName || "Student Scholar",
+                            matric_number: profile.matricNumber || "",
+                            department: profile.department || "Basic Sciences",
+                            level: profile.level || "100L",
+                            payment_type: "2026/2027 Session Dues",
+                            amount: duesPaidAmount,
+                            channel: "Korapay Online",
+                            status: "Paid",
+                            created_at: new Date().toISOString(),
+                          };
+                          setActiveReceipt(found);
+                          setReceiptModalOpen(true);
+                        }}
+                        className="w-full rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs gap-1.5 shadow-sm h-9"
                       >
                         <Printer className="h-3.5 w-3.5" />
                         <span>Print / Download Dues Receipt</span>
                       </Button>
                       <Button
                         onClick={() => setActiveTab("payments")}
-                        className="w-full rounded-xl bg-white border border-slate-200/90 text-slate-800 hover:bg-emerald-50 hover:text-emerald-900 font-bold text-xs gap-1.5 shadow-2xs"
+                        className="w-full rounded-xl bg-white border border-slate-200/90 text-slate-800 hover:bg-emerald-50 hover:text-emerald-900 font-bold text-xs gap-1.5 shadow-2xs h-9"
                         variant="outline"
                       >
                         <span>View All Receipts ({payments.length})</span>
@@ -2329,11 +2328,10 @@ const Dashboard = () => {
                   ) : (
                     <Button 
                       onClick={() => setActiveTab("payments")} 
-                      className="mt-6 w-full rounded-xl bg-white border border-slate-200/90 text-slate-800 hover:bg-emerald-50 hover:text-emerald-900 font-bold text-xs gap-1.5 shadow-2xs group-hover:border-emerald-500/50" 
-                      variant="outline"
+                      className="mt-5 sm:mt-6 w-full rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs gap-1.5 shadow-sm h-9 group-hover:bg-emerald-700" 
                     >
+                      <CreditCard className="h-3.5 w-3.5" />
                       <span>Pay Session Dues (₦2,500)</span>
-                      <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
                     </Button>
                   )}
                 </div>
@@ -2346,11 +2344,11 @@ const Dashboard = () => {
                       String(p.status || "").toLowerCase() === "paid"
                   );
                   return (
-                    <div className="group rounded-3xl border-2 border-emerald-500/20 bg-gradient-to-br from-white via-emerald-50/30 to-white p-6 shadow-sm transition-all duration-300 hover:border-emerald-600/40 hover:shadow-lg hover:-translate-y-1 flex flex-col justify-between">
+                    <div className="group rounded-2xl sm:rounded-3xl border border-emerald-500/20 bg-gradient-to-br from-white via-emerald-50/20 to-white p-4 sm:p-6 shadow-xs transition-all duration-300 hover:border-emerald-600/40 hover:shadow-md flex flex-col justify-between">
                       <div>
                         <div className="flex items-center justify-between">
-                          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-800 shadow-2xs group-hover:scale-105 transition-transform">
-                            <ShoppingBag className="h-6 w-6" />
+                          <div className="flex h-11 w-11 items-center justify-center rounded-xl sm:rounded-2xl bg-emerald-100 text-emerald-800 shadow-2xs group-hover:scale-105 transition-transform">
+                            <ShoppingBag className="h-5 w-5 sm:h-6 sm:w-6" />
                           </div>
                           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-emerald-100 text-emerald-800">
                             <span className="h-1.5 w-1.5 rounded-full bg-emerald-600" />
@@ -2358,35 +2356,35 @@ const Dashboard = () => {
                           </span>
                         </div>
 
-                        <div className="mt-5">
+                        <div className="mt-4 sm:mt-5">
                           <h3 className="font-display text-base font-bold text-slate-900">NASS Store & Essentials</h3>
                           <p className="mt-1 font-mono text-xl font-black text-emerald-800">
                             {paidLabcoatOrder ? `✓ Lab Coat (${paidLabcoatOrder.size || "Ordered"})` : "Lab Coat & Manuals"}
                           </p>
                           <p className="mt-1 text-xs text-slate-500 leading-relaxed">
                             {paidLabcoatOrder
-                              ? `Official CBS Lab Coat paid & verified (${paidLabcoatOrder.reference}). Print your receipt below for collection.`
+                              ? `Official CBS Lab Coat paid & verified (${paidLabcoatOrder.reference}). Ready for collection next week Wednesday.`
                               : "Acquire customized lab coats (with custom student name embroidery) and approved practical manuals."}
                           </p>
                         </div>
                       </div>
 
                       {paidLabcoatOrder ? (
-                        <div className="mt-6 flex flex-col gap-2">
+                        <div className="mt-5 sm:mt-6 flex flex-col gap-2">
                           <Button
                             onClick={() => {
                               setActiveReceipt(paidLabcoatOrder);
                               setReceiptModalOpen(true);
                             }}
-                            className="w-full rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs gap-1.5 shadow-sm"
+                            className="w-full rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs gap-1.5 shadow-sm h-9"
                           >
                             <Printer className="h-3.5 w-3.5" />
-                            <span>Print / Download Lab Coat Receipt</span>
+                            <span>Print Lab Coat Receipt</span>
                           </Button>
                           <Button
                             onClick={() => setActiveTab("store")}
                             variant="outline"
-                            className="w-full rounded-xl bg-white border border-slate-200/90 text-slate-800 hover:bg-emerald-50 hover:text-emerald-900 font-bold text-xs gap-1.5 shadow-2xs"
+                            className="w-full rounded-xl bg-white border border-slate-200/90 text-slate-800 hover:bg-emerald-50 hover:text-emerald-900 font-bold text-xs gap-1.5 shadow-2xs h-9"
                           >
                             <ShoppingBag className="h-3.5 w-3.5" />
                             <span>Open NASS Store</span>
@@ -2395,10 +2393,10 @@ const Dashboard = () => {
                       ) : (
                         <Button 
                           onClick={() => setActiveTab("store")} 
-                          className="mt-6 w-full rounded-xl bg-[#145a32] hover:bg-[#0f4426] text-white font-bold text-xs gap-1.5 shadow-md shadow-emerald-950/15"
+                          className="mt-5 sm:mt-6 w-full rounded-xl bg-[#145a32] hover:bg-[#0f4426] text-white font-bold text-xs gap-1.5 shadow-sm h-9"
                         >
                           <ShoppingBag className="h-3.5 w-3.5" />
-                          <span>View NASS Store</span>
+                          <span>Order Lab Coat (₦6,500)</span>
                         </Button>
                       )}
                     </div>
@@ -2406,11 +2404,11 @@ const Dashboard = () => {
                 })()}
 
                 {/* 3. Science Resources Card */}
-                <div className="group rounded-3xl border-2 border-blue-500/20 bg-gradient-to-br from-white via-blue-50/30 to-white p-6 shadow-sm transition-all duration-300 hover:border-blue-600/40 hover:shadow-lg hover:-translate-y-1 flex flex-col justify-between">
+                <div className="group rounded-2xl sm:rounded-3xl border border-blue-500/20 bg-gradient-to-br from-white via-blue-50/20 to-white p-4 sm:p-6 shadow-xs transition-all duration-300 hover:border-blue-600/40 hover:shadow-md flex flex-col justify-between">
                   <div>
                     <div className="flex items-center justify-between">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-100 text-[#1a4480] shadow-2xs group-hover:scale-105 transition-transform">
-                        <BookOpen className="h-6 w-6" />
+                      <div className="flex h-11 w-11 items-center justify-center rounded-xl sm:rounded-2xl bg-blue-100 text-[#1a4480] shadow-2xs group-hover:scale-105 transition-transform">
+                        <BookOpen className="h-5 w-5 sm:h-6 sm:w-6" />
                       </div>
                       <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-blue-100 text-[#1a4480] border border-blue-200">
                         <span className="h-1.5 w-1.5 rounded-full bg-[#1a4480]" />
@@ -2418,7 +2416,7 @@ const Dashboard = () => {
                       </span>
                     </div>
 
-                    <div className="mt-5">
+                    <div className="mt-4 sm:mt-5">
                       <h3 className="font-display text-base font-bold text-slate-900">Science Resources</h3>
                       <p className="mt-1 font-mono text-xl font-black text-[#1a4480]">100L - 400L</p>
                       <p className="mt-1 text-xs text-slate-500 leading-relaxed">
@@ -2429,7 +2427,7 @@ const Dashboard = () => {
 
                   <Button 
                     onClick={() => setActiveTab("resources")} 
-                    className="mt-6 w-full rounded-xl bg-white border border-slate-200/90 text-slate-800 hover:bg-blue-50 hover:text-[#1a4480] font-bold text-xs gap-1.5 shadow-2xs group-hover:border-blue-500/50" 
+                    className="mt-5 sm:mt-6 w-full rounded-xl bg-white border border-slate-200/90 text-slate-800 hover:bg-blue-50 hover:text-[#1a4480] font-bold text-xs gap-1.5 shadow-2xs group-hover:border-blue-500/50 h-9" 
                     variant="outline"
                   >
                     <span>Browse Study Materials</span>
