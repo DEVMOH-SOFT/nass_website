@@ -1923,28 +1923,26 @@ Secretariat, NASS LASUSTECH`);
                   </div>
 
                   {/* Summary Metric Cards */}
-                  <div className="mt-4 sm:mt-6 grid grid-cols-2 gap-2.5 sm:gap-4 lg:grid-cols-4">
-                    <div className="rounded-xl sm:rounded-2xl bg-emerald-50/70 p-3 sm:p-4 border border-emerald-100 min-w-0">
-                      <p className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-emerald-800 truncate">
-                        {paymentTypeFilter === "labcoat"
-                          ? "Lab Coat Revenue"
-                          : paymentTypeFilter === "dues"
-                            ? "Total Dues Collected"
-                            : "Total Revenue Collected"}
-                      </p>
-                      <p className="mt-1 sm:mt-2 text-base sm:text-xl lg:text-2xl font-bold text-emerald-950 truncate">
-                        {isSubAdmin && (paymentTypeFilter === "labcoat" || paymentTypeFilter === "all") ? (
-                          <span className="font-mono text-slate-400">••••••••</span>
-                        ) : (
-                          formatCurrency(
+                  <div className={`mt-4 sm:mt-6 grid grid-cols-2 gap-2.5 sm:gap-4 ${isSubAdmin ? "lg:grid-cols-3" : "lg:grid-cols-4"}`}>
+                    {!isSubAdmin && (
+                      <div className="rounded-xl sm:rounded-2xl bg-emerald-50/70 p-3 sm:p-4 border border-emerald-100 min-w-0">
+                        <p className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-emerald-800 truncate">
+                          {paymentTypeFilter === "labcoat"
+                            ? "Lab Coat Revenue"
+                            : paymentTypeFilter === "dues"
+                              ? "Total Dues Collected"
+                              : "Total Revenue Collected"}
+                        </p>
+                        <p className="mt-1 sm:mt-2 text-base sm:text-xl lg:text-2xl font-bold text-emerald-950 truncate">
+                          {formatCurrency(
                             filteredStudentPayments
                               .filter(p => p.status.toLowerCase() === "paid")
                               .reduce((sum, p) => sum + Number(p.amount || 0), 0)
-                          )
-                        )}
-                      </p>
-                      <p className="mt-0.5 sm:mt-1 text-[10px] sm:text-[11px] text-emerald-700/80 font-medium truncate">From verified student receipts</p>
-                    </div>
+                          )}
+                        </p>
+                        <p className="mt-0.5 sm:mt-1 text-[10px] sm:text-[11px] text-emerald-700/80 font-medium truncate">From verified student receipts</p>
+                      </div>
+                    )}
 
                     <div className="rounded-xl sm:rounded-2xl bg-blue-50/70 p-3 sm:p-4 border border-blue-100 min-w-0">
                       <p className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-blue-800 truncate">
@@ -2070,7 +2068,7 @@ Secretariat, NASS LASUSTECH`);
                           <th className="py-2.5 sm:py-3 px-3 sm:px-4">Student & Matric</th>
                           <th className="py-2.5 sm:py-3 px-3 sm:px-4">Category & Ref</th>
                           <th className="py-2.5 sm:py-3 px-3 sm:px-4">Department / Level</th>
-                          <th className="py-2.5 sm:py-3 px-3 sm:px-4">Amount</th>
+                          {!isSubAdmin && <th className="py-2.5 sm:py-3 px-3 sm:px-4">Amount</th>}
                           <th className="py-2.5 sm:py-3 px-3 sm:px-4">Channel / Date</th>
                           <th className="py-2.5 sm:py-3 px-3 sm:px-4 text-center">Status</th>
                         </tr>
@@ -2078,7 +2076,7 @@ Secretariat, NASS LASUSTECH`);
                       <tbody className="divide-y divide-border/60">
                         {filteredStudentPayments.length === 0 ? (
                           <tr>
-                            <td colSpan={6} className="py-12 text-center text-muted-foreground">
+                            <td colSpan={isSubAdmin ? 5 : 6} className="py-12 text-center text-muted-foreground">
                               <Receipt className="mx-auto h-8 w-8 opacity-40 mb-2" />
                               <p className="font-medium">No payment records found matching your filters.</p>
                               <p className="text-xs mt-1">Try resetting the search filters above.</p>
@@ -2157,13 +2155,11 @@ Secretariat, NASS LASUSTECH`);
                                 <div className="text-slate-800">{record.department}</div>
                                 <div className="text-xs text-muted-foreground">{record.level}</div>
                               </td>
-                              <td className="py-3 px-4 font-bold text-slate-900">
-                                {isSubAdmin && isLabCoatRecord(record) ? (
-                                  <span className="font-mono text-slate-400 text-xs tracking-widest">••••••</span>
-                                ) : (
-                                  formatCurrency(record.amount)
-                                )}
-                              </td>
+                              {!isSubAdmin && (
+                                <td className="py-3 px-4 font-bold text-slate-900">
+                                  {formatCurrency(record.amount)}
+                                </td>
+                              )}
                               <td className="py-3 px-4">
                                 <div className="text-xs font-medium text-slate-700">{record.channel}</div>
                                 <div className="text-[11px] text-muted-foreground">
