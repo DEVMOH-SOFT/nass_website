@@ -1744,9 +1744,8 @@ Secretariat, NASS LASUSTECH`);
                     <p className="text-[10px] sm:text-xs uppercase tracking-widest text-muted-foreground">Total Dues Collected</p>
                     <p className="mt-1 sm:mt-2 text-xl sm:text-2xl font-bold truncate">
                       {formatCurrency(
-                        votingDashboard?.totals?.totalAmount ||
-                        filteredStudentPayments
-                          .filter(p => p.status.toLowerCase() === "paid")
+                        getAllStudentPayments()
+                          .filter(p => p.status?.toLowerCase() === "paid" && String(p.payment_type || "").toLowerCase().includes("due"))
                           .reduce((sum, p) => sum + Number(p.amount || 0), 0)
                       )}
                     </p>
