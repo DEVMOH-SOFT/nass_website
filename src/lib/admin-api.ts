@@ -76,6 +76,24 @@ export const loginToAdminSystems = async (username: string, password: string) =>
   const isAuthorizedPassword = password === "admin_nass2026" || password === "admin_nass_2026";
   const isValidAdminUser = username.toLowerCase() === "admin" || username.toLowerCase() === "nassadmin";
 
+  // ── Sub-admin: Likinyo Ayomipo Deborah (matric: 230302010026) ──────────────
+  const cleanUser = username.trim().toUpperCase();
+  const isAyeoUser = cleanUser === "230302010026" || cleanUser === "AYEO" || cleanUser === "LIKINYO";
+  const subAdminPasswordValid = (p: string) => {
+    const c = p.trim().toLowerCase();
+    return c === "likinyo" || c === "ayomipo" || c === "deborah" || c === "ayeo" || c === "lasustech" || c === "nass2026" || c === "admin_nass2026";
+  };
+  if (isAyeoUser && subAdminPasswordValid(password)) {
+    const activeUser = {
+      name: "Likinyo Ayomipo (Ayeo)",
+      username: "230302010026",
+      role: "sub-admin",
+    };
+    localStorage.setItem("adminUser", JSON.stringify(activeUser));
+    return { main: { user: activeUser }, voting: null, mainError: null, votingError: null };
+  }
+  // ───────────────────────────────────────────────────────────────────────────
+
   if (!mainPayload && !votingPayload) {
     if (isValidAdminUser && isAuthorizedPassword) {
       const activeUser = {

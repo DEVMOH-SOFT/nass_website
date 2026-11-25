@@ -52,6 +52,7 @@ const AdminPortal = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberTerminal, setRememberTerminal] = useState(true);
   const [adminUser, setAdminUser] = useState<any>(null);
+  const isSubAdmin = adminUser?.role === "sub-admin";
   const [credentials, setCredentials] = useState({ username: "", password: "" });
   const [dashboard, setDashboard] = useState<any>(null);
   const [students, setStudents] = useState<any[]>([]);
@@ -698,7 +699,14 @@ Secretariat, NASS LASUSTECH`);
         if (onlyPaid.length !== verified.length) {
           localStorage.setItem("nass_verified_payments", JSON.stringify(onlyPaid));
         }
-        list.push(...onlyPaid);
+        let filteredPaid = onlyPaid;
+        if (isSubAdmin) {
+          filteredPaid = filteredPaid.filter((p: any) => {
+            const pt = String(p?.payment_type || p?.id || "").toLowerCase();
+            return !pt.includes("lab coat") && !pt.includes("labcoat");
+          });
+        }
+        list.push(...filteredPaid);
       }
     } catch (e) {}
 
@@ -711,6 +719,10 @@ Secretariat, NASS LASUSTECH`);
       // 2a. Include any confirmed CBS Lab Coat / Store orders stored on the student's Supabase record
       const storeOrders = parseStudentStoreOrders(st);
       for (const order of storeOrders) {
+        if (isSubAdmin) {
+          const pt = String(order.payment_type || order.id || "").toLowerCase();
+          if (pt.includes("lab coat") || pt.includes("labcoat")) continue;
+        }
         if (!list.some((p) => p.reference === order.reference)) {
           list.push(order);
         }
@@ -790,6 +802,14 @@ Secretariat, NASS LASUSTECH`);
   });
 
   const handleDownloadPaymentsCSV = () => {
+    if (isSubAdmin) {
+      toast({
+        title: "Access Restricted",
+        description: "You do not have permission to export or download CSV records.",
+        variant: "destructive",
+      });
+      return;
+    }
     const records = filteredStudentPayments;
     if (records.length === 0) {
       toast({ title: "No records to export", description: "No payment records match your current filter.", variant: "destructive" });
@@ -1397,7 +1417,7 @@ Secretariat, NASS LASUSTECH`);
                     {/* Username Input */}
                     <div className="space-y-1.5">
                       <label className="text-[11px] font-bold uppercase tracking-wider text-emerald-200/90 block">
-                        Administrator Username
+                        Administrator Username or Matric Number
                       </label>
                       <div className="relative">
                         <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-emerald-400/80">
@@ -1407,7 +1427,7 @@ Secretariat, NASS LASUSTECH`);
                           type="text"
                           value={credentials.username}
                           onChange={(e) => setCredentials({ ...credentials, username: e.target.value })}
-                          placeholder="Enter admin username"
+                          placeholder="Enter admin username or matric number"
                           required
                           className="h-12 pl-10 pr-4 rounded-xl bg-black/40 border-white/15 text-white placeholder:text-white/30 text-sm focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20 transition-all font-medium"
                         />
@@ -1427,7 +1447,7 @@ Secretariat, NASS LASUSTECH`);
                           type={showPassword ? "text" : "password"}
                           value={credentials.password}
                           onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
-                          placeholder="Enter security passphrase"
+                          placeholder="Enter security passphrase or password"
                           required
                           className="h-12 pl-10 pr-11 rounded-xl bg-black/40 border-white/15 text-white placeholder:text-white/30 text-sm focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20 transition-all font-mono"
                         />
@@ -1785,13 +1805,15 @@ Secretariat, NASS LASUSTECH`);
                         <Printer className="h-4 w-4" />
                         Print Summary
                       </Button>
-                      <Button
-                        onClick={handleDownloadPaymentsCSV}
-                        className="w-full sm:w-auto rounded-xl bg-[#062018] text-white hover:bg-[#062018]/90 font-semibold gap-2 shadow-sm justify-center text-xs sm:text-sm h-10"
-                      >
-                        <FileSpreadsheet className="h-4 w-4" />
-                        Download CSV / Excel
-                      </Button>
+                      {!isSubAdmin && (
+                        <Button
+                          onClick={handleDownloadPaymentsCSV}
+                          className="w-full sm:w-auto rounded-xl bg-[#062018] text-white hover:bg-[#062018]/90 font-semibold gap-2 shadow-sm justify-center text-xs sm:text-sm h-10"
+                        >
+                          <FileSpreadsheet className="h-4 w-4" />
+                          Download CSV / Excel
+                        </Button>
+                      )}
                     </div>
                   </div>
 
@@ -1903,7 +1925,7 @@ Secretariat, NASS LASUSTECH`);
                       >
                         <option value="all">All Payment Types</option>
                         <option value="dues">Collegiate Session Dues</option>
-                        <option value="labcoat">Official Lab Coats</option>
+                        {!isSubAdmin && <option value="labcoat">Official Lab Coats</option>}
                         <option value="books">Practical Manuals & Hardcover Books</option>
                         <option value="award">Awards & Voting Payments</option>
                       </select>
@@ -2007,13 +2029,15 @@ Secretariat, NASS LASUSTECH`);
                     <span>
                       Showing <strong className="text-slate-800">{filteredStudentPayments.length}</strong> record{filteredStudentPayments.length === 1 ? "" : "s"}
                     </span>
-                    <button
-                      onClick={handleDownloadPaymentsCSV}
-                      className="text-primary hover:underline font-semibold flex items-center gap-1"
-                    >
-                      <Download className="h-3.5 w-3.5" />
-                      Export filtered records as CSV
-                    </button>
+                    {!isSubAdmin && (
+                      <button
+                        onClick={handleDownloadPaymentsCSV}
+                        className="text-primary hover:underline font-semibold flex items-center gap-1"
+                      >
+                        <Download className="h-3.5 w-3.5" />
+                        Export filtered records as CSV
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -2122,7 +2146,10 @@ Secretariat, NASS LASUSTECH`);
                       </div>
 
                       <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
-                        {["all", "labcoat", "jersey", "manual", "gear", "general"].map((cat) => (
+                        {(isSubAdmin
+                          ? ["all", "jersey", "manual", "gear", "general"]
+                          : ["all", "labcoat", "jersey", "manual", "gear", "general"]
+                        ).map((cat) => (
                           <button
                             key={cat}
                             onClick={() => setStoreCategoryFilter(cat)}
@@ -2397,7 +2424,7 @@ Secretariat, NASS LASUSTECH`);
                               onChange={(e) => setProductForm({ ...productForm, category: e.target.value as any })}
                               className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-medium text-slate-800"
                             >
-                              <option value="labcoat">Lab Coat (Custom Embroidery)</option>
+                              {!isSubAdmin && <option value="labcoat">Lab Coat (Custom Embroidery)</option>}
                               <option value="jersey">Sport Jersey</option>
                               <option value="manual">Practical Manual</option>
                               <option value="gear">Collegiate Gear</option>
