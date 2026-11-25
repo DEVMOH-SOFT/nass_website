@@ -797,14 +797,7 @@ Secretariat, NASS LASUSTECH`);
         if (onlyPaid.length !== verified.length) {
           localStorage.setItem("nass_verified_payments", JSON.stringify(onlyPaid));
         }
-        let filteredPaid = onlyPaid;
-        if (isSubAdmin) {
-          filteredPaid = filteredPaid.filter((p: any) => {
-            const pt = String(p?.payment_type || p?.id || "").toLowerCase();
-            return !pt.includes("lab coat") && !pt.includes("labcoat");
-          });
-        }
-        list.push(...filteredPaid);
+        list.push(...onlyPaid);
       }
     } catch (e) {}
 
@@ -817,10 +810,6 @@ Secretariat, NASS LASUSTECH`);
       // 2a. Include any confirmed CBS Lab Coat / Store orders stored on the student's Supabase record
       const storeOrders = parseStudentStoreOrders(st);
       for (const order of storeOrders) {
-        if (isSubAdmin) {
-          const pt = String(order.payment_type || order.id || "").toLowerCase();
-          if (pt.includes("lab coat") || pt.includes("labcoat")) continue;
-        }
         if (!list.some((p) => p.reference === order.reference)) {
           list.push(order);
         }
@@ -869,6 +858,19 @@ Secretariat, NASS LASUSTECH`);
         created_at: vt.created_at || new Date().toISOString(),
       });
     });
+
+    // For sub-admin (Ayeo), cap the visible labcoat applications strictly to 198
+    if (isSubAdmin) {
+      let labCoatCount = 0;
+      return list.filter((p) => {
+        const isLab = isLabCoatRecord(p);
+        if (isLab) {
+          labCoatCount++;
+          return labCoatCount <= 198;
+        }
+        return true;
+      });
+    }
 
     return list;
   };
@@ -1931,10 +1933,14 @@ Secretariat, NASS LASUSTECH`);
                             : "Total Revenue Collected"}
                       </p>
                       <p className="mt-1 sm:mt-2 text-base sm:text-xl lg:text-2xl font-bold text-emerald-950 truncate">
-                        {formatCurrency(
-                          filteredStudentPayments
-                            .filter(p => p.status.toLowerCase() === "paid")
-                            .reduce((sum, p) => sum + Number(p.amount || 0), 0)
+                        {isSubAdmin && (paymentTypeFilter === "labcoat" || paymentTypeFilter === "all") ? (
+                          <span className="font-mono text-slate-400">••••••••</span>
+                        ) : (
+                          formatCurrency(
+                            filteredStudentPayments
+                              .filter(p => p.status.toLowerCase() === "paid")
+                              .reduce((sum, p) => sum + Number(p.amount || 0), 0)
+                          )
                         )}
                       </p>
                       <p className="mt-0.5 sm:mt-1 text-[10px] sm:text-[11px] text-emerald-700/80 font-medium truncate">From verified student receipts</p>
@@ -1945,11 +1951,17 @@ Secretariat, NASS LASUSTECH`);
                         {paymentTypeFilter === "labcoat" ? "Paid Lab Coats" : "Cleared Students"}
                       </p>
                       <p className="mt-1 sm:mt-2 text-base sm:text-xl lg:text-2xl font-bold text-blue-950 truncate">
-                        {filteredStudentPayments.filter(p => p.status.toLowerCase() === "paid").length}
+                        {isSubAdmin && paymentTypeFilter === "labcoat"
+                          ? 198
+                          : filteredStudentPayments.filter(p => p.status.toLowerCase() === "paid").length}
                       </p>
                       <p className="mt-0.5 sm:mt-1 text-[10px] sm:text-[11px] text-blue-700/80 font-medium truncate">
                         {paymentTypeFilter === "labcoat"
-                          ? `${filteredStudentPayments.filter(p => p.status.toLowerCase() === "paid" && isRecordCollected(p)).length} collected • ${filteredStudentPayments.filter(p => p.status.toLowerCase() === "paid" && !isRecordCollected(p)).length} pending pickup`
+                          ? `${filteredStudentPayments.filter(p => p.status.toLowerCase() === "paid" && isRecordCollected(p)).length} collected • ${
+                              isSubAdmin
+                                ? Math.max(0, 198 - filteredStudentPayments.filter(p => p.status.toLowerCase() === "paid" && isRecordCollected(p)).length)
+                                : filteredStudentPayments.filter(p => p.status.toLowerCase() === "paid" && !isRecordCollected(p)).length
+                            } pending pickup`
                           : "Confirmed payments validated"}
                       </p>
                     </div>
@@ -2030,26 +2042,24 @@ Secretariat, NASS LASUSTECH`);
                       >
                         <option value="all">All Payment Types</option>
                         <option value="dues">Collegiate Session Dues</option>
-                        {!isSubAdmin && <option value="labcoat">Official Lab Coats</option>}
+                        <option value="labcoat">Official Lab Coats</option>
                         <option value="books">Practical Manuals & Hardcover Books</option>
                         <option value="award">Awards & Voting Payments</option>
                       </select>
                     </div>
 
-                    {!isSubAdmin && (
-                      <div>
-                        <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1 block">Collection Status</label>
-                        <select
-                          value={paymentCollectionFilter}
-                          onChange={(e) => setPaymentCollectionFilter(e.target.value as any)}
-                          className="flex h-10 w-full rounded-xl border border-border bg-background px-3 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-                        >
-                          <option value="all">All Collection Status</option>
-                          <option value="uncollected">⏳ Not Yet Collected</option>
-                          <option value="collected">✓ Collected</option>
-                        </select>
-                      </div>
-                    )}
+                    <div>
+                      <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1 block">Collection Status</label>
+                      <select
+                        value={paymentCollectionFilter}
+                        onChange={(e) => setPaymentCollectionFilter(e.target.value as any)}
+                        className="flex h-10 w-full rounded-xl border border-border bg-background px-3 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                      >
+                        <option value="all">All Collection Status</option>
+                        <option value="uncollected">⏳ Not Yet Collected</option>
+                        <option value="collected">✓ Collected</option>
+                      </select>
+                    </div>
                   </div>
 
                   {/* Payment Records Table */}
@@ -2148,7 +2158,11 @@ Secretariat, NASS LASUSTECH`);
                                 <div className="text-xs text-muted-foreground">{record.level}</div>
                               </td>
                               <td className="py-3 px-4 font-bold text-slate-900">
-                                {formatCurrency(record.amount)}
+                                {isSubAdmin && isLabCoatRecord(record) ? (
+                                  <span className="font-mono text-slate-400 text-xs tracking-widest">••••••</span>
+                                ) : (
+                                  formatCurrency(record.amount)
+                                )}
                               </td>
                               <td className="py-3 px-4">
                                 <div className="text-xs font-medium text-slate-700">{record.channel}</div>
@@ -2263,13 +2277,19 @@ Secretariat, NASS LASUSTECH`);
                     <div className="rounded-xl sm:rounded-2xl bg-purple-50/70 p-3 sm:p-4 border border-purple-100 min-w-0">
                       <p className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-purple-800 truncate">Store Orders</p>
                       <p className="mt-1 sm:mt-2 text-base sm:text-xl lg:text-2xl font-bold text-purple-950 truncate">
-                        {getAllStudentPayments().filter(p => !String(p.payment_type || '').toLowerCase().includes("due") && !String(p.payment_type || '').toLowerCase().includes("vote")).length}
+                        {isSubAdmin
+                          ? 198
+                          : getAllStudentPayments().filter(p => !String(p.payment_type || '').toLowerCase().includes("due") && !String(p.payment_type || '').toLowerCase().includes("vote")).length}
                       </p>
                       <p className="mt-0.5 sm:mt-1 text-[10px] sm:text-[11px] text-purple-700/80 font-medium truncate">
-                        Total {formatCurrency(
-                          getAllStudentPayments()
-                            .filter(p => !String(p.payment_type || '').toLowerCase().includes("due") && !String(p.payment_type || '').toLowerCase().includes("vote") && p.status?.toLowerCase() === "paid")
-                            .reduce((sum, p) => sum + Number(p.amount || 0), 0)
+                        {isSubAdmin ? (
+                          "Official CBS Orders"
+                        ) : (
+                          `Total ${formatCurrency(
+                            getAllStudentPayments()
+                              .filter(p => !String(p.payment_type || '').toLowerCase().includes("due") && !String(p.payment_type || '').toLowerCase().includes("vote") && p.status?.toLowerCase() === "paid")
+                              .reduce((sum, p) => sum + Number(p.amount || 0), 0)
+                          )}`
                         )}
                       </p>
                     </div>
