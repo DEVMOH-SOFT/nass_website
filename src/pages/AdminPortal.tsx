@@ -614,6 +614,104 @@ Secretariat, NASS LASUSTECH`);
   const [paymentStatusFilter, setPaymentStatusFilter] = useState("all");
   const [paymentDeptFilter, setPaymentDeptFilter] = useState("all");
   const [paymentTypeFilter, setPaymentTypeFilter] = useState("all");
+  const [paymentCollectionFilter, setPaymentCollectionFilter] = useState<"all" | "collected" | "uncollected">("all");
+  const [collectedMap, setCollectedMap] = useState<Record<string, boolean>>(() => {
+    try {
+      return JSON.parse(localStorage.getItem("nass_labcoat_collected") || "{}");
+    } catch {
+      return {};
+    }
+  });
+
+  const isLabCoatRecord = (r: any) => {
+    const pt = String(r?.payment_type || r?.id || "").toLowerCase();
+    return Boolean(r?.labcoat_name) || pt.includes("lab coat") || pt.includes("labcoat");
+  };
+
+  const isRecordCollected = (r: any) => {
+    const key = r?.reference || r?.id || r?.matric_number;
+    if (key && collectedMap[key] !== undefined) {
+      return Boolean(collectedMap[key]);
+    }
+    return Boolean(r?.collected);
+  };
+
+  const toggleLabcoatCollected = async (record: any) => {
+    const key = record.reference || record.id || record.matric_number;
+    if (!key) return;
+
+    const currentStatus = isRecordCollected(record);
+    const newStatus = !currentStatus;
+
+    // 1. Update local state immediately
+    const updatedMap = { ...collectedMap, [key]: newStatus };
+    setCollectedMap(updatedMap);
+
+    // 2. Persist to localStorage
+    try {
+      localStorage.setItem("nass_labcoat_collected", JSON.stringify(updatedMap));
+    } catch (e) {}
+
+    // 3. Sync to Supabase emergency_contact JSON if configured
+    const matric = record.matric_number;
+    if (matric && isSupabaseConfigured()) {
+      try {
+        const student = (students || []).find(
+          (s: any) =>
+            (s.matric_number || s.matric_no || s.matric || "").toLowerCase() === matric.toLowerCase()
+        );
+        if (student && student.emergency_contact) {
+          let parsed: any[] = [];
+          try {
+            parsed = JSON.parse(student.emergency_contact);
+            if (!Array.isArray(parsed)) parsed = [parsed];
+          } catch {}
+
+          let changed = false;
+          parsed = parsed.map((item: any) => {
+            if (
+              item.reference === record.reference ||
+              item.id === record.id ||
+              String(item.payment_type || "").toLowerCase().includes("lab")
+            ) {
+              changed = true;
+              return {
+                ...item,
+                collected: newStatus,
+                collected_at: newStatus ? new Date().toISOString() : null,
+              };
+            }
+            return item;
+          });
+
+          if (changed) {
+            await supabase
+              .from("students")
+              .update({
+                emergency_contact: JSON.stringify(parsed),
+                updated_at: new Date().toISOString(),
+              })
+              .ilike("matric_number", matric);
+
+            setStudents((prev) =>
+              prev.map((s) =>
+                (s.matric_number || s.matric_no || s.matric || "").toLowerCase() === matric.toLowerCase()
+                  ? { ...s, emergency_contact: JSON.stringify(parsed) }
+                  : s
+              )
+            );
+          }
+        }
+      } catch (err: any) {
+        console.error("Failed to sync collected status to Supabase:", err);
+      }
+    }
+
+    toast({
+      title: newStatus ? "Marked as Collected" : "Marked as Not Collected",
+      description: `${record.student_name} (${record.labcoat_name || record.matric_number || "Lab Coat"})`,
+    });
+  };
 
   const handleUploadPastQuestion = (e: React.FormEvent) => {
     e.preventDefault();
@@ -788,6 +886,11 @@ Secretariat, NASS LASUSTECH`);
       if (paymentTypeFilter === "labcoat" && !type.includes("lab coat") && !type.includes("labcoat")) return false;
       if (paymentTypeFilter === "books" && !type.includes("manual") && !type.includes("book")) return false;
       if (paymentTypeFilter === "award" && !type.includes("vote") && !type.includes("award")) return false;
+    }
+    if (paymentCollectionFilter !== "all" && isLabCoatRecord(pay)) {
+      const collected = isRecordCollected(pay);
+      if (paymentCollectionFilter === "collected" && !collected) return false;
+      if (paymentCollectionFilter === "uncollected" && collected) return false;
     }
     if (paymentSearch.trim()) {
       const q = paymentSearch.toLowerCase();
@@ -1845,7 +1948,9 @@ Secretariat, NASS LASUSTECH`);
                         {filteredStudentPayments.filter(p => p.status.toLowerCase() === "paid").length}
                       </p>
                       <p className="mt-0.5 sm:mt-1 text-[10px] sm:text-[11px] text-blue-700/80 font-medium truncate">
-                        {paymentTypeFilter === "labcoat" ? "Confirmed lab coat orders" : "Confirmed payments validated"}
+                        {paymentTypeFilter === "labcoat"
+                          ? `${filteredStudentPayments.filter(p => p.status.toLowerCase() === "paid" && isRecordCollected(p)).length} collected • ${filteredStudentPayments.filter(p => p.status.toLowerCase() === "paid" && !isRecordCollected(p)).length} pending pickup`
+                          : "Confirmed payments validated"}
                       </p>
                     </div>
 
@@ -1869,7 +1974,7 @@ Secretariat, NASS LASUSTECH`);
 
                 {/* Filters & Search Toolbar */}
                 <div className="rounded-2xl sm:rounded-[2rem] bg-white p-4 sm:p-6 shadow-sm border border-border/40">
-                  <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+                  <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
                     <div className="sm:col-span-2 lg:col-span-1">
                       <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1 block">Search Records</label>
                       <div className="relative">
@@ -1930,6 +2035,21 @@ Secretariat, NASS LASUSTECH`);
                         <option value="award">Awards & Voting Payments</option>
                       </select>
                     </div>
+
+                    {!isSubAdmin && (
+                      <div>
+                        <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1 block">Collection Status</label>
+                        <select
+                          value={paymentCollectionFilter}
+                          onChange={(e) => setPaymentCollectionFilter(e.target.value as any)}
+                          className="flex h-10 w-full rounded-xl border border-border bg-background px-3 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                        >
+                          <option value="all">All Collection Status</option>
+                          <option value="uncollected">⏳ Not Yet Collected</option>
+                          <option value="collected">✓ Collected</option>
+                        </select>
+                      </div>
+                    )}
                   </div>
 
                   {/* Payment Records Table */}
@@ -1958,7 +2078,36 @@ Secretariat, NASS LASUSTECH`);
                           filteredStudentPayments.map((record, i) => (
                             <tr key={record.id || i} className="hover:bg-muted/10 transition">
                               <td className="py-3 px-4">
-                                <div className="font-semibold text-slate-900">{record.student_name}</div>
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <div className="font-semibold text-slate-900">{record.student_name}</div>
+                                  {isLabCoatRecord(record) && (
+                                    <button
+                                      type="button"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        toggleLabcoatCollected(record);
+                                      }}
+                                      title={isRecordCollected(record) ? "Click to unmark as collected" : "Click to mark as collected"}
+                                      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase transition-all shadow-xs cursor-pointer ${
+                                        isRecordCollected(record)
+                                          ? "bg-emerald-600 hover:bg-emerald-700 text-white"
+                                          : "bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300"
+                                      }`}
+                                    >
+                                      {isRecordCollected(record) ? (
+                                        <>
+                                          <CheckCircle2 className="h-3 w-3" />
+                                          Collected
+                                        </>
+                                      ) : (
+                                        <>
+                                          <Package className="h-3 w-3" />
+                                          Mark Collected
+                                        </>
+                                      )}
+                                    </button>
+                                  )}
+                                </div>
                                 <div className="text-xs font-mono text-muted-foreground">{record.matric_number}</div>
                               </td>
                               <td className="py-3 px-4">
@@ -1967,8 +2116,13 @@ Secretariat, NASS LASUSTECH`);
                                 {(record.labcoat_name || record.jersey_name || record.size || record.whatsapp_number) && (
                                   <div className="flex flex-wrap gap-1 mt-1 text-[10px]">
                                     {record.labcoat_name && (
-                                      <span className="bg-amber-100 text-amber-900 px-1.5 py-0.5 rounded font-mono font-bold">
+                                      <span className="bg-amber-100 text-amber-900 px-1.5 py-0.5 rounded font-mono font-bold inline-flex items-center gap-1.5">
                                         Labcoat: {record.labcoat_name}
+                                        {isRecordCollected(record) && (
+                                          <span className="bg-emerald-700 text-white text-[9px] px-1 py-0.2 rounded font-sans uppercase font-extrabold">
+                                            ✓ Collected
+                                          </span>
+                                        )}
                                       </span>
                                     )}
                                     {record.jersey_name && (

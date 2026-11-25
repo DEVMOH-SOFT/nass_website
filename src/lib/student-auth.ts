@@ -738,6 +738,8 @@ export const parseStudentStoreOrders = (student?: Partial<StudentRecord> | any |
         labcoat_name: o.labcoat_name,
         jersey_name: o.jersey_name,
         jersey_number: o.jersey_number,
+        collected: Boolean(o.collected),
+        collected_at: o.collected_at || null,
         channel: o.channel || "Korapay Online",
         status: "Paid",
         created_at: o.created_at || student.updated_at || new Date().toISOString(),
